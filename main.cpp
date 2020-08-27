@@ -44,8 +44,8 @@ int main(int argc, char *argv[]){
     //Create new file
     std::string file = filename;
     
-    //Append filename with value of n, for example filename_n.csv
-    file.append("_" + std::to_string(n));
+    //Append filename with value of n, and give type; i.e filename_n.csv
+    file.append("_" + std::to_string(n) + ".csv");
 
     //Calculation starts here
      
@@ -55,6 +55,8 @@ int main(int argc, char *argv[]){
     ofile.open(file);
     //Write to file here
     //can format the output data later
+    ofile << "Testing   ";
+    ofile << "Tester" << std::endl;
 
     ofile.close();
 
