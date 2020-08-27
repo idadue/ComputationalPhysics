@@ -26,16 +26,16 @@ int main(int argc, char *argv[]){
     //Read in the name of the output file, and the exponent n
     if (argc <= 1) {
         //If no commands are specified, exit program
-        //Can also provide a standard set of values
-        std::cout << "Bad Usage: " << argv[0] << " read also file name on same line and max power 10^n" << std::endl;
+        //Could instead provide a standard set of values
+        std::cout << "Bad Usage: " << argv[0] << " Missing arguments" << std::endl;
         exit(1);
     }
     else {
         filename = argv[1]; // first command line argument after name of program
-        n = atoi(argv[2]);
-        a = atoi(argv[3]);
-        b = atoi(argv[4]);
-        c = atoi(argv[5]);
+        n = std::atoi(argv[2]);
+        a = std::atoi(argv[3]);
+        b = std::atoi(argv[4]);
+        c = std::atoi(argv[5]);
     }
     
 
