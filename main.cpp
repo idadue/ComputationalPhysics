@@ -24,10 +24,10 @@ int main(int argc, char *argv[]){
     int c;
 
     //Read in the name of the output file, and the exponent n
-    if (argc <= 1) {
+    if (argc < 6) {
         //If no commands are specified, exit program
         //Could instead provide a standard set of values
-        std::cout << "Bad Usage: " << argv[0] << " Missing arguments" << std::endl;
+        std::cout << "Bad Usage: " << argv[0] << " is missing arguments" << std::endl;
         exit(1);
     }
     else {
