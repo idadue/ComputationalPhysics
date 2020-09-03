@@ -99,8 +99,8 @@ int main(int argc, char *argv[]){
     ofile.open(file);
     //Write to file here
     //can format the output data later
-    ofile << "Numeric:   ";
-    ofile << "Analytic:  ";
+    ofile << "Numeric:,";
+    ofile << "Analytic:,";
     ofile << "Relative Error:" << std::endl;
 
     double * v = new double[n];
@@ -108,11 +108,10 @@ int main(int argc, char *argv[]){
 
     for ( int i = 0; i < n; i++) {
       v[i] = 1 - (1 - std::exp(-10))*(i + 1)*h - std::exp(-10*(i + 1)*h);
-      std::cout << std::setprecision(15) << v[i] << " | " << u[i] << " | " << v[i] - u[i] << " | " << ((v[i] - u[i]) / v[i]) << std::endl;
       relative_err[i] = ((v[i] - u[i]) / v[i]);
-      ofile << u[i];
-      ofile << "   " << v[i];
-      ofile << "   " <<  relative_err[i] << std::endl;
+      ofile << u[i] << ",";
+      ofile << v[i] << ",";
+      ofile <<  relative_err[i] << std::endl;
     }//printing current results compared with the analytic solution
 
     ofile.close();
