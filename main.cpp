@@ -1,10 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "time.h"
 
 //include setw, setprecision, etc
 #include <iomanip>
-
 #include <cmath> //needed for exp
 
 
@@ -52,25 +52,30 @@ int main(int argc, char *argv[]){
 
     //Calculation starts here
 
+    //Time the execution of the algorithm
+    std::clock_t start, finish;
+    start = std::clock();
+
     //Vector versions of the input values from command line
-    double v_a[n-1];
-    double v_b[n];
-    double v_c[n-1];
-    double h = 1.0/(n+1);
-    for ( int i = 0; i < n-1; i++) {
+    double * v_a = new double [n-1];
+    double * v_b = new double [n];
+    double * v_c = new double [n-1];
+    double h = 1.0 / (n + 1);
+
+    for (int i = 0; i < n-1; i++) {
       v_a[i] = a;
       v_c[i] = c;
     };
     //Vector value of the right side of the equation, h²*f(x_i)
-    double v_g[n];
+    double * v_g = new double[n];
     for ( int i = 0; i < n; i++) {
       v_g[i] = h*h*100*exp(-10*(i+1)*h);
       v_b[i] = b;
     };
 
-    double B[n]; //Diagonal values after forward substitution
-    double G[n]; //b_tilde values after forward substitution
-    double u[n]; //the vector we're trying to solve, final answer
+    double * B = new double[n]; //Diagonal values after forward substitution
+    double * G = new double[n]; //b_tilde values after forward substitution
+    double * u = new double[n]; //the vector we're trying to solve, final answer
 
     G[0] = v_g[0];
     B[0] = v_b[0]; //Forward substitution leaves the first element of b and g unchanged
@@ -86,25 +91,38 @@ int main(int argc, char *argv[]){
       u[i] = (G[i] - v_c[i]*u[i+1])/B[i];
     } //Solving all other rows
 
+    finish = std::clock();
+    std::cout << "Execution time: " << float(finish - start) / CLOCKS_PER_SEC << " seconds" << std::endl;
     //Calculation ends here
 
     //Open and close file
     ofile.open(file);
     //Write to file here
     //can format the output data later
-    ofile << "Numeric   ";
-    ofile << "Analytic" << std::endl;
+    ofile << "Numeric:,";
+    ofile << "Analytic:,";
+    ofile << "Relative Error:" << std::endl;
 
-    double v[n];
+    double * v = new double[n];
+    double * relative_err = new double[n];
 
     for ( int i = 0; i < n; i++) {
-      ofile << u[i];
-      v[i] = 1 - (1 - exp(-10))*(i+1)*h - exp(-10*(i+1)*h);
-      ofile << "   " << v[i] << std::endl;
+      v[i] = 1 - (1 - std::exp(-10))*(i + 1)*h - std::exp(-10*(i + 1)*h);
+      relative_err[i] = ((v[i] - u[i]) / v[i]);
+      ofile << u[i] << ",";
+      ofile << v[i] << ",";
+      ofile <<  relative_err[i] << std::endl;
     }//printing current results compared with the analytic solution
 
     ofile.close();
 
+
+    delete[] v_a, v_b, v_c, v_g;
+    delete[] B, G, u;
+    delete[] relative_err;
+    v_a, v_b, v_c, v_g = NULL;
+    B, G, u = NULL;
+    relative_err = NULL;
 
     return 0;
 }
