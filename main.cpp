@@ -10,13 +10,17 @@
 //TODO Find also the precise number of floating point operations needed to solve the above equations.
 
 double* generalSolver(int n, double h, int a, int b, int c) {
-    //Function that solves the general equation on
-    //the form Av = b
+    /*
+    This function solves the general equation Av = h^2 *f
 
-    //a_v --- vector of constants a_1...a_n-1
-    //b_v --- vector of constants b_1...b_n
-    //c_v --- vector of constants c_1...c_n-1
-    //b_tilde = h²*f(x_i)
+    a_v --- vector of constants a_1...a_n-1
+    b_v --- vector of constants b_1...b_n
+    c_v --- vector of constants c_1...c_n-1
+    b_tilde = h²*f(x_i)
+
+    n - number of integration points
+    h - step size
+    */
 
 
     double* a_v = new double[n - 1];
@@ -55,7 +59,9 @@ double* generalSolver(int n, double h, int a, int b, int c) {
 }
 
 void writeToFile(std::string filename, int n, double* v, double* u, double* rel_err = 0) {
-    //Tries to create a folder in current directory and create and write to files in that new folder
+    /*
+    Tries to create a folder in current directory and create and write to files in that new folder
+    */
 
     //Prepare output to file
     std::ofstream ofile;
@@ -103,6 +109,10 @@ void writeToFile(std::string filename, int n, double* v, double* u, double* rel_
 }
 
 double* analyticalSolution(int n, double h) {
+    /*
+    Returns the analytical solution of equation u, with n integration points
+    */
+
     double* u = new double[n];
     for (int i = 0; i < n; i++) {
         u[i] = 1 - (1 - std::exp(-10)) * (i + 1) * h - std::exp(-10 * (i + 1) * h);
@@ -119,7 +129,11 @@ int main(int argc, char* argv[]) {
     // h is found from n, which are our integration points
     // b_tilde is found from f, which we will calculate
 
-    //Assumed as integers in this case, but we will treat them sort of like arrays
+    //Assumed as integers in this case, but we will treat like arrays in the implementation
+    //If we wanted to use n different integers we would have to rewrite some of the code, and it would be better to
+    //read such an array from a file
+    //We could also just have the program check if it is given an array of numbers or just a single
+    //int, and then do different actions based on the situation
     int a;
     int b;
     int c;
@@ -138,15 +152,16 @@ int main(int argc, char* argv[]) {
         c = std::atoi(argv[3]);
 
     askForInput:
-        std::cout << "Please input what task you want to solve (valid tasks: b, c, d, e, f): ";
+        std::cout << "Please input what task you want to solve (valid tasks: b, c, d, e, f and 0 for exit): ";
         std::cin >> task;
 
         std::clock_t start, finish;
 
 
         switch (task) {
+        //TODO create general case were the user can choose n, filename themselves
+        //TODO declare a global n array for all tasks?
         case 'b': {
-            //TODO: Switch to m to n;
             int n[3] = { 10, 100, 1000 };
             for (int i = 0; i < 3; i++) {
                 double h = 1.0 / (n[i] + 1);
@@ -174,11 +189,14 @@ int main(int argc, char* argv[]) {
             break;
         }
         case 'c': {
+            //TODO: Create a specialized algo
+            //Similar structure as task b
             int n[5] = { 10, 100, 1000, 10000, 1000000 };
             std::cout << "Not yet implemented" << std::endl;
             exit(1);
         }
         case 'd': {
+            //TODO not finished yet
             int n = int(pow(10, 7));
             double h = 1.0 / (n + 1);
 
@@ -192,10 +210,9 @@ int main(int argc, char* argv[]) {
             //The realtive error
             double* rel_err = new double[n];
             for (int i = 0; i < n; i++) {
-                u[i] = 1 - (1 - std::exp(-10)) * (i + 1) * h - std::exp(-10 * (i + 1) * h);
                 rel_err[i] = std::log10(std::abs((v[i] - u[i]) / u[i]));
             }
-
+            std::cout << "Writing to file, this might take a while." << std::endl;
             writeToFile("task_c", n, v, u, rel_err);
 
             std::cout << "Not completely implemented yet" << std::endl;
@@ -205,10 +222,8 @@ int main(int argc, char* argv[]) {
             break;
         }
         case 'e': {
-            std::cout << "Not yet implemented" << std::endl;
-            exit(1);
-        }
-        case 'f': {
+            //Use armadillo or make our own implementation of LU decomp. ?
+            int n[3] = { 10, 100, 1000 };
             std::cout << "Not yet implemented" << std::endl;
             exit(1);
         }
