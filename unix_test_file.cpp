@@ -23,7 +23,11 @@ std::string slash = "/";
 
 void create_directory(std::string filename) {
 	char* dir = const_cast<char*>(filename.c_str());    //convert string to char*
-		createFolder(dir);
+	#if defined(__CYGWIN__)
+	createFolder(dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	#else
+	createFolder(dir);
+	#endif
 }
 
 std::string get_current_dir() {
