@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 
                     double execution_time = double(finish - start) / double(CLOCKS_PER_SEC);
                     std::cout << "Execution time for n = " << n[i] << " is " << std::fixed << std::setprecision(4)
-                        << execution_time*1000 << "ms" << std::endl;
+                    << execution_time*1000 << "ms" << std::endl;
 
                     writeToFile("task_b", n[i], v, u);
                     writeExecTimeToFile("task_b", n[i], execution_time);
@@ -77,29 +77,26 @@ int main(int argc, char* argv[]) {
 
                   double h = 1.0 / (n[i] + 1);
 
-                  double* v_spec;
-                  double* v_gen;
                   //Time the execution of the algorithm
                   start = std::clock();
-                  v_spec = specSolver(n[i], h);
+                  double* v_spec = specSolver(n[i], h);
                   finish = std::clock();
 
                   double execution_time_spec = double(finish - start) / double(CLOCKS_PER_SEC);
                   std::cout << "Execution time for the special case, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
-                      << execution_time_spec*1000 << "ms" << std::endl;
+                  << execution_time_spec*1000 << "ms" << std::endl;
 
                   //comparing with the general solution
                   //includes writing the analytical expression for b_v in the special case in the timing, which the lecturer said shouldn't really count
                   start = std::clock();
-                  v_gen = generalSolver(n[i], h, a, b, c);
+                  double* v_gen = generalSolver(n[i], h, a, b, c);
                   finish = std::clock();
 
                   double execution_time_gen = double(finish - start) / double(CLOCKS_PER_SEC);
                   std::cout << "Execution time for the general case, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
-                      << execution_time_gen*1000 << "ms" << std::endl;
+                  << execution_time_gen*1000 << "ms" << std::endl;
 
-                  double* u;
-                  u = analyticalSolution(n[i], h);
+                  double* u = analyticalSolution(n[i], h);
 
                   writeToFile("task_c", n[i], v_spec, u);
 
@@ -134,9 +131,27 @@ int main(int argc, char* argv[]) {
             }
             case 'e': {
                 //Use armadillo or make our own implementation of LU decomp. ?
-                int n[3] = { 10, 100, 1000 };
-                std::cout << "Not yet implemented" << std::endl;
-                exit(1);
+                int n[3] = { 10, 100, 1000 }; //10 000 works, about 35 seconds, but 100 000 runs out of memory
+                for ( int i = 0; i < 3; i++){
+
+                  double h = 1.0 / (n[i] + 1);
+
+                  start = std::clock();
+                  double* v_lu = lusolver(n[i], h, a, b, c);
+                  finish = std::clock();
+
+                  double execution_time = double(finish - start) / double(CLOCKS_PER_SEC);
+                  std::cout << "Execution time using LU decomposition, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
+                  << execution_time*1000 << "ms" << std::endl;
+
+                  double* u = analyticalSolution(n[i], h);
+
+                  writeToFile("task_e", n[i], v_lu, u);
+
+
+                }
+
+                break;
             }
             case 'f': {
                 int n; std::string filename;

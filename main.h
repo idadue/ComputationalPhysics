@@ -7,6 +7,8 @@
 #include <cmath>
 #include <iomanip>
 
+#include <armadillo>
+
 /*
 * This part checks during pre proccessing what system the user is using. If the user is using windows, they should have
 * direct.h and io.h located on their system, and if the user has a unix based system, they should have unistd.h and sys/stat.h
@@ -211,6 +213,65 @@ double* specSolver(int n, double h) {
     b_v, b_tilde = NULL;
 
     return v;
+}
+
+double* lusolver(int n, double h, int a, int b, int c) {
+
+    /*
+    Using Armadillo for LU decomp. We have A*v = b_tilde
+    Since A = L*U, we define U*v = w, which means L*w = b_tilde
+    Then we solve first w and then v.
+    */
+
+
+    //using armadillo for the matrix handling
+    arma::vec b_tilde(n);
+    arma::vec w(n);
+    arma::vec v(n);
+    arma::mat A(n,n);
+    double* v_pointer = new double[n]; //for compatibility with writeToFile
+
+    //initializing the matrix A with -1 2 -1
+    A.fill(0.0);
+    A(0,0) = b;
+    for ( int i = 1; i < n; i++){
+      A(i,i) = b;
+      A(i-1,i) = c;
+      A(i,i-1) = a;
+    }
+
+    //LU decomp
+    arma::mat L, U;
+    arma::lu(L, U, A);
+
+    /*
+    printing for testing purposes
+    L.print("L= ");
+    U.print("U= ");
+    A.print("A =");
+    (A-L*U).print("LU test");
+    */
+
+    //solving w
+    for ( int i = 0; i < n; i++){
+      b_tilde(i) = h * h * 100 * std::exp(-10 * h * (i+1));
+      w(i) = b_tilde(i);
+      for ( int j = 0; j < i ; j++){
+        w(i) -= L(i,j)*w(j);
+      }
+    }
+
+    //solving v
+    for ( int i = n - 1; i > -1; i--){
+      v(i) = w(i);
+      for ( int j = n - 1; j > i ; j--){
+        v(i) -= U(i,j)*v(j);
+      }
+      v(i) /= U(i,i);
+      v_pointer[i] = v(i);
+    }
+
+    return v_pointer;
 }
 
 //Analytical solution
