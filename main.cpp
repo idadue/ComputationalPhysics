@@ -86,10 +86,10 @@ void writeToFile(std::string filename, int n, double* v, double* u, double* rel_
     ofile.open(current_path + "//" + filename + "//" + file);
     //Write to file here
 
-    ofile << "Numeric:,";
+    ofile << "Numeric,";
 
     if (rel_err != 0) {
-        ofile << "Analytic:,";
+        ofile << "Analytic,";
         ofile << "Relative Error:" << std::endl;
         for (int i = 0; i < n; i++) {
             ofile << v[i] << ",";
@@ -98,7 +98,7 @@ void writeToFile(std::string filename, int n, double* v, double* u, double* rel_
         }
     }
     else {
-        ofile << "Analytic:" << std::endl;
+        ofile << "Analytic" << std::endl;
         for (int i = 0; i < n; i++) {
             ofile << v[i] << ",";
             ofile << u[i] << std::endl;
@@ -166,18 +166,16 @@ int main(int argc, char* argv[]) {
             for (int i = 0; i < 3; i++) {
                 double h = 1.0 / (n[i] + 1);
 
-                double* v;
-
-                //Time the execution of the algorithm
+                //Timing the execution of the algorithm
                 start = std::clock();
-                v = generalSolver(n[i], h, a, b, c);
+                double* v = generalSolver(n[i], h, a, b, c);
                 finish = std::clock();
 
-                double* u;
-                u = analyticalSolution(n[i], h);
+                //double* u;
+                double* u = analyticalSolution(n[i], h);
 
                 double execution_time = double(finish - start) / double(CLOCKS_PER_SEC);
-                std::cout << "Execution time for n = : " << n[i] << " is: " << std::fixed << execution_time
+                std::cout << "Execution time for n =  " << n[i] << " is " << std::fixed << execution_time
                     << std::setprecision(7) << " seconds" << std::endl;
 
                 writeToFile("task_b", n[i], v, u);
@@ -200,12 +198,9 @@ int main(int argc, char* argv[]) {
             int n = int(pow(10, 7));
             double h = 1.0 / (n + 1);
 
-            double* v;
-            double* u;
-
             //Can use specialized algorithm instead
-            v = generalSolver(n, h, a, b, c);
-            u = analyticalSolution(n, h);
+            double* v = generalSolver(n, h, a, b, c);
+            double* u = analyticalSolution(n, h);
 
             //The realtive error
             double* rel_err = new double[n];
