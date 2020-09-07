@@ -4,4 +4,4 @@ compile:
 	c++ -o main.out main.cpp
 
 execute:
-	./main.out Hello 10 -1 2 -1
+	./main.out -1 2 -1
