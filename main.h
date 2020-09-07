@@ -134,7 +134,7 @@ double* generalSolver(int n, double h, int a, int b, int c) {
     a_v --- vector of constants a_1...a_n-1
     b_v --- vector of constants b_1...b_n
     c_v --- vector of constants c_1...c_n-1
-    b_tilde = h²*f(x_i)
+    b_tilde = hï¿½*f(x_i)
 
     n - number of integration points
     h - step size
@@ -176,8 +176,42 @@ double* generalSolver(int n, double h, int a, int b, int c) {
     return v;
 }
 
+double* specSolver(int n, double h) {
+    /*
+    This function solves the general equation Av = h^2 *f for the specific tridiagonal case of -1, 2, -1
+
+    b_v --- vector of constants b_1...b_n, given by b_i = (i+1)/i
+    b_tilde = hÂ²*f(x_i)
+
+    n - number of integration points
+    h - step size
+    */
 
 
+    double* b_v = new double[n];
+    double* b_tilde = new double[n];
+    double* v = new double[n]; //the vector we're trying to solve, final answer
+
+    b_v[0] = 2;
+    b_tilde[0] = h * h * 100 * std::exp(-10 * h);
+
+    for (int i = 1; i < n; i++) {
+      b_v[i] = (i + 2.0)/(i + 1.0); //analytical expression of b_v
+      b_tilde[i] = h * h * 100 * exp(-10 * (i + 1) * h) + b_tilde[i - 1] / b_v[i - 1]; //immediately calculating b_tilde with forward substitution
+    }
+
+    v[n - 1] = b_tilde[n - 1] / b_v[n - 1]; //Solving the final row
+
+    //Apply backward substitution
+    for (int i = n - 2; i > -1; i--) {
+        v[i] = (b_tilde[i] + v[i + 1]) / b_v[i];
+    } //Solving all other rows
+
+    delete[] b_v, b_tilde;
+    b_v, b_tilde = NULL;
+
+    return v;
+}
 
 //Analytical solution
 double* analyticalSolution(int n, double h) {
