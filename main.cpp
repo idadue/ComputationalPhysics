@@ -148,7 +148,8 @@ int main(int argc, char* argv[]) {
 
                   writeToFile("task_e", n[i], v_lu, u);
 
-
+                  delete[] v_lu, u;
+                  v_lu, u = NULL;
                 }
 
                 break;
