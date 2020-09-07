@@ -7,28 +7,25 @@
 #include <cmath>
 #include <iomanip>
 
-
 /*
-* This part checks during pre proccessing what libraries are included in the users system. If the user is using windows, they should have
-* direct.h located on their system, and if the user has a unix based system, they should have unistd.h and sys/stat.h
+* This part checks during pre proccessing what system the user is using. If the user is using windows, they should have
+* direct.h and io.h located on their system, and if the user has a unix based system, they should have unistd.h and sys/stat.h
 * on their system. We only want to include libraries that the user already has, and ignore the others, such that we do not get any compile errors.
 */
-#if __has_include(<direct.h>)
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #include <direct.h>
+#include <io.h>
+#define access _access_s
 #define GetCurrentDir _getcwd
 #define createFolder _mkdir
-
+#define F_OK 0
+std::string slash = "//";
 #else
 #include <unistd.h>
 #include <sys/stat.h>
 #define createFolder mkdir
 #define GetCurrentDir getcwd
-#endif
-
-//Here we define what value the string "slash" should have, dependent on what system the user is using
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-std::string slash = "//";
-#else
 std::string slash = "/";
 #endif
 
@@ -36,10 +33,10 @@ std::string slash = "/";
 void create_directory(std::string filename) {
     char* dir = const_cast<char*>(filename.c_str());    //convert string to char*
     //mkdir and _mkdir take different arguments, so we need to make sure we are passing them correctly
-    #if defined(__CYGWIN__)
-        createFolder(dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    #else
+    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
         createFolder(dir);
+    #else
+        createFolder(dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     #endif
 }
 
@@ -58,8 +55,6 @@ std::string get_current_dir() {
 
 //Output functions
 void writeToFile(std::string filename, int n, double* v, double* u, double* rel_err = 0) {
-    //Tries to create a folder in current directory and create and write to files in that new folder
-
     //Prepare output to file
     std::ofstream ofile;
 
@@ -99,6 +94,37 @@ void writeToFile(std::string filename, int n, double* v, double* u, double* rel_
     ofile.close();
 }
 
+void writeExecTimeToFile(std::string filename, int n, double exec_time) {
+    //Writes execution times to file
+    std::ofstream ofile;
+    std::string file = filename;
+
+    create_directory(filename);
+    std::string dir = get_current_dir();
+
+    file.append("_" + std::to_string(n) + "_timing" + ".csv");
+
+    std::string fileDir = dir + slash + filename + slash + file;
+    if (access(fileDir.c_str(),F_OK) == 0) {
+        ofile.open(fileDir, std::fstream::app);
+
+        if (ofile.is_open()) {
+            ofile << n << ",";
+            ofile << std::fixed << std::setprecision(4) << exec_time << std::endl;
+        }
+    }
+    else {
+        ofile.open(fileDir, std::fstream::out);
+
+        if (ofile.is_open()) {
+            ofile << "n,";
+            ofile << std::fixed << std::setprecision(4) << "ms" << std::endl;
+            ofile << n << ",";
+            ofile << exec_time << std::endl;
+        }
+    }
+    ofile.close();
+}
 
 //Solver functions
 double* generalSolver(int n, double h, int a, int b, int c) {
@@ -149,6 +175,8 @@ double* generalSolver(int n, double h, int a, int b, int c) {
 
     return v;
 }
+
+
 
 
 //Analytical solution

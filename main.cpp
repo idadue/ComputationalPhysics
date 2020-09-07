@@ -2,7 +2,7 @@
 #include "time.h"
 #include "main.h"
 
-//TODO Find also the precise number of floating point operations needed to solve the above equations.
+//TODO Find also the precise number of floating point operations needed to solve equations.
 
 //Begin main program
 int main(int argc, char* argv[]) {
@@ -13,8 +13,8 @@ int main(int argc, char* argv[]) {
     // h is found from n, which are our integration points
     // b_tilde is found from f, which we will calculate
 
-    //Assumed as integers in this case, but we will treat like arrays in the implementation
-    //If we wanted to use n different integers we would have to rewrite some of the code, and it would be better to
+    //Assumed as integers in this case, but we will treat them like arrays in the implementation
+    //If we wanted to use n different integers for each diagonal we would have to rewrite some of the code, and it would be better to
     //read such an array from a file
     //We could also just have the program check if it is given an array of numbers or just a single
     //int, and then do different actions based on the situation
@@ -36,6 +36,8 @@ int main(int argc, char* argv[]) {
 
         std::clock_t start, finish;
 
+        //This part uses a while loop in conjunction with a switch to keep the program running until
+        //the user wants to exit
         std::cout << "Valid tasks are b, c, d, or e, f for custom and 0 to exit. " << std::endl;
         while (task != '0') {
             std::cout << "Insert task: ";
@@ -59,6 +61,7 @@ int main(int argc, char* argv[]) {
                         << execution_time*1000 << "ms" << std::endl;
 
                     writeToFile("task_b", n[i], v, u);
+                    writeExecTimeToFile("task_b", n[i], execution_time);
 
                     delete[] v, u;
                     v, u = NULL;
@@ -68,7 +71,6 @@ int main(int argc, char* argv[]) {
             }
             case 'c': {
                 //TODO: Create a specialized algo
-                //Similar structure as task b
                 int n[5] = { 10, 100, 1000, 10000, 1000000 };
                 std::cout << "Not yet implemented" << std::endl;
                 exit(1);
