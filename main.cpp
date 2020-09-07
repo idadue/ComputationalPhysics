@@ -196,7 +196,6 @@ int main(int argc, char* argv[]) {
             std::cin >> task;
 
             switch (task) {
-            //TODO declare a global n array for all tasks?
             case 'b': {
                 int n[3] = { 10, 100, 1000 };
                 for (int i = 0; i < 3; i++) {
@@ -243,12 +242,13 @@ int main(int argc, char* argv[]) {
                     rel_err[i] = std::log10(std::abs((v[i] - u[i]) / u[i]));
                 }
                 std::cout << "Writing to file, this might take a while." << std::endl;
-                writeToFile("task_c", n, v, u, rel_err);
+                writeToFile("task_d", n, v, u, rel_err);
 
-                std::cout << "Not completely implemented yet" << std::endl;
+                std::cout << "Writing completed \n" << std::endl;
+                //std::cout << "Not completely implemented yet" << std::endl;
 
-                delete[] v, u;
-                v, u = NULL;
+                delete[] v, u, rel_err;
+                v, u, rel_err = NULL;
                 break;
             }
             case 'e': {
@@ -300,7 +300,6 @@ int main(int argc, char* argv[]) {
 
         }
     }
-
 
 
     return 0;
