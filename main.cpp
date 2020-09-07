@@ -7,7 +7,7 @@
 //Begin main program
 int main(int argc, char* argv[]) {
     // A*v = h^2 *f_i = b_tilde
-    //A needs a, b and c values. 
+    //A needs a, b and c values.
     //if constant, they could be hard coded
     // v is what we will calculate
     // h is found from n, which are our integration points
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
                     double* u = analyticalSolution(n[i], h);
 
                     double execution_time = double(finish - start) / double(CLOCKS_PER_SEC);
-                    std::cout << "Execution time for n = " << n[i] << " is " << std::fixed << std::setprecision(4) 
+                    std::cout << "Execution time for n = " << n[i] << " is " << std::fixed << std::setprecision(4)
                         << execution_time*1000 << "ms" << std::endl;
 
                     writeToFile("task_b", n[i], v, u);
@@ -71,9 +71,42 @@ int main(int argc, char* argv[]) {
             }
             case 'c': {
                 //TODO: Create a specialized algo
-                int n[5] = { 10, 100, 1000, 10000, 1000000 };
-                std::cout << "Not yet implemented" << std::endl;
-                exit(1);
+                //Similar structure as task b
+                int n[6] = { 10, 100, 1000, 10000, 100000, 1000000 };
+                for (int i = 0; i < 6; i++) {
+
+                  double h = 1.0 / (n[i] + 1);
+
+                  double* v_spec;
+                  double* v_gen;
+                  //Time the execution of the algorithm
+                  start = std::clock();
+                  v_spec = specSolver(n[i], h);
+                  finish = std::clock();
+
+                  double execution_time_spec = double(finish - start) / double(CLOCKS_PER_SEC);
+                  std::cout << "Execution time for the special case, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
+                      << execution_time_spec*1000 << "ms" << std::endl;
+
+                  //comparing with the general solution
+                  //includes writing the analytical expression for b_v in the special case in the timing, which the lecturer said shouldn't really count
+                  start = std::clock();
+                  v_gen = generalSolver(n[i], h, a, b, c);
+                  finish = std::clock();
+
+                  double execution_time_gen = double(finish - start) / double(CLOCKS_PER_SEC);
+                  std::cout << "Execution time for the general case, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
+                      << execution_time_gen*1000 << "ms" << std::endl;
+
+                  double* u;
+                  u = analyticalSolution(n[i], h);
+
+                  writeToFile("task_c", n[i], v_spec, u);
+
+                  delete[] v_spec, v_gen, u;
+                  v_spec, v_gen, u = NULL;
+                }
+                break;
             }
             case 'd': {
                 //TODO not finished yet
