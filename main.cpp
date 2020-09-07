@@ -3,11 +3,55 @@
 #include <string>
 #include "time.h"
 #include <iomanip>
-#include <cmath> 
-#include <direct.h> // mkdir
-#include <filesystem>
+#include <cmath>
+#include <algorithm>
 
-//TODO Find also the precise number of floating point operations needed to solve the above equations.
+/*
+* This part checks during pre proccessing what libraries are included in the users system. If the user is using windows, they should have
+* direct.h located on their system, and if the user has a unix based system, they should have unistd.h and sys/stat.h 
+* on their system. We only want to include libraries that the user already has, and ignore the others, such that we do not get any compile errors.
+*/
+#if __has_include(<direct.h>)
+#include <direct.h>
+#define GetCurrentDir _getcwd
+#define createFolder _mkdir
+
+#else
+#include <unistd.h>
+#include <sys/stat.h>
+#define createFolder mkdir
+#define GetCurrentDir getcwd
+#endif
+
+//Here we define what value the string "slash" should have, dependent on what system the user is using
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+std::string slash = "//";
+#else
+std::string slash = "/";
+#endif
+
+void create_directory(std::string filename) {
+    char* dir = const_cast<char*>(filename.c_str());    //convert string to char*
+    //mkdir and _mkdir take different arguments, so we need to make sure we are passing them correctly
+    #if defined(__CYGWIN__)
+    createFolder(dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    #else
+    createFolder(dir);
+    #endif
+}
+
+std::string get_current_dir() {
+    char buff[FILENAME_MAX];
+    GetCurrentDir(buff, FILENAME_MAX);
+    std::string current_working_dir(buff);
+
+    for (int i = 0; i < int(current_working_dir.length()); i++) {
+        if (current_working_dir[i] == '\\') {
+            current_working_dir.replace(i, 1, slash);
+        }
+    }
+    return current_working_dir;
+}
 
 double* generalSolver(int n, double h, int a, int b, int c) {
     /*
@@ -59,9 +103,7 @@ double* generalSolver(int n, double h, int a, int b, int c) {
 }
 
 void writeToFile(std::string filename, int n, double* v, double* u, double* rel_err = 0) {
-    /*
-    Tries to create a folder in current directory and create and write to files in that new folder
-    */
+    //Tries to create a folder in current directory and create and write to files in that new folder
 
     //Prepare output to file
     std::ofstream ofile;
@@ -69,39 +111,33 @@ void writeToFile(std::string filename, int n, double* v, double* u, double* rel_
     //Create new file
     std::string file = filename;
 
-    //Get current path and convert to string
-    std::filesystem::path path = std::filesystem::current_path(); //C++17
-    std::string current_path(path.u8string());
+    //Create a new folder in current directory
+    create_directory(filename);
+    std::string dir = get_current_dir();
 
     //Append filename with value of n, and give type; i.e filename_n.csv
     file.append("_" + std::to_string(n) + ".csv");
 
-    //Creates new folder in directory
-    //might not work on UNIX systems, needs testing
-    char* dir = const_cast<char*>(filename.c_str());    //convert string to char*
-    if (_mkdir(dir) != EEXIST) {
-        _mkdir(dir);
-    }
-
-    ofile.open(current_path + "//" + filename + "//" + file);
+    ofile.open(dir + slash + filename + slash + file, std::fstream::out);
     //Write to file here
+    if (ofile.is_open()) {
+        ofile << "Numeric,";
 
-    ofile << "Numeric,";
-
-    if (rel_err != 0) {
-        ofile << "Analytic,";
-        ofile << "Relative Error:" << std::endl;
-        for (int i = 0; i < n; i++) {
-            ofile << v[i] << ",";
-            ofile << u[i] << ",";
-            ofile << rel_err[i] << std::endl;
+        if (rel_err != 0) {
+            ofile << "Analytic,";
+            ofile << "Relative Error:" << std::endl;
+            for (int i = 0; i < n; i++) {
+                ofile << v[i] << ",";
+                ofile << u[i] << ",";
+                ofile << rel_err[i] << std::endl;
+            }
         }
-    }
-    else {
-        ofile << "Analytic" << std::endl;
-        for (int i = 0; i < n; i++) {
-            ofile << v[i] << ",";
-            ofile << u[i] << std::endl;
+        else {
+            ofile << "Analytic" << std::endl;
+            for (int i = 0; i < n; i++) {
+                ofile << v[i] << ",";
+                ofile << u[i] << std::endl;
+            }
         }
     }
 
@@ -119,6 +155,8 @@ double* analyticalSolution(int n, double h) {
     }
     return u;
 }
+
+//TODO Find also the precise number of floating point operations needed to solve the above equations.
 
 //Begin main program
 int main(int argc, char* argv[]) {
@@ -156,7 +194,6 @@ int main(int argc, char* argv[]) {
         std::cin >> task;
 
         std::clock_t start, finish;
-
 
         switch (task) {
         //TODO create general case were the user can choose n, filename themselves
