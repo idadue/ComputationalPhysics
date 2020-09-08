@@ -1,128 +1,203 @@
 #include <iostream>
-#include <fstream>
-#include <string>
 #include "time.h"
+#include "main.h"
 
-//include setw, setprecision, etc
-#include <iomanip>
-#include <cmath> //needed for exp
+//TODO Find also the precise number of floating point operations needed to solve equations.
 
-
-//begin main program
-int main(int argc, char *argv[]){
-
-    //Input from command line
-    // A*u = h^2 b_tilde
-    //A needs a, b and c values. Could be vector of constants, but need only be single constant for this project?
-    //for 1b we need it to be general, so should be vectors - G
+//Begin main program
+int main(int argc, char* argv[]) {
+    // A*v = h^2 *f_i = b_tilde
+    //A needs a, b and c values.
     //if constant, they could be hard coded
-    // u is what we will calculate
+    // v is what we will calculate
     // h is found from n, which are our integration points
-    // b is found from f, which we will calculate
+    // b_tilde is found from f, which we will calculate
 
-    int n;
-    std::string filename;
+    //Assumed as integers in this case, but we will treat them like arrays in the implementation
+    //If we wanted to use n different integers for each diagonal we would have to rewrite some of the code, and it would be better to
+    //read such an array from a file
+    //We could also just have the program check if it is given an array of numbers or just a single
+    //int, and then do different actions based on the situation
     int a;
     int b;
     int c;
 
-    //Read in the name of the output file, and the exponent n
-    if (argc < 6) {
+    if (argc < 4) {
         //If no commands are specified, exit program
         //Could instead provide a standard set of values
         std::cout << "Bad Usage: " << argv[0] << " is missing arguments" << std::endl;
         exit(1);
     }
     else {
-        filename = argv[1]; // first command line argument after name of program
-        n = std::atoi(argv[2]);
-        a = std::atoi(argv[3]);
-        b = std::atoi(argv[4]);
-        c = std::atoi(argv[5]);
+        a = std::atoi(argv[1]);
+        b = std::atoi(argv[2]);
+        c = std::atoi(argv[3]);
+        char task = ' ';
+
+        std::clock_t start, finish;
+
+        //This part uses a while loop in conjunction with a switch to keep the program running until
+        //the user wants to exit
+        std::cout << "Valid tasks are b, c, d, or e, f for custom and 0 to exit. " << std::endl;
+        while (task != '0') {
+            std::cout << "Insert task: ";
+            std::cin >> task;
+
+            switch (task) {
+            case 'b': {
+                int n[3] = { 10, 100, 1000 };
+                for (int i = 0; i < 3; i++) {
+                    double h = 1.0 / (n[i] + 1);
+
+                    //Timing the execution of the algorithm
+                    start = std::clock();
+                    double* v = generalSolver(n[i], h, a, b, c);
+                    finish = std::clock();
+
+                    double* u = analyticalSolution(n[i], h);
+
+                    double execution_time = double(finish - start) / double(CLOCKS_PER_SEC);
+                    std::cout << "Execution time for n = " << n[i] << " is " << std::fixed << std::setprecision(4)
+                    << execution_time*1000 << "ms" << std::endl;
+
+                    writeToFile("task_b", n[i], v, u);
+                    writeExecTimeToFile("task_b", n[i], execution_time);
+
+                    delete[] v, u;
+                    v, u = NULL;
+                }
+                std::cout << "Task b has been completed \n" << std::endl;
+                break;
+            }
+            case 'c': {
+                //TODO: Create a specialized algo
+                //Similar structure as task b
+                int n[6] = { 10, 100, 1000, 10000, 100000, 1000000 };
+                for (int i = 0; i < 6; i++) {
+
+                  double h = 1.0 / (n[i] + 1);
+
+                  //Time the execution of the algorithm
+                  start = std::clock();
+                  double* v_spec = specSolver(n[i], h);
+                  finish = std::clock();
+
+                  double execution_time_spec = double(finish - start) / double(CLOCKS_PER_SEC);
+                  std::cout << "Execution time for the special case, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
+                  << execution_time_spec*1000 << "ms" << std::endl;
+
+                  //comparing with the general solution
+                  //includes writing the analytical expression for b_v in the special case in the timing, which the lecturer said shouldn't really count
+                  start = std::clock();
+                  double* v_gen = generalSolver(n[i], h, a, b, c);
+                  finish = std::clock();
+
+                  double execution_time_gen = double(finish - start) / double(CLOCKS_PER_SEC);
+                  std::cout << "Execution time for the general case, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
+                  << execution_time_gen*1000 << "ms" << std::endl;
+
+                  double* u = analyticalSolution(n[i], h);
+
+                  writeToFile("task_c", n[i], v_spec, u);
+
+                  delete[] v_spec, v_gen, u;
+                  v_spec, v_gen, u = NULL;
+                }
+                break;
+            }
+            case 'd': {
+                //TODO not finished yet
+                int n = int(pow(10, 7));
+                double h = 1.0 / (n + 1);
+
+                //Can use specialized algorithm instead
+                double* v = generalSolver(n, h, a, b, c);
+                double* u = analyticalSolution(n, h);
+
+                //The realtive error
+                double* rel_err = new double[n];
+                for (int i = 0; i < n; i++) {
+                    rel_err[i] = std::log10(std::abs((v[i] - u[i]) / u[i]));
+                }
+                std::cout << "Writing to file, this might take a while." << std::endl;
+                writeToFile("task_d", n, v, u, rel_err);
+
+                std::cout << "Writing completed \n" << std::endl;
+                //std::cout << "Not completely implemented yet" << std::endl;
+
+                delete[] v, u, rel_err;
+                v, u, rel_err = NULL;
+                break;
+            }
+            case 'e': {
+                //Use armadillo or make our own implementation of LU decomp. ?
+                int n[3] = { 10, 100, 1000 }; //10 000 works, about 35 seconds, but 100 000 runs out of memory
+                for ( int i = 0; i < 3; i++){
+
+                  double h = 1.0 / (n[i] + 1);
+
+                  start = std::clock();
+                  double* v_lu = lusolver(n[i], h, a, b, c);
+                  finish = std::clock();
+
+                  double execution_time = double(finish - start) / double(CLOCKS_PER_SEC);
+                  std::cout << "Execution time using LU decomposition, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
+                  << execution_time*1000 << "ms" << std::endl;
+
+                  double* u = analyticalSolution(n[i], h);
+
+                  writeToFile("task_e", n[i], v_lu, u);
+
+                  delete[] v_lu, u;
+                  v_lu, u = NULL;
+                }
+
+                break;
+            }
+            case 'f': {
+                int n; std::string filename;
+                std::cout << "Enter value for n, filename: ";
+                std::cin >> n >> filename;
+                std::cout << "\n";
+                std::cout << "You entered: " << n << ", " << filename << std::endl;
+
+                double h = 1.0 / (n + 1);
+
+                //Timing the execution of the algorithm
+                start = std::clock();
+                double* v = generalSolver(n, h, a, b, c);
+                finish = std::clock();
+
+                double* u = analyticalSolution(n, h);
+
+                double execution_time = double(finish - start) / double(CLOCKS_PER_SEC);
+                std::cout << "Execution time for n = " << n << " is " << std::fixed << std::setprecision(4)
+                    << execution_time * 1000 << "ms" << std::endl;
+
+                std::cout << "Writing data to file..." << std::endl;
+                writeToFile(filename, n, v, u);
+
+                delete[] v, u;
+                v, u = NULL;
+
+                std::cout << "Task completed! \n" << std::endl;
+                break;
+            }
+            default: {
+                if (task == '0') {
+                    std::cout << "Exiting..." << std::endl;
+                }
+                else {
+                    std::cout << "Error, must insert valid character!" << std::endl;
+                    break;
+                }
+            }
+
+            }
+
+        }
     }
 
-
-    //Prepare output to file
-    std::ofstream ofile;
-    //Create new file
-    std::string file = filename;
-
-    //Append filename with value of n, and give type; i.e filename_n.csv
-    file.append("_" + std::to_string(n) + ".csv");
-
-    //Calculation starts here
-
-    //Time the execution of the algorithm
-    std::clock_t start, finish;
-    start = std::clock();
-
-    //Vector versions of the input values from command line
-    double * v_a = new double [n-1];
-    double * v_b = new double [n];
-    double * v_c = new double [n-1];
-    double h = 1.0 / (n + 1);
-
-    for (int i = 0; i < n-1; i++) {
-      v_a[i] = a;
-      v_c[i] = c;
-    };
-    //Vector value of the right side of the equation, h²*f(x_i)
-    double * v_g = new double[n];
-    for ( int i = 0; i < n; i++) {
-      v_g[i] = h*h*100*exp(-10*(i+1)*h);
-      v_b[i] = b;
-    };
-
-    double * B = new double[n]; //Diagonal values after forward substitution
-    double * G = new double[n]; //b_tilde values after forward substitution
-    double * u = new double[n]; //the vector we're trying to solve, final answer
-
-    G[0] = v_g[0];
-    B[0] = v_b[0]; //Forward substitution leaves the first element of b and g unchanged
-
-    for ( int i = 1; i < n; i++) {
-      B[i] = v_b[i] - v_c[i-1]*v_a[i-1]/B[i-1];
-      G[i] = v_g[i] - G[i-1]*v_a[i-1]/B[i-1];
-    } //Performing forward substitution
-
-    u[n-1] = G[n-1]/B[n-1]; //Solving the final row
-
-    for ( int i = n-2; i > -1; i--) {
-      u[i] = (G[i] - v_c[i]*u[i+1])/B[i];
-    } //Solving all other rows
-
-    finish = std::clock();
-    std::cout << "Execution time: " << float(finish - start) / CLOCKS_PER_SEC << " seconds" << std::endl;
-    //Calculation ends here
-
-    //Open and close file
-    ofile.open(file);
-    //Write to file here
-    //can format the output data later
-    ofile << "Numeric:,";
-    ofile << "Analytic:,";
-    ofile << "Relative Error:" << std::endl;
-
-    double * v = new double[n];
-    double * relative_err = new double[n];
-
-    for ( int i = 0; i < n; i++) {
-      v[i] = 1 - (1 - std::exp(-10))*(i + 1)*h - std::exp(-10*(i + 1)*h);
-      relative_err[i] = ((v[i] - u[i]) / v[i]);
-      ofile << u[i] << ",";
-      ofile << v[i] << ",";
-      ofile <<  relative_err[i] << std::endl;
-    }//printing current results compared with the analytic solution
-
-    ofile.close();
-
-
-    delete[] v_a, v_b, v_c, v_g;
-    delete[] B, G, u;
-    delete[] relative_err;
-    v_a, v_b, v_c, v_g = NULL;
-    B, G, u = NULL;
-    relative_err = NULL;
 
     return 0;
 }
