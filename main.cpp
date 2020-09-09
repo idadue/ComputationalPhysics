@@ -99,6 +99,7 @@ int main(int argc, char* argv[]) {
                   double* u = analyticalSolution(n[i], h);
 
                   writeToFile("task_c", n[i], v_spec, u);
+                  writeExecTimeToFile("task_c", n[i], execution_time_spec);
 
                   delete[] v_spec, v_gen, u;
                   v_spec, v_gen, u = NULL;
@@ -147,6 +148,7 @@ int main(int argc, char* argv[]) {
                   double* u = analyticalSolution(n[i], h);
 
                   writeToFile("task_e", n[i], v_lu, u);
+                  writeExecTimeToFile("task_e", n[i], execution_time);
 
                   delete[] v_lu, u;
                   v_lu, u = NULL;
