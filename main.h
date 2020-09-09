@@ -101,6 +101,8 @@ void writeExecTimeToFile(std::string filename, int n, double exec_time) {
     std::ofstream ofile;
     std::string file = filename;
 
+    exec_time *= 1000; //converting to ms
+
     create_directory(filename);
     std::string dir = get_current_dir();
 

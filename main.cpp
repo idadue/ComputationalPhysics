@@ -132,57 +132,123 @@ int main(int argc, char* argv[]) {
             }
             case 'e': {
                 //Use armadillo or make our own implementation of LU decomp. ?
-                int n[3] = { 10, 100, 1000 }; //10 000 works, about 33 seconds, but 100 000 runs out of memory
+                int n[3] = { 10, 100, 1000}; //10 000 works, about 33 seconds, but 100 000 runs out of memory
                 for ( int i = 0; i < 3; i++){
 
                   double h = 1.0 / (n[i] + 1);
+                  double* execution_time = new double[10];
+                  double execution_time_avg = 0; //finding average execution time over 10 tries
 
-                  start = std::clock();
-                  double* v_lu = lusolver(n[i], h, a, b, c);
-                  finish = std::clock();
+                  for ( int j = 0; j < 10; j++){
 
-                  double execution_time = double(finish - start) / double(CLOCKS_PER_SEC);
-                  std::cout << "Execution time using LU decomposition, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
-                  << execution_time*1000 << "ms" << std::endl;
+                    start = std::clock();
+                    double* v_lu = lusolver(n[i], h, a, b, c);
+                    finish = std::clock();
 
-                  double* u = analyticalSolution(n[i], h);
 
-                  writeToFile("task_e", n[i], v_lu, u);
-                  writeExecTimeToFile("task_e", n[i], execution_time);
+                    execution_time[j] = double(finish - start) / double(CLOCKS_PER_SEC);
+                    std::cout << "Execution time using LU decomposition, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
+                    << execution_time[j]*1000 << "ms" << std::endl;
 
-                  delete[] v_lu, u;
-                  v_lu, u = NULL;
+                    execution_time_avg += (execution_time[j])/10;
+
+
+                  }
+
+                std::cout << "Average Execution time using LU decomposition, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
+                << execution_time_avg*1000 << "ms" << std::endl;
+
+                double* v_lu = lusolver(n[i], h, a, b, c);
+                double* u = analyticalSolution(n[i], h);
+
+                writeToFile("task_e", n[i], v_lu, u);
+                writeExecTimeToFile("exec_time_lu", n[i], execution_time_avg);
+
+
+
+                delete[] v_lu, u;
+                v_lu, u = NULL;
                 }
-
                 break;
             }
             case 'f': {
-                int n; std::string filename;
-                std::cout << "Enter value for n, filename: ";
-                std::cin >> n >> filename;
+                int n; //std::string filename;
+                int m; //number of executions to average over
+                std::cout << "Enter value for n, m (number of executions): ";
+                std::cin >> n >> m;
                 std::cout << "\n";
-                std::cout << "You entered: " << n << ", " << filename << std::endl;
+                std::cout << "You entered: " << n << ", " << m << " number of executions"<< std::endl;
 
                 double h = 1.0 / (n + 1);
+                double* execution_time = new double[m];
+                double execution_time_avg_lu = 0;
+                double execution_time_avg_spec = 0;
+                double execution_time_avg_gen = 0;
 
-                //Timing the execution of the algorithm
-                start = std::clock();
-                double* v = generalSolver(n, h, a, b, c);
-                finish = std::clock();
+                //Timing the execution of each algorithm
 
-                double* u = analyticalSolution(n, h);
+                //general case:
+                for ( int i = 0; i < m; i++){
 
-                double execution_time = double(finish - start) / double(CLOCKS_PER_SEC);
-                std::cout << "Execution time for n = " << n << " is " << std::fixed << std::setprecision(4)
-                    << execution_time * 1000 << "ms" << std::endl;
+                  start = std::clock();
+                  generalSolver(n, h, a, b, c);
+                  finish = std::clock();
 
-                std::cout << "Writing data to file..." << std::endl;
-                writeToFile(filename, n, v, u);
+                  execution_time[i] = double(finish - start) / double(CLOCKS_PER_SEC);
+                  std::cout << "Execution time, general case, n = " << n << " is " << std::fixed << std::setprecision(4)
+                  << execution_time[i] * 1000 << "ms" << std::endl;
 
-                delete[] v, u;
-                v, u = NULL;
+                  execution_time_avg_gen += execution_time[i]/m;
+
+                }
+                std::cout << "Average Execution time, general case, n = " << n << " is " << std::fixed << std::setprecision(4)
+                << execution_time_avg_gen * 1000 << "ms" << std::endl;
+
+                //special case:
+                for ( int i = 0; i < m; i++){
+
+                  start = std::clock();
+                  specSolver(n, h);
+                  finish = std::clock();
+
+                  execution_time[i] = double(finish - start) / double(CLOCKS_PER_SEC);
+                  std::cout << "Execution time, special case, n =" << n << " is " << std::fixed << std::setprecision(4)
+                  << execution_time[i] * 1000 << "ms" << std::endl;
+
+                  execution_time_avg_spec += execution_time[i]/m;
+
+                }
+                std::cout << "Average Execution time, special case, n = " << n << " is " << std::fixed << std::setprecision(4)
+                << execution_time_avg_spec * 1000 << "ms" << std::endl;
+
+                //lu decomposition, too time consuming compared with gen/spec so moved back to e)
+                /*
+                for ( int i = 0; i < m; i++){
+
+                  start = std::clock();
+                  lusolver(n, h, a, b, c);
+                  finish = std::clock();
+
+                  execution_time[i] = double(finish - start) / double(CLOCKS_PER_SEC);
+                  std::cout << "Execution time, LU-decomp, n =" << n << " is " << std::fixed << std::setprecision(4)
+                  << execution_time[i] * 1000 << "ms" << std::endl;
+
+                  execution_time_avg_lu += execution_time[i]/m;
+
+                }
+                std::cout << "Average Execution time, LU-decomp, n = " << n << " is " << std::fixed << std::setprecision(4)
+                << execution_time_avg_lu * 1000 << "ms" << std::endl;
+                */
+
+
+                //writeExecTimeToFile("exec_time_lu", n, execution_time_avg_lu);
+                writeExecTimeToFile("exec_time_spec", n, execution_time_avg_spec);
+                writeExecTimeToFile("exec_time_gen", n, execution_time_avg_gen);
 
                 std::cout << "Task completed! \n" << std::endl;
+
+                delete[] execution_time;
+
                 break;
             }
             default: {
