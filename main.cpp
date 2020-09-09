@@ -108,38 +108,50 @@ int main(int argc, char* argv[]) {
             }
             case 'd': {
                 //TODO not finished yet
-                int n = int(pow(10, 7));
-                double h = 1.0 / (n + 1);
+                double* rel_err_max = new double[7];
 
-                //Can use specialized algorithm instead
-                double* v = generalSolver(n, h, a, b, c);
-                double* u = analyticalSolution(n, h);
+                for (int j = 0; j < 7; j++){
+                  int n = int(pow(10, j+1));
+                  double h = 1.0 / (n + 1);
 
-                //The realtive error
-                double* rel_err = new double[n];
-                for (int i = 0; i < n; i++) {
+                  //Can use specialized algorithm instead
+                  double* v = specSolver(n, h);
+                  double* u = analyticalSolution(n, h);
+
+                  //The relative error
+                  double* rel_err = new double[n];
+                  rel_err_max[j] = -10000;
+                  for (int i = 0; i < n; i++) {
                     rel_err[i] = std::log10(std::abs((v[i] - u[i]) / u[i]));
-                }
-                std::cout << "Writing to file, this might take a while." << std::endl;
-                writeToFile("task_d", n, v, u, rel_err);
+                    if (rel_err_max[j] < rel_err[i]) {
+                      rel_err_max[j] = rel_err[i];
+                    }
+                    //std::cout << "relative error for n = " << n << " is "
+                    //<< std::fixed << std::setprecision(4) << rel_err[i] << std::endl;
+                  }
 
-                std::cout << "Writing completed \n" << std::endl;
-                //std::cout << "Not completely implemented yet" << std::endl;
+                  std::cout << "Maximum relative error for n = " << n << " is "
+                  << std::fixed << std::setprecision(4) << rel_err_max[j] << std::endl;
+                  //writeToFile("task_d", n, v, u, rel_err);
 
-                delete[] v, u, rel_err;
-                v, u, rel_err = NULL;
+                  delete[] v, u, rel_err;
+                  v, u, rel_err = NULL;
+                  }
+                  delete[] rel_err_max;
+                  rel_err_max = NULL;
                 break;
             }
             case 'e': {
                 //Use armadillo or make our own implementation of LU decomp. ?
                 int n[3] = { 10, 100, 1000}; //10 000 works, about 33 seconds, but 100 000 runs out of memory
+                int m = 50; //number of executions to average over
                 for ( int i = 0; i < 3; i++){
 
                   double h = 1.0 / (n[i] + 1);
-                  double* execution_time = new double[10];
+                  double* execution_time = new double[m];
                   double execution_time_avg = 0; //finding average execution time over 10 tries
 
-                  for ( int j = 0; j < 10; j++){
+                  for ( int j = 0; j < m; j++){
 
                     start = std::clock();
                     double* v_lu = lusolver(n[i], h, a, b, c);
@@ -150,7 +162,7 @@ int main(int argc, char* argv[]) {
                     std::cout << "Execution time using LU decomposition, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
                     << execution_time[j]*1000 << "ms" << std::endl;
 
-                    execution_time_avg += (execution_time[j])/10;
+                    execution_time_avg += (execution_time[j])/m;
 
 
                   }
