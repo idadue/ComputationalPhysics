@@ -132,7 +132,7 @@ int main(int argc, char* argv[]) {
             }
             case 'e': {
                 //Use armadillo or make our own implementation of LU decomp. ?
-                int n[3] = { 10, 100, 1000 }; //10 000 works, about 35 seconds, but 100 000 runs out of memory
+                int n[3] = { 10, 100, 1000 }; //10 000 works, about 33 seconds, but 100 000 runs out of memory
                 for ( int i = 0; i < 3; i++){
 
                   double h = 1.0 / (n[i] + 1);
