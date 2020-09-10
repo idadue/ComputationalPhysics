@@ -7,6 +7,7 @@
 #include <cmath>
 #include <iomanip>
 #include <armadillo>
+#include <time.h>
 
 /*
 * This part checks during pre proccessing what system the user is using. If the user is using windows, they should have
@@ -30,10 +31,9 @@ std::string slash = "//";
 std::string slash = "/";
 #endif
 
-//Directory finders/editors
+/*Creates a folder in current path*/
 void create_directory(std::string filename)
 {
-    /*Creates a folder in current path*/
     char *dir = const_cast<char *>(filename.c_str());
     //mkdir and _mkdir take different arguments, so we need to make sure we are passing them correctly
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
@@ -43,9 +43,9 @@ void create_directory(std::string filename)
 #endif
 }
 
+/*Returns path to current directory*/
 std::string get_current_dir()
 {
-    /*Returns path to current directory*/
     char buff[FILENAME_MAX];
     GetCurrentDir(buff, FILENAME_MAX);
     std::string current_working_dir(buff);
@@ -60,10 +60,9 @@ std::string get_current_dir()
     return current_working_dir;
 }
 
-//Output functions
+/*Output data to file with the .csv type*/
 void writeToFile(std::string filename, int n, double *v, double *u, double *rel_err = 0)
 {
-    /*Output data to file with the .csv type*/
     std::ofstream ofile;
     std::string file = filename;
 
@@ -105,9 +104,9 @@ void writeToFile(std::string filename, int n, double *v, double *u, double *rel_
     ofile.close();
 }
 
+/*Writes execution times to file*/
 void writeExecTimeToFile(std::string filename, int n, double exec_time)
 {
-    /*Writes execution times to file*/
     std::ofstream ofile;
     std::string file = filename;
 
@@ -145,10 +144,7 @@ void writeExecTimeToFile(std::string filename, int n, double exec_time)
     ofile.close();
 }
 
-//Solver functions
-double *generalSolver(int n, double h, int a, int b, int c)
-{
-    /*
+/*
     This function solves the general equation Av = h^2 *f, using a general algortihm
 
     a_v --- vector of constants a_1...a_n-1
@@ -162,7 +158,8 @@ double *generalSolver(int n, double h, int a, int b, int c)
     n - number of integration points
     h - step size
     */
-
+double *generalSolver(int n, double h, int a, int b, int c)
+{
     /*Note: Declaring a_v, b_v and c_v as arrays and filling them with a singular value is technically 
    redundant since the program can only take in one value for each, but since the performance hit is minimal, we will leave it as is.*/
     double *a_v = new double[n - 1];
@@ -203,14 +200,12 @@ double *generalSolver(int n, double h, int a, int b, int c)
     return v;
 }
 
+/*
+This function solves the general equation Av = h^2 *f for the specific tridiagonal case of -1, 2, -1
+For details, see generalSolver()
+*/
 double *specSolver(int n, double h)
 {
-    /*
-    This function solves the general equation Av = h^2 *f for the specific tridiagonal case of -1, 2, -1
-
-    For details, see generalSolver()
-    */
-
     double *b_v = new double[n];
     double *b_tilde = new double[n];
     double *v = new double[n];
@@ -238,14 +233,13 @@ double *specSolver(int n, double h)
     return v;
 }
 
+/*
+Using Armadillo for LU decomp. We have A*v = b_tilde
+Since A = L*U, we define U*v = w, which means L*w = b_tilde
+Then we solve first w and then v.
+*/
 double *lusolver(int n, double h, int a, int b, int c)
 {
-    /*
-    Using Armadillo for LU decomp. We have A*v = b_tilde
-    Since A = L*U, we define U*v = w, which means L*w = b_tilde
-    Then we solve first w and then v.
-    */
-
     //using armadillo for the matrix handling
     arma::vec b_tilde(n);
     arma::vec w(n);
@@ -256,6 +250,7 @@ double *lusolver(int n, double h, int a, int b, int c)
     //initializing the matrix A with -1 2 -1
     A.fill(0.0);
     A(0, 0) = b;
+    /*There is a better way of doing this, using armadillo A.diag()*/
     for (int i = 1; i < n; i++)
     {
         A(i, i) = b;
@@ -293,7 +288,6 @@ double *lusolver(int n, double h, int a, int b, int c)
     return v_pointer;
 }
 
-//Analytical solution
 double *analyticalSolution(int n, double h)
 {
     /*
@@ -306,6 +300,38 @@ double *analyticalSolution(int n, double h)
         u[i] = 1 - (1 - std::exp(-10)) * (i + 1) * h - std::exp(-10 * (i + 1) * h);
     }
     return u;
+}
+
+void time_and_write(double *(*solver)(int, double, int, int, int), int n, int a, int b, int c, std::string task)
+{
+    std::clock_t start, finish;
+    double h = 1.0 / (n + 1);
+    double *v;
+
+    if (a == 0 || b == 0 || c == 0)
+    {
+        start = std::clock();
+        v = specSolver(n, h);
+        finish = std::clock();
+    }
+    else
+    {
+        start = std::clock();
+        v = solver(n, h, a, b, c);
+        finish = std::clock();
+    }
+
+    double *u = analyticalSolution(n, h);
+
+    double execution_time = double(finish - start) / double(CLOCKS_PER_SEC);
+    std::cout << "Execution time for n = " << n << " is " << std::fixed << std::setprecision(4)
+              << execution_time * 1000 << "ms" << std::endl;
+
+    writeToFile(task, n, v, u);
+    writeExecTimeToFile(task, n, execution_time);
+
+    delete[] v, u;
+    v, u = NULL;
 }
 
 #endif

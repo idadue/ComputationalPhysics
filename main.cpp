@@ -24,70 +24,28 @@ int main()
   {
     std::cout << "Insert task: ";
     std::cin >> task;
+    int n[6] = {10, 100, 1000, 10000, 100000, 1000000};
 
     switch (task)
     {
     case 'b':
     {
-      int n[3] = {10, 100, 1000};
       for (int i = 0; i < 3; i++)
       {
-        double h = 1.0 / (n[i] + 1);
-
-        //Timing the execution of the algorithm
-        start = std::clock();
-        double *v = generalSolver(n[i], h, a, b, c);
-        finish = std::clock();
-
-        double *u = analyticalSolution(n[i], h);
-
-        double execution_time = double(finish - start) / double(CLOCKS_PER_SEC);
-        std::cout << "Execution time for n = " << n[i] << " is " << std::fixed << std::setprecision(4)
-                  << execution_time * 1000 << "ms" << std::endl;
-
-        writeToFile("task_b", n[i], v, u);
-        writeExecTimeToFile("task_b", n[i], execution_time);
-
-        delete[] v, u;
-        v, u = NULL;
+        time_and_write(generalSolver, n[i], a, b, c, "task_b");
       }
-      std::cout << "Task b has been completed \n"
-                << std::endl;
       break;
     }
     case 'c':
     {
-      int n[6] = {10, 100, 1000, 10000, 100000, 1000000};
       for (int i = 0; i < 6; i++)
       {
+        //special algorithm
+        time_and_write(generalSolver, n[i], 0, 0, 0, "task_c_spec");
+        //general algorithm
+        time_and_write(generalSolver, n[i], a, b, c, "task_c_general");
 
-        double h = 1.0 / (n[i] + 1);
-
-        start = std::clock();
-        double *v_spec = specSolver(n[i], h);
-        finish = std::clock();
-
-        double execution_time_spec = double(finish - start) / double(CLOCKS_PER_SEC);
-        std::cout << "Execution time for the special case, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
-                  << execution_time_spec * 1000 << "ms" << std::endl;
-
-        //comparing with the general solution
         //includes writing the analytical expression for b_v in the special case in the timing, which the lecturer said shouldn't really count
-        start = std::clock();
-        double *v_gen = generalSolver(n[i], h, a, b, c);
-        finish = std::clock();
-
-        double execution_time_gen = double(finish - start) / double(CLOCKS_PER_SEC);
-        std::cout << "Execution time for the general case, for n = : " << n[i] << " is: " << std::fixed << std::setprecision(4)
-                  << execution_time_gen * 1000 << "ms" << std::endl;
-
-        double *u = analyticalSolution(n[i], h);
-
-        writeToFile("task_c", n[i], v_spec, u);
-        writeExecTimeToFile("task_c", n[i], execution_time_spec);
-
-        delete[] v_spec, v_gen, u;
-        v_spec, v_gen, u = NULL;
       }
       break;
     }
@@ -128,8 +86,8 @@ int main()
     }
     case 'e':
     {
-      int n[3] = {10, 100, 1000}; //10 000 works, about 33 seconds, but 100 000 runs out of memory
-      int m = 50;                 //number of executions to average over
+      //10 000 works, about 33 seconds, but 100 000 runs out of memory
+      int m = 50; //number of executions to average over
       for (int i = 0; i < 3; i++)
       {
 
