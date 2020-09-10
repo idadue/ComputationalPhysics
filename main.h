@@ -195,7 +195,7 @@ double *generalSolver(int n, double h, int a, int b, int c)
     }
 
     delete[] a_v, b_v, c_v, b_tilde;
-    a_v, b_v, c_v, b_tilde = NULL;
+    a_v, b_v, c_v, b_tilde = nullptr;
 
     return v;
 }
@@ -228,7 +228,7 @@ double *specSolver(int n, double h)
     }
 
     delete[] b_v, b_tilde;
-    b_v, b_tilde = NULL;
+    b_v, b_tilde = nullptr;
 
     return v;
 }
@@ -329,7 +329,7 @@ void time_and_write(double *(*solver)(int, double, int, int, int), int n, int a,
     writeExecTimeToFile(task, n, execution_time);
 
     delete[] v, u;
-    v, u = NULL;
+    v, u = nullptr;
 }
 
 #endif
