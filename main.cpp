@@ -85,10 +85,8 @@ int main(int argc, char *argv[])
                     << std::fixed << std::setprecision(4) << rel_err_max[j] << std::endl;
 
           delete[] v, u, rel_err;
-          v, u, rel_err = nullptr;
         }
         delete[] rel_err_max;
-        rel_err_max = nullptr;
 
         break;
       }
@@ -126,7 +124,6 @@ int main(int argc, char *argv[])
           writeExecTimeToFile("exec_time_lu", n[i], execution_time_avg);
 
           delete[] v_lu, u;
-          v_lu, u = nullptr;
         }
         break;
       }
@@ -186,7 +183,6 @@ int main(int argc, char *argv[])
                   << std::endl;
 
         delete[] execution_time;
-        execution_time = nullptr;
 
         break;
       }
