@@ -134,7 +134,6 @@ int main()
 
       double h = 1.0 / (n + 1);
       double *execution_time = new double[m];
-      double execution_time_avg_lu = 0;
       double execution_time_avg_spec = 0;
       double execution_time_avg_gen = 0;
 

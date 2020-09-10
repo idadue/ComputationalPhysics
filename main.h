@@ -288,12 +288,9 @@ double *lusolver(int n, double h, int a, int b, int c)
     return v_pointer;
 }
 
+/*Returns the analytical solution of equation u, with n integration points*/
 double *analyticalSolution(int n, double h)
 {
-    /*
-    Returns the analytical solution of equation u, with n integration points
-    */
-
     double *u = new double[n];
     for (int i = 0; i < n; i++)
     {
@@ -302,6 +299,7 @@ double *analyticalSolution(int n, double h)
     return u;
 }
 
+/*Times and outputs the execution of the algorithms*/
 void time_and_write(double *(*solver)(int, double, int, int, int), int n, int a, int b, int c, std::string task)
 {
     std::clock_t start, finish;
