@@ -1,5 +1,13 @@
 #include "TridiagonalMatrixSolver.h"
 
+TridiagonalMatrixSolver::TridiagonalMatrixSolver(const unsigned int n) : n{ n }, start{ 0 }, finish{ 0 }, v{ v.zeros(n) }
+{
+	//initializing arma::mat should probably be done directly in constructor
+	//v = v.zeros(n);
+	step_size = 1.0 / (double(n) + 1);
+	step_size_sqrd = step_size * step_size;
+}
+
 double TridiagonalMatrixSolver::f(double x)
 {
 	return 100 * exp(-10 * x);
@@ -10,6 +18,7 @@ void TridiagonalMatrixSolver::display()
 	std::cout.precision(7);
 	std::cout.setf(std::ios::fixed);
 	v.raw_print(std::cout, "v:");
+	printf("\n");
 }
 
 void TridiagonalMatrixSolver::writeToFile(std::string filename)
@@ -26,6 +35,15 @@ void TridiagonalMatrixSolver::writeToFile(std::string filename)
 }
 
 /*------------------------------------------------------------*/
+
+ThomasSolver::ThomasSolver(const unsigned int n, const double a, const double b, const double c) : TridiagonalMatrixSolver(n), a{ a }, c{ c }
+{
+	b_tilde.zeros(n);
+	d = d.ones(n) * b;
+	for (arma::uword i = 0; i < n; i++) {
+		b_tilde[i] = step_size_sqrd * f((i + 1.0) * step_size);
+	}
+}
 
 void ThomasSolver::forward_substitution()
 {
@@ -58,6 +76,11 @@ void ThomasSolver::solve()
 
 /*------------------------------------------------------------*/
 
+SpecialThomasSolver::SpecialThomasSolver(const unsigned int n) : TridiagonalMatrixSolver(n) {
+	d = d.ones(n) * 2;
+	b_tilde.zeros(n);
+}
+
 void SpecialThomasSolver::forward_subtitution()
 {
 	for (arma::uword i = 0; i < n; i++) {
@@ -84,6 +107,16 @@ void SpecialThomasSolver::solve()
 
 /*------------------------------------------------------------*/
 
+LUSolver::LUSolver(const unsigned int n, const int a, const int b, const int c) : TridiagonalMatrixSolver(n)
+{
+	A = A.zeros(n, n);
+	A.diag() += b;
+	A.diag(-1) += a;
+	A.diag(1) += c;
+
+	arma::lu(L, U, A);
+}
+
 void LUSolver::solve()
 {
 	for (arma::uword i = 0; i < n; i++) {
@@ -99,4 +132,46 @@ void LUSolver::solve()
 		}
 		v[i] /= U(i, i);
 	}
+}
+
+/*------------------------------------------------------------*/
+
+JacobiSolver::JacobiSolver(const int n, const float rho) : TridiagonalMatrixSolver(n)
+{
+	step_size = rho / double(n);
+	step_size_sqrd = step_size * step_size;
+
+	a = -(1 / step_size_sqrd);
+	d = 2 / step_size_sqrd;
+
+	A = A.zeros(n, n);
+	A.diag() += d;
+	A.diag(-1) += a;
+	A.diag(1) += a;
+}
+
+JacobiSolver::~JacobiSolver() {
+	delete[] analyticalEigenval;
+	delete[] analyticalEigenvec;
+}
+
+void JacobiSolver::analyticalEigenvalues()
+{
+	analyticalEigenval = new double[n];
+	for (unsigned int j = 1; j < n + 1; j++) {
+		analyticalEigenval[j - 1] = d + 2 * a * std::cos(j * pi / (double(n) + 1));
+	}
+}
+
+void JacobiSolver::analyticalEigenvector()
+{
+	analyticalEigenvec = new double(n);
+	for (unsigned int j = 1; j < n + 1; j++) {
+		analyticalEigenvec[j - 1] = std::sin(j * pi / (double(n) + 1));
+	}
+}
+
+double* JacobiSolver::getanalyticalEigenvalues()
+{
+	return analyticalEigenval;
 }
