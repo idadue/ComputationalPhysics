@@ -13,6 +13,8 @@
 
 //Note: [] on armadillo objects != (). Safe for use on one dimensional objects, but NOT multi dimensional objects
 //usigned int on backwards substitution loops is not good
+//Member initialization list does not work with armadillo vec class. setting #define ARMA_USE_CXX11 in config.hpp should fix this, although testing
+//shows this is at best unstable. Recommend avoiding or using mat instead, although mat does not seem to work when used as a matrix
 
 class TridiagonalMatrixSolver
 {
@@ -20,22 +22,17 @@ protected:
 	unsigned int n;
 	double step_size, step_size_sqrd;
 	clock_t start, finish;
-	arma::mat v;
+	arma::mat v; // d, b_tilde;
 	std::fstream outputFile;
 public:
-	TridiagonalMatrixSolver(const unsigned int n)
-	{
-		this->n = n;
-
-		v.zeros(n);
-
-		step_size = 1.0 / (double(n) + 1);
-		step_size_sqrd = step_size * step_size;
-	}
+	TridiagonalMatrixSolver(const unsigned int n);
+	//TridiagonalMatrixSolver(const unsigned int n, const unsigned a);
 
 	double f(double x);
 	virtual void display();
 	virtual void writeToFile(std::string filename);
+
+	//Add your code here, repeat for other classes.
 };
 
 /*------------------------------------------------------------*/
@@ -48,16 +45,7 @@ private:
 	void forward_substitution();
 	void backward_substitution();
 public:
-	ThomasSolver(const unsigned int n, const double a, const double b, const double c) : TridiagonalMatrixSolver(n) {
-		this->d = this->d.ones(n) * b;
-		this->a = a; this->c = c;
-
-		b_tilde.zeros(n);
-
-		for (arma::uword i = 0; i < n; i++) {
-			b_tilde[i] = step_size_sqrd * f((i + 1.0) * step_size);
-		}
-	}
+	ThomasSolver(const unsigned int n, const double a, const double b, const double c);
 	double getExecutionTime();
 	void solve();
 };
@@ -71,10 +59,7 @@ private:
 	void forward_subtitution();
 	void backward_subtitution();
 public:
-	SpecialThomasSolver(const unsigned int n) : TridiagonalMatrixSolver(n) {
-		d = d.ones(n) * 2;
-		b_tilde.zeros(n);
-	}
+	SpecialThomasSolver(const unsigned int n);
 
 	void solve();
 };
@@ -85,16 +70,31 @@ class LUSolver : public TridiagonalMatrixSolver {
 private:
 	arma::mat A, L, U;
 public:
-	LUSolver(const unsigned int n, const int a, const int b, const int c) : TridiagonalMatrixSolver(n) {
-		A.zeros(n, n);
-		A.diag() += b;
-		A.diag(-1) += a;
-		A.diag(1) += c;
-
-		arma::lu(L, U, A);
-	}
+	LUSolver(const unsigned int n, const int a, const int b, const int c);
 
 	void solve();
+};
+
+/*------------------------------------------------------------*/
+
+class JacobiSolver : TridiagonalMatrixSolver {
+private:
+	//will probably change some of these names and function types
+	double* analyticalEigenval;
+	//vector of vectors?
+	double* analyticalEigenvec;
+	double a, d;
+	double step_size, step_size_sqrd;
+	unsigned int rho;
+	arma::mat A;
+public:
+	JacobiSolver(const int n, const float rho);
+	~JacobiSolver();
+	void analyticalEigenvalues();
+	//not tested
+	void analyticalEigenvector();
+
+	double* getanalyticalEigenvalues();
 };
 
 #endif
