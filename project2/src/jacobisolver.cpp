@@ -45,8 +45,8 @@ std::tuple<int, int, double> JacobiSolver::findMaxNonDiagElement(const arma::mat
 	double max = 0;
 	std::tuple<int, int, double> max_ij;
 	for (arma::uword i = 0; i < n; i++) {
-		for (arma::uword j = 0; j < n; j++) {
-			if (i != j && fabs(V(i, j)) > max) {
+		for (arma::uword j = i+1; j < n; j++) {
+			if (fabs(V(i, j)) > max) {
 				max = fabs(V(i, j));
 				max_ij = { i,j, max };
 			}
@@ -111,7 +111,7 @@ void JacobiSolver::solve(int multiplier)
 		iterations++;
 	}
 	std::cout << "End of loop at " << iterations << " iterations completed.\n \n";
-	arma::normalise(R, 1);
+	//R = arma::normalise(R, 1);
 }
 
 arma::vec JacobiSolver::getPotential()
