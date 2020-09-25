@@ -95,7 +95,6 @@ void JacobiSolver::rotate(int k, int l)
 		r_il = R(i, l);
 		R(i, k) = c * r_ik - s * r_il;
 		R(i, l) = c * r_il + s * r_ik;
-		lambda(i) = B(i, i);
 	}
 }
 
@@ -110,6 +109,7 @@ void JacobiSolver::solve(int multiplier)
 		maxoffdiag = findMaxNonDiagElement(B);
 		iterations++;
 	}
+	arma::vec lambda  = B.diag();
 	std::cout << "End of loop at " << iterations << " iterations completed.\n \n";
 	//R = arma::normalise(R, 1);
 }
