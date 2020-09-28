@@ -30,9 +30,9 @@ TEST_CASE("Running the jacobi algorithm") {
 	REQUIRE(trace_diff < 1.0e-02);
 
 	printf("Analytical eigenvectors: \n");
-	std::cout << j.getAnalyticEigVec().col(0) << std::endl;
+	std::cout << j.getAnalyticEigVec().col(n-1) << std::endl;
 	printf("Numerical eigenvectors(sorted): \n");
-	std::cout << j.getR().col(0) << std::endl;
+	std::cout << j.getR().col(n-1) << std::endl;
 	//printf("Numerical eigenvectors(unsorted): \n");
 	//std::cout << j.getR() << std::endl;
 	//printf("Numerical eigenvectors(armadillo 'std'): \n");
