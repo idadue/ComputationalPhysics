@@ -29,8 +29,10 @@ TEST_CASE("Running the jacobi algorithm") {
 	double trace_diff = j.compareTrace();
 	REQUIRE(trace_diff < 1.0e-02);
 
-	//printf("Analytical eigenvectors: \n");
-	//std::cout << j.getAnalyticEigVec() << std::endl;
+	printf("Analytical eigenvectors: \n");
+	std::cout << j.getAnalyticEigVec().col(0) << std::endl;
+	printf("Numerical eigenvectors(sorted): \n");
+	std::cout << j.getR().col(0) << std::endl;
 	//printf("Numerical eigenvectors(unsorted): \n");
 	//std::cout << j.getR() << std::endl;
 	//printf("Numerical eigenvectors(armadillo 'std'): \n");
@@ -38,13 +40,14 @@ TEST_CASE("Running the jacobi algorithm") {
 	//printf("Test of orthonormality: \n");
 	//std::cout << j.getR().t() * j.getR() << std::endl;
 
-	//printf("Analytical eigenvalues: \n");
-	//std::cout << j.getAnalyticEigVal() << std::endl;
+	printf("Analytical eigenvalues: \n");
+	std::cout << j.getAnalyticEigVal() << std::endl;
 	printf("Numerical eigenvalues(sorted): \n");
 	//std::cout << arma::sort(j.getLambda()) << std::endl;
 	std::cout << j.getLambda() << std::endl;
-	printf("Numerical eigenvalues(armadillo 'std'): \n");
-	std::cout << armaeig.first << std::endl;
+	//printf("Numerical eigenvalues(armadillo 'std'): \n");
+	//std::cout << armaeig.first << std::endl;
+
 
 	//FileWriter file("eigenvalues");
 	//file.writeToFile(j.getLambda());

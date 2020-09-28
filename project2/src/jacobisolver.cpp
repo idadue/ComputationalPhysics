@@ -203,9 +203,9 @@ arma::mat JacobiSolver::sortR(arma::mat R, arma::uvec indSorted)
 {
 	arma::mat RSorted;
 	RSorted.copy_size(R);
-	for (arma::uword j; j < R.n_cols; j++)
+	for (arma::uword j = 0; j < R.n_cols; j++)
 	{
-		for (arma::uword i; i < R.n_rows; i++)
+		for (arma::uword i = 0; i < R.n_rows; i++)
 		{
 			RSorted(i,j) = R(i, indSorted(j));
 		}

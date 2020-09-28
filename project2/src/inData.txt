@@ -1,2 +1,2 @@
 Format is: n, rho, multiplier, potential, omega
-10 20.0 1000 1 0.5
+100 20.0 1000 0 0.5
