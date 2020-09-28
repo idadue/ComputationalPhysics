@@ -40,7 +40,7 @@ TEST_CASE("Running the jacobi algorithm") {
 
 	//printf("Analytical eigenvalues: \n");
 	//std::cout << j.getAnalyticEigVal() << std::endl;
-	printf("Numerical eigenvalues(unsorted): \n");
+	printf("Numerical eigenvalues(sorted): \n");
 	//std::cout << arma::sort(j.getLambda()) << std::endl;
 	std::cout << j.getLambda() << std::endl;
 	printf("Numerical eigenvalues(armadillo 'std'): \n");

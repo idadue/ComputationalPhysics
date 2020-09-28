@@ -109,7 +109,12 @@ void JacobiSolver::solve(int multiplier)
 		maxoffdiag = findMaxNonDiagElement(B);
 		iterations++;
 	}
-	arma::vec lambda  = B.diag();
+	lambda = B.diag();
+	arma::uvec indSorted = arma::sort_index(lambda);
+	lambda  = arma::sort(lambda);
+
+	R = sortR(R, indSorted);
+
 	std::cout << "End of loop at " << iterations << " iterations completed.\n \n";
 	//R = arma::normalise(R, 1);
 }
@@ -192,4 +197,19 @@ arma::mat JacobiSolver::getAnalyticEigVal()
 		analyticEigVal(j - 1) = d + 2 * a * std::cos(j * pi / (double(n)));
 	}
 	return analyticEigVal;
+}
+
+arma::mat JacobiSolver::sortR(arma::mat R, arma::uvec indSorted)
+{
+	arma::mat RSorted;
+	RSorted.copy_size(R);
+	for (arma::uword j; j < R.n_cols; j++)
+	{
+		for (arma::uword i; i < R.n_rows; i++)
+		{
+			RSorted(i,j) = R(i, indSorted(j));
+		}
+	}
+
+	return RSorted;
 }

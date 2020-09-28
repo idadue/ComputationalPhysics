@@ -37,6 +37,8 @@ public:
 
 	std::pair<arma::vec, arma::mat> armadilloSolution();
 
+	arma::mat sortR(arma::mat R, arma::uvec indSorted);
+
 	//Test
 	arma::mat getTestR();
 	double compareTrace();
