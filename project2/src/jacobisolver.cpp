@@ -1,29 +1,11 @@
 #include "jacobisolver.h"
 
-/*
-Class for solving eigenvalue problems using the Jacobi eigenvalue algorithm.
-
-Variables:
-	h - step size
-	h_sqrd - h^2
-
-	A - Tridiagonal matrix (Toeplitz)
-	B - Copy of A, used in rotation
-	R - Matrix containing calculated eigenvectors
-
-	a, d - problem specific constants
-	epsilon - tolerance
-	potential - int, choose what hard coded potential to use
-	omega - frequency, only used with the corresponding potential
-
-*/
-
 JacobiSolver::JacobiSolver(const unsigned int n, const float rho, const int potential, const float omega) : n{ n }, h{ rho / double(n) }
 {
 	a = -(1.0 / pow(h, 2));
 	d = 2.0 / pow(h, 2);
 
-	epsilon = 1.0e-12;
+	epsilon = 1.0e-13;
 	if (potential == 1) {
 		matrixInit(getPotential());
 	}
@@ -35,18 +17,13 @@ JacobiSolver::JacobiSolver(const unsigned int n, const float rho, const int pote
 	}
 }
 
-JacobiSolver::JacobiSolver(const unsigned int n, const float rho, const int multiplier, const int potential, const float omega) : JacobiSolver(n, rho, potential, omega)
-{
-	solve(multiplier);
-}
-
 std::tuple<int, int, double> JacobiSolver::findMaxNonDiagElement(const arma::mat& V)
 {
 	double max = 0;
 	std::tuple<int, int, double> max_ij;
 	for (arma::uword i = 0; i < n; i++) {
-		for (arma::uword j = 0; j < n; j++) {
-			if (i != j && fabs(V(i, j)) > max) {
+		for (arma::uword j = i + 1; j < n; j++) {
+			if (fabs(V(i, j)) > max) {
 				max = fabs(V(i, j));
 				max_ij = { i,j, max };
 			}
@@ -95,11 +72,26 @@ void JacobiSolver::rotate(int k, int l)
 		r_il = R(i, l);
 		R(i, k) = c * r_ik - s * r_il;
 		R(i, l) = c * r_il + s * r_ik;
-		lambda(i) = B(i, i);
+		//lambda(i) = B(i, i);
 	}
 }
 
-void JacobiSolver::solve(int multiplier)
+arma::mat JacobiSolver::sortR(const arma::mat& R, const arma::uvec& indSorted)
+{
+	arma::mat RSorted;
+	RSorted.copy_size(R);
+	for (arma::uword j = 0; j < R.n_cols; j++)
+	{
+		for (arma::uword i = 0; i < R.n_rows; i++)
+		{
+			RSorted(i, j) = R(i, indSorted(j));
+		}
+	}
+
+	return RSorted;
+}
+
+void JacobiSolver::solve(const int multiplier)
 {
 	int iterations = 0;
 	int max_iterations = n * multiplier;
@@ -110,8 +102,27 @@ void JacobiSolver::solve(int multiplier)
 		maxoffdiag = findMaxNonDiagElement(B);
 		iterations++;
 	}
-	std::cout << "End of loop at " << iterations << " iterations completed.\n \n";
-	arma::normalise(R, 1);
+	arma::uvec indSorted = arma::sort_index(B.diag());
+
+	R = sortR(R, indSorted);
+	printf("End of loop at %d iterations \n", iterations);
+}
+
+double JacobiSolver::solveWithTime(const int multiplier)
+{
+	clock_t start, finish;
+	start = clock();
+	solve(multiplier);
+	finish = clock();
+	return (double(finish) - double(start)) / double(CLOCKS_PER_SEC);
+}
+
+std::pair<arma::vec, arma::mat> JacobiSolver::armadilloSolution()
+{
+	arma::vec eigval;
+	arma::mat eigvec;
+	arma::eig_sym(eigval, eigvec, A, "std");
+	return std::pair<arma::vec, arma::mat>(eigval, eigvec);
 }
 
 arma::vec JacobiSolver::getPotential()
@@ -133,14 +144,6 @@ arma::vec JacobiSolver::getPotential(const float omega)
 	return v;
 }
 
-std::pair<arma::vec, arma::mat> JacobiSolver::armadilloSolution()
-{
-	arma::vec eigval;
-	arma::mat eigvec;
-	arma::eig_sym(eigval, eigvec, A, "std");
-	return std::pair<arma::vec, arma::mat>(eigval, eigvec);
-}
-
 arma::mat JacobiSolver::getTestR()
 {
 	arma::mat R_copy = R;
@@ -153,13 +156,7 @@ arma::mat JacobiSolver::getTestR()
 
 double JacobiSolver::compareTrace()
 {
-	double A_diag = arma::sum(A.diag());
-	return abs(A_diag - arma::sum(lambda));
-}
-
-arma::mat JacobiSolver::getA()
-{
-	return A;
+	return abs(arma::sum(A.diag()) - arma::sum(B.diag()));
 }
 
 arma::mat JacobiSolver::getR()
@@ -169,7 +166,7 @@ arma::mat JacobiSolver::getR()
 
 arma::mat JacobiSolver::getLambda()
 {
-	return lambda;
+	return arma::sort(B.diag());
 }
 
 arma::mat JacobiSolver::getAnalyticEigVec()
@@ -177,19 +174,27 @@ arma::mat JacobiSolver::getAnalyticEigVec()
 	arma::mat analyticalEigVec(n, n);
 	for (arma::uword j = 0; j < n; j++) {
 		for (arma::uword i = 1; i < n + 1; i++) {
-			analyticalEigVec(i - 1, j) = sin(i * (double(j) + 1.0) * pi / (double(n)));
+			analyticalEigVec(i - 1, j) = sin(i * (double(j) + 1.0) * pi / (double(n + 1)));
 		}
 	}
-	//analyticalEigVec = arma::normalise(analyticalEigVec, 1);
 	return analyticalEigVec;
 }
 
-arma::mat JacobiSolver::getAnalyticEigVal()
+arma::vec JacobiSolver::getAnalyticEigVal()
 {
 	arma::vec analyticEigVal(n);
 	for (unsigned int j = 1; j < n + 1; j++)
 	{
-		analyticEigVal(j - 1) = d + 2 * a * std::cos(j * pi / (double(n)));
+		analyticEigVal(j - 1) = d + 2 * a * std::cos(j * pi / (double(n + 1)));
 	}
 	return analyticEigVal;
+}
+
+void JacobiSolver::display(const arma::mat& v)
+{
+	std::cout.precision(4);
+	std::cout.setf(std::ios::fixed);
+	std::cout.width(9);
+	v.raw_print(std::cout);
+	printf("\n");
 }
