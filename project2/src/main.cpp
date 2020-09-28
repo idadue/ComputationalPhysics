@@ -1,5 +1,5 @@
 #define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+#include "catch.hpp"
 #include "jacobisolver.h"
 #include "filehandler.h"
 #include <time.h>
