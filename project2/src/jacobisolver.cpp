@@ -1,38 +1,45 @@
 #include "jacobisolver.h"
 
-JacobiSolver::JacobiSolver(const unsigned int n, const float rho, const int potential, const float omega) : n{ n }, h{ rho / double(n) }
+JacobiSolver::JacobiSolver(const unsigned int n, const float rho, const int potential, const float omega) : n{n}, h{rho / double(n)}
 {
 	a = -(1.0 / pow(h, 2));
 	d = 2.0 / pow(h, 2);
 
-	epsilon = 1.0e-13;
-	if (potential == 1) {
+	epsilon = 1.0e-8;
+	if (potential == 1)
+	{
 		matrixInit(getPotential());
 	}
-	else if (potential == 2 && omega != 0) {
+	else if (potential == 2 && omega != 0)
+	{
 		matrixInit(getPotential(omega));
 	}
-	else {
+	else
+	{
 		matrixInit(NULL);
 	}
 }
 
-std::tuple<int, int, double> JacobiSolver::findMaxNonDiagElement(const arma::mat& V)
+std::tuple<int, int, double> JacobiSolver::findMaxNonDiagElement(const arma::mat &V)
 {
 	double max = 0;
 	std::tuple<int, int, double> max_ij;
-	for (arma::uword i = 0; i < n; i++) {
-		for (arma::uword j = i + 1; j < n; j++) {
-			if (fabs(V(i, j)) > max) {
+	for (arma::uword i = 0; i < n; i++)
+	{
+		for (arma::uword j = i + 1; j < n; j++)
+		{
+			if (fabs(V(i, j)) > max)
+			{
 				max = fabs(V(i, j));
-				max_ij = { i,j, max };
+				max_ij = {i, j, max};
 			}
 		}
 	}
 	return max_ij;
 }
-
-void JacobiSolver::rotate(int k, int l)
+/*Implementation of the rotation matrix as described by the Jacobi eigenvalue algorithm
+Coulumns of R is filled with eigenvectors and B is rotated.*/
+void JacobiSolver::rotate(unsigned int k, unsigned int l)
 {
 	double s, c;
 
@@ -59,8 +66,10 @@ void JacobiSolver::rotate(int k, int l)
 	B(k, l) = 0;
 	B(l, k) = 0;
 
-	for (unsigned int i = 0; i < n; i++) {
-		if (i != k && i != l) {
+	for (arma::uword i = 0; i < n; i++)
+	{
+		if (i != k && i != l)
+		{
 			a_ik = B(i, k);
 			a_il = B(i, l);
 			B(i, k) = c * a_ik - s * a_il;
@@ -72,11 +81,10 @@ void JacobiSolver::rotate(int k, int l)
 		r_il = R(i, l);
 		R(i, k) = c * r_ik - s * r_il;
 		R(i, l) = c * r_il + s * r_ik;
-		//lambda(i) = B(i, i);
 	}
 }
 
-arma::mat JacobiSolver::sortR(const arma::mat& R, const arma::uvec& indSorted)
+arma::mat JacobiSolver::sortR(const arma::mat &R, const arma::uvec &indSorted)
 {
 	arma::mat RSorted;
 	RSorted.copy_size(R);
@@ -91,13 +99,16 @@ arma::mat JacobiSolver::sortR(const arma::mat& R, const arma::uvec& indSorted)
 	return RSorted;
 }
 
+/*Uses rotate() and findMaxNonDiagElements() to compute the Jacobi eigenvalue algorithm, with a multiplier such that 
+we can run for enough iterations to reach the accuracy we need.*/
 void JacobiSolver::solve(const int multiplier)
 {
 	int iterations = 0;
 	int max_iterations = n * multiplier;
 	auto maxoffdiag = findMaxNonDiagElement(B);
 
-	while (pow(std::get<2>(maxoffdiag), 2) > epsilon && iterations < max_iterations) {
+	while (pow(std::get<2>(maxoffdiag), 2) > epsilon && iterations < max_iterations)
+	{
 		rotate(std::get<0>(maxoffdiag), std::get<1>(maxoffdiag));
 		maxoffdiag = findMaxNonDiagElement(B);
 		iterations++;
@@ -117,18 +128,23 @@ double JacobiSolver::solveWithTime(const int multiplier)
 	return (double(finish) - double(start)) / double(CLOCKS_PER_SEC);
 }
 
-std::pair<arma::vec, arma::mat> JacobiSolver::armadilloSolution()
+std::tuple<arma::vec, arma::mat, double> JacobiSolver::armadilloSolution()
 {
+	clock_t start, finish;
 	arma::vec eigval;
 	arma::mat eigvec;
+	start = clock();
 	arma::eig_sym(eigval, eigvec, A, "std");
-	return std::pair<arma::vec, arma::mat>(eigval, eigvec);
+	finish = clock();
+	double timing = (double(finish) - double(start)) / double(CLOCKS_PER_SEC);
+	return std::tuple<arma::vec, arma::mat, double>(eigval, eigvec, timing);
 }
 
 arma::vec JacobiSolver::getPotential()
 {
 	arma::vec v(n);
-	for (arma::uword i = 0; i < n; i++) {
+	for (arma::uword i = 0; i < n; i++)
+	{
 		v(i) = pow((double(i) + 1.0) * h, 2);
 	}
 	return v;
@@ -137,7 +153,8 @@ arma::vec JacobiSolver::getPotential()
 arma::vec JacobiSolver::getPotential(const float omega)
 {
 	arma::vec v(n);
-	for (arma::uword i = 0; i < n; i++) {
+	for (arma::uword i = 0; i < n; i++)
+	{
 		double rho = (double(i) + 1.0) * h;
 		v(i) = pow(omega, 2) * pow(rho, 2) + 1 / rho;
 	}
@@ -148,7 +165,8 @@ arma::mat JacobiSolver::getTestR()
 {
 	arma::mat R_copy = R;
 	R_copy = R_copy * R_copy.t();
-	for (unsigned int i = 0; i < n; i++) {
+	for (arma::uword i = 0; i < n; i++)
+	{
 		R_copy(i, i) -= R_copy.diag()(i);
 	}
 	return R_copy;
@@ -172,8 +190,10 @@ arma::mat JacobiSolver::getLambda()
 arma::mat JacobiSolver::getAnalyticEigVec()
 {
 	arma::mat analyticalEigVec(n, n);
-	for (arma::uword j = 0; j < n; j++) {
-		for (arma::uword i = 1; i < n + 1; i++) {
+	for (arma::uword j = 0; j < n; j++)
+	{
+		for (arma::uword i = 1; i < n + 1; i++)
+		{
 			analyticalEigVec(i - 1, j) = sin(i * (double(j) + 1.0) * pi / (double(n + 1)));
 		}
 	}
@@ -183,14 +203,14 @@ arma::mat JacobiSolver::getAnalyticEigVec()
 arma::vec JacobiSolver::getAnalyticEigVal()
 {
 	arma::vec analyticEigVal(n);
-	for (unsigned int j = 1; j < n + 1; j++)
+	for (arma::uword j = 1; j < n + 1; j++)
 	{
 		analyticEigVal(j - 1) = d + 2 * a * std::cos(j * pi / (double(n + 1)));
 	}
 	return analyticEigVal;
 }
 
-void JacobiSolver::display(const arma::mat& v)
+void JacobiSolver::display(const arma::mat &v)
 {
 	std::cout.precision(4);
 	std::cout.setf(std::ios::fixed);
