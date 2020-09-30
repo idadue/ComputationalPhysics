@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
+#include "time.h"
 
 /*
 Class for solving eigenvalue problems using the Jacobi eigenvalue algorithm.
@@ -38,8 +39,8 @@ Functions:
 
 */
 
-//TODO: Remove surplous methods, variables
-const long double pi = 3.141592653589793238462643383279502884;
+#define pi M_PI
+//const long double pi = 3.141592653589793238462643383279502884;
 
 class JacobiSolver
 {
@@ -51,10 +52,10 @@ private:
 	float rho;
 	arma::mat A, B, R;
 
-	std::tuple<int, int, double> findMaxNonDiagElement(const arma::mat& V);
+	std::tuple<int, int, double> findMaxNonDiagElement(const arma::mat &V);
 
-	void rotate(int k, int l);
-	arma::mat sortR(const arma::mat& R, const arma::uvec& indSorted);
+	void rotate(unsigned int k, unsigned int l);
+	arma::mat sortR(const arma::mat &R, const arma::uvec &indSorted);
 
 public:
 	JacobiSolver(const unsigned int n, const float rho, const int potential, const float omega);
@@ -65,12 +66,11 @@ public:
 	void solve(const int multiplier);
 	double solveWithTime(const int multiplier);
 
-	std::pair<arma::vec, arma::mat> armadilloSolution();
+	std::tuple<arma::vec, arma::mat, double> armadilloSolution();
 
 	arma::vec getPotential();
 	arma::vec getPotential(const float omega);
 
-	//Test
 	arma::mat getTestR();
 	double compareTrace();
 
@@ -79,10 +79,10 @@ public:
 	arma::mat getAnalyticEigVec();
 	arma::vec getAnalyticEigVal();
 
-	void display(const arma::mat& v);
+	void display(const arma::mat &v);
 };
 
-template<class T>
+template <class T>
 inline void JacobiSolver::matrixInit(T potential)
 {
 	A = A.zeros(n, n);

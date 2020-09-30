@@ -30,7 +30,7 @@ std::string slash = "/";
 /*Creates a folder in current path*/
 void create_directory(std::string filename)
 {
-	char* dir = const_cast<char*>(filename.c_str());
+	char *dir = const_cast<char *>(filename.c_str());
 	//mkdir and _mkdir take different arguments, so we need to make sure we are passing them correctly
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 	createFolder(dir);
@@ -56,7 +56,8 @@ std::string get_current_dir()
 	return current_working_dir;
 }
 
-class FileHandler {
+class FileHandler
+{
 private:
 	std::ofstream outFile;
 	std::ifstream inFile;
@@ -65,19 +66,22 @@ private:
 	bool append = false;
 
 public:
-	FileHandler(std::string folder) {
+	FileHandler(std::string folder)
+	{
 		create_directory("results");
 		create_directory("results" + slash + folder);
 		currentPath = get_current_dir();
 		currentPath += slash + "results" + slash + folder + slash;
 	}
 
-	void writeToFile(std::string& filename, const arma::vec& v) {
+	void writeToFile(std::string &filename, const arma::vec &v)
+	{
 		filename = currentPath + filename + ".csv";
 		bool does_exist = exists(filename);
 		fileOpener(filename, does_exist);
 
-		if (does_exist && outFile.is_open()) {
+		if (does_exist && outFile.is_open())
+		{
 			outFile << "----------------- \n";
 			outFile << 0 << "\n";
 			unsigned int n = v.size();
@@ -86,7 +90,8 @@ public:
 				outFile << v(i) << "\n";
 			}
 		}
-		else if (outFile.is_open()) {
+		else if (outFile.is_open())
+		{
 			outFile << 0 << "\n";
 			unsigned int n = v.size();
 			for (unsigned int i = 0; i < n; i++)
@@ -98,12 +103,41 @@ public:
 		outFile.close();
 	}
 
-	inline bool exists(const std::string& name) {
+	/*Dont add 0 to beginning and end. Needs a better implementation*/
+	void writeRawToFile(std::string &filename, const arma::vec &v)
+	{
+		filename = currentPath + filename + ".csv";
+		bool does_exist = exists(filename);
+		fileOpener(filename, does_exist);
+
+		if (does_exist && outFile.is_open())
+		{
+			outFile << "----------------- \n";
+			unsigned int n = v.size();
+			for (unsigned int i = 0; i < n; i++)
+			{
+				outFile << v(i) << "\n";
+			}
+		}
+		else if (outFile.is_open())
+		{
+			unsigned int n = v.size();
+			for (unsigned int i = 0; i < n; i++)
+			{
+				outFile << v(i) << "\n";
+			}
+		}
+		outFile.close();
+	}
+
+	inline bool exists(const std::string &name)
+	{
 		std::ifstream f(name.c_str());
 		return f.good();
 	}
 
-	void fileOpener(std::string filename, const bool file) {
+	void fileOpener(std::string filename, const bool file)
+	{
 		(file) ? outFile.open(filename, std::ofstream::app) : outFile.open(filename, std::ofstream::out);
 	}
 };
