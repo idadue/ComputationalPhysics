@@ -1,0 +1,17 @@
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+std::cout << "This is windows" << std::endl;
+#else
+std::cout << "This is Unix based system" << std::endl;
+#endif
+--------------------------------------------
+#if __has_include(<direct.h>)
+#include <direct.h>
+#define GetCurrentDir _getcwd
+#define createFolder _mkdir
+
+#else
+#include <unistd.h>
+#include <sys/stat.h>
+#define createFolder mkdir
+#define GetCurrentDir getcwd
+#endif

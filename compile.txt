@@ -1,0 +1,3 @@
+cl /std:c++17 /EHsc /W4 main.cpp
+
+main.exe -1 2 -1
