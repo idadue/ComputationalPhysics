@@ -23,13 +23,13 @@ Variables:
 
 Functions:
 	void matrixInit() - takes any type T, altough in reality only type arma::vec is accounted for.
-	std::tuple findMaxNonDiagElement - returns the biggest absoulute non diagonal element of a matrix with indices.
+	std::tuple findMaxNonDiagElement - returns the biggest absoulute non diagonal element of a matrix with related indices.
 
 	void solve() - Solve for eigenvalues of tridiagonal Toeplitz matrix using Jacobi eigenvalue algorithm
 	double solveWithTime() - Same as solve() but returns the time it took to completed computation
 
 	void rotate() - the actual method for implementing the Jacobi eigenvalue algorithm
-	arma::mat sortR - sorts the eigenvector matrix to match with the sorted eigenvalues
+	arma::mat sortR - sorts the eigenvector matrix to match with the sorted eigenvalues and returns sorted matrix
 
 	arma::vec getPotential() - returns a potential function to be added to the super and sub diagonals elements of the Toeplitz matrix.
 	arma::mat getTestR() - Returns an R matrix with diagonals removed so the orthonormality of R can be tested.
@@ -52,10 +52,10 @@ private:
 	float rho;
 	arma::mat A, B, R;
 
-	std::tuple<int, int, double> findMaxNonDiagElement(const arma::mat &V);
+	std::tuple<int, int, double> findMaxNonDiagElement(const arma::mat& V);
 
 	void rotate(unsigned int k, unsigned int l);
-	arma::mat sortR(const arma::mat &R, const arma::uvec &indSorted);
+	arma::mat sortR(const arma::mat& R, const arma::uvec& indSorted);
 
 public:
 	JacobiSolver(const unsigned int n, const float rho, const int potential, const float omega);
@@ -79,7 +79,7 @@ public:
 	arma::mat getAnalyticEigVec();
 	arma::vec getAnalyticEigVal();
 
-	void display(const arma::mat &v);
+	void display(const arma::mat& v);
 };
 
 template <class T>
