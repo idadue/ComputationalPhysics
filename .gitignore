@@ -5,6 +5,5 @@ project2/src/.vs/
 
 Project2.1/
 
-.vs
-
-.vscode
+**/.vs
+**/.vscode
