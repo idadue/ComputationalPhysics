@@ -3,7 +3,10 @@
 #include <string>
 #include <armadillo>
 
-/*Class for writing to files, creating folders and possibly reading from files(future)*/
+/*
+Class for writing to files, creating folders and possibly reading from files(future)
+Needs a rewrite for generality, ease of use
+*/
 
 /*
 * This part checks during pre proccessing what system the user is using. If the user is using windows, they should have
@@ -30,7 +33,7 @@ std::string slash = "/";
 /*Creates a folder in current path*/
 void create_directory(std::string filename)
 {
-	char *dir = const_cast<char *>(filename.c_str());
+	char* dir = const_cast<char*>(filename.c_str());
 	//mkdir and _mkdir take different arguments, so we need to make sure we are passing them correctly
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 	createFolder(dir);
@@ -74,7 +77,7 @@ public:
 		currentPath += slash + "results" + slash + folder + slash;
 	}
 
-	void writeToFile(std::string &filename, const arma::vec &v)
+	void writeToFile(std::string& filename, const arma::vec& v)
 	{
 		filename = currentPath + filename + ".csv";
 		bool does_exist = exists(filename);
@@ -104,7 +107,7 @@ public:
 	}
 
 	/*Dont add 0 to beginning and end. Needs a better implementation*/
-	void writeRawToFile(std::string &filename, const arma::vec &v)
+	void writeRawToFile(std::string& filename, const arma::vec& v)
 	{
 		filename = currentPath + filename + ".csv";
 		bool does_exist = exists(filename);
@@ -130,7 +133,7 @@ public:
 		outFile.close();
 	}
 
-	inline bool exists(const std::string &name)
+	inline bool exists(const std::string& name)
 	{
 		std::ifstream f(name.c_str());
 		return f.good();

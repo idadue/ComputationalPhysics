@@ -66,7 +66,6 @@ TEST_CASE("Running the jacobi algorithm")
 		else
 		{
 			timing.push_back(time);
-			counter++;
 		}
 
 		std::cout << "Execution time of algorithm is: " << time << " seconds \n \n";
@@ -74,11 +73,9 @@ TEST_CASE("Running the jacobi algorithm")
 
 	if (!timing.empty())
 	{
-		arma::vec t = timing;
 		FileHandler file("bbeam");
 		std::string file_t = "timing";
 		file.writeToFile(file_t, timing);
-		printf("Average execution time for buckling beam problem with n = 100 was t = %f seconds \n", ((arma::sum(t)) / double(counter)));
 	}
 
 	inData.close();

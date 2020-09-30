@@ -1,10 +1,16 @@
 #include "jacobisolver.h"
 
-JacobiSolver::JacobiSolver(const unsigned int n, const float rho, const int potential, const float omega) : n{n}, h{rho / double(n)}
+/*
+	Methods implementations of methods declared in jacobisolver.h
+	See jacobisolver.h for general description on functionality
+*/
+
+JacobiSolver::JacobiSolver(const unsigned int n, const float rho, const int potential, const float omega) : n{ n }, h{ rho / double(n) }
 {
 	a = -(1.0 / pow(h, 2));
 	d = 2.0 / pow(h, 2);
 
+	//Using hard coded epsilon
 	epsilon = 1.0e-8;
 	if (potential == 1)
 	{
@@ -20,7 +26,7 @@ JacobiSolver::JacobiSolver(const unsigned int n, const float rho, const int pote
 	}
 }
 
-std::tuple<int, int, double> JacobiSolver::findMaxNonDiagElement(const arma::mat &V)
+std::tuple<int, int, double> JacobiSolver::findMaxNonDiagElement(const arma::mat& V)
 {
 	double max = 0;
 	std::tuple<int, int, double> max_ij;
@@ -31,7 +37,7 @@ std::tuple<int, int, double> JacobiSolver::findMaxNonDiagElement(const arma::mat
 			if (fabs(V(i, j)) > max)
 			{
 				max = fabs(V(i, j));
-				max_ij = {i, j, max};
+				max_ij = { i, j, max };
 			}
 		}
 	}
@@ -84,7 +90,7 @@ void JacobiSolver::rotate(unsigned int k, unsigned int l)
 	}
 }
 
-arma::mat JacobiSolver::sortR(const arma::mat &R, const arma::uvec &indSorted)
+arma::mat JacobiSolver::sortR(const arma::mat& R, const arma::uvec& indSorted)
 {
 	arma::mat RSorted;
 	RSorted.copy_size(R);
@@ -99,7 +105,7 @@ arma::mat JacobiSolver::sortR(const arma::mat &R, const arma::uvec &indSorted)
 	return RSorted;
 }
 
-/*Uses rotate() and findMaxNonDiagElements() to compute the Jacobi eigenvalue algorithm, with a multiplier such that 
+/*Uses rotate() and findMaxNonDiagElements() to compute the Jacobi eigenvalue algorithm, with a multiplier such that
 we can run for enough iterations to reach the accuracy we need.*/
 void JacobiSolver::solve(const int multiplier)
 {
@@ -210,7 +216,7 @@ arma::vec JacobiSolver::getAnalyticEigVal()
 	return analyticEigVal;
 }
 
-void JacobiSolver::display(const arma::mat &v)
+void JacobiSolver::display(const arma::mat& v)
 {
 	std::cout.precision(4);
 	std::cout.setf(std::ios::fixed);
