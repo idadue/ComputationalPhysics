@@ -1,0 +1,90 @@
+*******************************************************************************
+ Revised: January 23, 2020             Saturn                               699
+ 
+ PHYSICAL DATA (updated 2020-Jan-03):
+  Mass x10^26 (kg)      = 5.6834          Density (g/cm^3)       =  0.687+-.001
+  Equat. radius (1 bar) = 60268+-4 km     Polar radius (km)      = 54364+-10
+  Vol. Mean Radius (km) = 58232+-6        Flattening             =  0.09796
+  Geometric Albedo      = 0.47            Rocky core mass (Mc/M) =  0.1027
+  Sid. rot. period (III)= 10h 39m 22.4s   Sid. rot. rate (rad/s) =  0.000163785 
+  Mean solar day, hrs   =~10.656         
+  GM (km^3/s^2)         = 37931206.159    GM 1-sigma (km^3/s^2)  = +- 98
+  Equ. grav, ge (m/s^2) = 10.44           Pol. grav, gp (m/s^2)  = 12.14+-0.01
+  Vis. magnitude V(1,0) = -8.88          
+  Vis. mag. (opposition)= +0.67           Obliquity to orbit     = 26.73 deg
+  Sidereal orbit period = 29.447498 yr    Sidereal orbit period  = 10755.698 d
+  Mean daily motion     = 0.0334979 deg/d Mean orbit velocity    =  9.68 km/s
+  Atmos. temp. (1 bar)  = 134+-4 K        Escape speed, km/s    =  35.5          
+  Aroche(ice)/Rp        =  2.71           Hill's sphere rad. Rp  = 1100
+                                 Perihelion  Aphelion    Mean
+  Solar Constant (W/m^2)         16.8        13.6        15.1
+  Maximum Planetary IR (W/m^2)    4.7         4.5         4.6
+  Minimum Planetary IR (W/m^2)    4.7         4.5         4.6
+*******************************************************************************
+ 
+ 
+*******************************************************************************
+Ephemeris / WWW_USER Thu Oct 15 08:50:50 2020 Pasadena, USA      / Horizons
+*******************************************************************************
+Target body name: Saturn (699)                    {source: sat427l_merged_DE438}
+Center body name: Solar System Barycenter (0)     {source: DE431mx}
+Center-site name: BODY CENTER
+*******************************************************************************
+Start time      : A.D. 2020-Oct-08 00:00:00.0000 TDB
+Stop  time      : A.D. 2020-Oct-10 00:00:00.0000 TDB
+Step-size       : 1 calendar years
+*******************************************************************************
+Center geodetic : 0.00000000,0.00000000,0.0000000 {E-lon(deg),Lat(deg),Alt(km)}
+Center cylindric: 0.00000000,0.00000000,0.0000000 {E-lon(deg),Dxy(km),Dz(km)}
+Center radii    : (undefined)                                                  
+Output units    : AU-D
+Output type     : GEOMETRIC cartesian states
+Output format   : 2 (position and velocity)
+Reference frame : Ecliptic of J2000.0
+*******************************************************************************
+JDTDB
+   X     Y     Z
+   VX    VY    VZ
+*******************************************************************************
+$$SOE
+2459130.500000000 = A.D. 2020-Oct-08 00:00:00.0000 TDB 
+ X = 5.108205900950103E+00 Y =-8.586489985150672E+00 Z =-5.406451432311900E-02
+ VX= 4.484363829052398E-03 VY= 2.837371726481273E-03 VZ=-2.276593212167927E-04
+$$EOE
+*******************************************************************************
+Coordinate system description:
+
+  Ecliptic at the standard reference epoch
+
+    Reference epoch: J2000.0
+    X-Y plane: adopted Earth orbital plane at the reference epoch
+               Note: obliquity of 84381.448 arcseconds (IAU76) wrt ICRF equator
+    X-axis   : ICRF
+    Z-axis   : perpendicular to the X-Y plane in the directional (+ or -) sense
+               of Earth's north pole at the reference epoch.
+
+  Symbol meaning [1 au= 149597870.700 km, 1 day= 86400.0 s]:
+
+    JDTDB    Julian Day Number, Barycentric Dynamical Time
+      X      X-component of position vector (au)
+      Y      Y-component of position vector (au)
+      Z      Z-component of position vector (au)
+      VX     X-component of velocity vector (au/day)                           
+      VY     Y-component of velocity vector (au/day)                           
+      VZ     Z-component of velocity vector (au/day)                           
+
+Geometric states/elements have no aberrations applied.
+
+
+ Computations by ...
+     Solar System Dynamics Group, Horizons On-Line Ephemeris System
+     4800 Oak Grove Drive, Jet Propulsion Laboratory
+     Pasadena, CA  91109   USA
+     Information  : https://ssd.jpl.nasa.gov/
+     Documentation: https://ssd.jpl.nasa.gov/?horizons_doc
+     Connect      : https://ssd.jpl.nasa.gov/?horizons (browser)
+                    telnet ssd.jpl.nasa.gov 6775       (command-line)
+                    e-mail command interface available
+                    Script and CGI interfaces available
+     Author       : Jon.D.Giorgini@jpl.nasa.gov
+*******************************************************************************
