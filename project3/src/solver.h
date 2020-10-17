@@ -19,8 +19,8 @@ public:
     Solver();
 
     void addPlanet(const Planet &planet);
-    void forwardEulerMethod(int endingTime, unsigned int N);
-    void verletMethod(int endingTime, unsigned int N, bool read = true);
+    void solarSystem(int endingTime, unsigned int N, int method = 0, bool read = true);
+
     void readData();
 
 private:

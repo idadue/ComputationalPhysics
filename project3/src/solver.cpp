@@ -11,19 +11,14 @@ Solver::Solver()
     dir_path = path;
 }
 
-void Solver::forwardEulerMethod(int endingTime, unsigned int N)
-{
-    /*
-    Pass
-    */
-    double dt = double(endingTime) / double(N);
-    double elapsedTime = 0;
-}
-
 /*
-Solve diff equation using the Verlet velocity method.
+Solves the system for endingTime years.
+Method 0 = Velocity Verlet - default
+Method 1 = Forward Euler
+Method 2 = Euler-Cromer
 */
-void Solver::verletMethod(int endingTime, unsigned int N, bool read)
+
+void Solver::solarSystem(int endingTime, unsigned int N, int method, bool read)
 {
     double dt = endingTime / double(N);
     double elapsedTime = 0;
@@ -37,6 +32,13 @@ void Solver::verletMethod(int endingTime, unsigned int N, bool read)
         readData();
     }
     prepareFolder("data");
+    double cpx = centerMassPosition(0);
+    double cpy = centerMassPosition(1);
+    double cpz = centerMassPosition(2);
+
+    double cvx = centerMassVelocity(0);
+    double cvy = centerMassVelocity(1);
+    double cvz = centerMassVelocity(2);
 
     while (elapsedTime <= endingTime)
     {
@@ -48,13 +50,13 @@ void Solver::verletMethod(int endingTime, unsigned int N, bool read)
 
             if (elapsedTime == 0.0)
             {
-                x = planets[i].getPosition(0) - centerMassPosition(0);
-                y = planets[i].getPosition(1) - centerMassPosition(1);
-                z = planets[i].getPosition(2) - centerMassPosition(2);
+                x = planets[i].getPosition(0) - cpx;
+                y = planets[i].getPosition(1) - cpy;
+                z = planets[i].getPosition(2) - cpz;
 
-                vx = planets[i].getVelocity(0) - centerMassPosition(0);
-                vy = planets[i].getVelocity(1) - centerMassPosition(1);
-                vz = planets[i].getVelocity(2) - centerMassPosition(2);
+                vx = planets[i].getVelocity(0) - cvx;
+                vy = planets[i].getVelocity(1) - cvy;
+                vz = planets[i].getVelocity(2) - cvz;
                 printer(out, x, y, z);
             }
             else
@@ -74,21 +76,49 @@ void Solver::verletMethod(int endingTime, unsigned int N, bool read)
             ay = Fy / planets[i].getMass();
             az = Fz / planets[i].getMass();
 
-            x = x + vx * dt + ax * pow(dt, 2) * 0.5;
-            y = y + vy * dt + ay * pow(dt, 2) * 0.5;
-            z = z + vz * dt + az * pow(dt, 2) * 0.5;
-            planets[i].setPosition(x, y, z);
+            if (method == 1)
+            {
+                x = x + vx * dt;
+                y = y + vy * dt;
+                z = z + vz * dt;
 
-            gravitationalForce(planets[i], Fx, Fy, Fz);
+                planets[i].setPosition(x, y, z);
+
+                vx = vx + (ax * dt);
+                vy = vy + (ay * dt);
+                vz = vz + (az * dt);            }
+            else if (method == 2)
+            {
+                vx = vx + (ax * dt);
+                vy = vy + (ay * dt);
+                vz = vz + (az * dt);
+
+                x = x + vx * dt;
+                y = y + vy * dt;
+                z = z + vz * dt;
+
+                planets[i].setPosition(x, y, z);
+            }
+            else
+            {
+                x = x + vx * dt + ax * pow(dt, 2) * 0.5;
+                y = y + vy * dt + ay * pow(dt, 2) * 0.5;
+                z = z + vz * dt + az * pow(dt, 2) * 0.5;
+                planets[i].setPosition(x, y, z);
+
+                gravitationalForce(planets[i], Fx, Fy, Fz);
+
+                ax_dt = Fx / planets[i].getMass();
+                ay_dt = Fy / planets[i].getMass();
+                az_dt = Fz / planets[i].getMass();
+
+                vx = vx + (ax_dt + ax) * (0.5 * dt);
+                vy = vy + (ay_dt + ay) * (0.5 * dt);
+                vz = vz + (az_dt + az) * (0.5 * dt);
+            }
+
             printer(out, x, y, z);
 
-            ax_dt = Fx / planets[i].getMass();
-            ay_dt = Fy / planets[i].getMass();
-            az_dt = Fz / planets[i].getMass();
-
-            vx = vx + (ax_dt + ax) * (0.5 * dt);
-            vy = vy + (ay_dt + ay) * (0.5 * dt);
-            vz = vz + (az_dt + az) * (0.5 * dt);
             planets[i].setVelocity(vx, vy, vz);
 
             x = y = z = 0;
@@ -191,8 +221,9 @@ void Solver::readData()
         inData >> x >> y >> z;
         inData >> vx >> vy >> vz;
         it.setMass(mass);
-        systemMass += mass;
+        systemMass += mass/it.solarMass;
         it.setPosition(x, y, z);
         it.setVelocity(it.YEARS * vx, it.YEARS * vy, it.YEARS * vz);
     }
+    std::cout << systemMass << std::endl;
 }

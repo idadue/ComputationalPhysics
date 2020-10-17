@@ -44,10 +44,11 @@ int main()
     solver.addPlanet(neptune);
     solver.addPlanet(pluto);
 
-    solver.readData();
+    //solver.readData();
 
     //just enough time for pluto to complete on orbit, ie 248 years
-    solver.verletMethod(248.0, 10000.0);
+    double years = 248;
+    solver.solarSystem(years, years * 365, 0);
 
     return 0;
 }
