@@ -27,17 +27,27 @@ void Solver::verletMethod(int endingTime, unsigned int N, bool read)
 {
     double dt = endingTime / double(N);
     double elapsedTime = 0;
+    time_t start, finish;
 
-    double x, y, z, vx, vy, vz;
-    double Fx, Fy, Fz;
-    double ax, ay, az, ax_dt, ay_dt, az_dt;
+    double cmp[3];
+    double cmv[3];
+    double pos[3];
+    double vel[3];
+    double acc[3];
+    double force[3];
 
     if (read)
     {
-        readData();
+        readData(readFile);
     }
-    prepareFolder("data");
+    for (int i = 0; i < 3; i++)
+    {
+        cmp[i] = centerMassPosition(i);
+        cmv[i] = centerMassVelocity(i);
+    }
+    prepareFolder();
 
+    start = clock();
     while (elapsedTime <= endingTime)
     {
         for (long unsigned int i = 0; i < planets.size(); ++i)
@@ -48,55 +58,44 @@ void Solver::verletMethod(int endingTime, unsigned int N, bool read)
 
             if (elapsedTime == 0.0)
             {
-                x = planets[i].getPosition(0) - centerMassPosition(0);
-                y = planets[i].getPosition(1) - centerMassPosition(1);
-                z = planets[i].getPosition(2) - centerMassPosition(2);
-
-                vx = planets[i].getVelocity(0) - centerMassPosition(0);
-                vy = planets[i].getVelocity(1) - centerMassPosition(1);
-                vz = planets[i].getVelocity(2) - centerMassPosition(2);
-                printer(out, x, y, z);
+                for (int j = 0; j < 3; ++j)
+                {
+                    pos[j] = planets[i].getPosition(j) - cmp[j];
+                    vel[j] = planets[i].getVelocity(j) - cmv[j];
+                    planets[i].setPos(j, pos[j]);
+                }
             }
             else
             {
-                x = planets[i].getPosition(0);
-                y = planets[i].getPosition(1);
-                z = planets[i].getPosition(2);
+                for (int j = 0; j < 3; ++j)
+                {
+                    pos[j] = planets[i].getPosition(j);
+                    vel[j] = planets[i].getVelocity(j);
+                }
+            }
+            gravitationalForce(planets[i], force[0], force[1], force[2]);
 
-                vx = planets[i].getVelocity(0);
-                vy = planets[i].getVelocity(1);
-                vz = planets[i].getVelocity(2);
+            for (int j = 0; j < 3; ++j)
+            {
+                acc[j] = force[j] / planets[i].getMass();
+                pos[j] += vel[j] * dt + acc[j] * pow(dt, 2) * 0.5;
+                planets[i].setPos(j, pos[j]);
             }
 
-            gravitationalForce(planets[i], Fx, Fy, Fz);
+            gravitationalForce(planets[i], force[0], force[1], force[2]);
+            printer(out, pos[0], pos[1], pos[2]);
 
-            ax = Fx / planets[i].getMass();
-            ay = Fy / planets[i].getMass();
-            az = Fz / planets[i].getMass();
-
-            x = x + vx * dt + ax * pow(dt, 2) * 0.5;
-            y = y + vy * dt + ay * pow(dt, 2) * 0.5;
-            z = z + vz * dt + az * pow(dt, 2) * 0.5;
-            planets[i].setPosition(x, y, z);
-
-            gravitationalForce(planets[i], Fx, Fy, Fz);
-            printer(out, x, y, z);
-
-            ax_dt = Fx / planets[i].getMass();
-            ay_dt = Fy / planets[i].getMass();
-            az_dt = Fz / planets[i].getMass();
-
-            vx = vx + (ax_dt + ax) * (0.5 * dt);
-            vy = vy + (ay_dt + ay) * (0.5 * dt);
-            vz = vz + (az_dt + az) * (0.5 * dt);
-            planets[i].setVelocity(vx, vy, vz);
-
-            x = y = z = 0;
-            vx = vy = vz = 0;
-            Fx = Fy = Fz = 0;
+            for (int j = 0; j < 3; ++j)
+            {
+                acc[j] += force[j] / planets[i].getMass();
+                vel[j] += acc[j] * (0.5 * dt);
+                planets[i].setVel(j, vel[j]);
+            }
         }
         elapsedTime += dt;
     }
+    finish = clock();
+    printf("Execution time is : %f seconds. \n", double(finish - start) / double(CLOCKS_PER_SEC));
 }
 
 void Solver::addPlanet(const Planet &planet)
@@ -166,7 +165,7 @@ bool Solver::checkIfExists(const std::string &path)
     return fs::exists(path);
 }
 
-void Solver::prepareFolder(const std::string &folder)
+void Solver::prepareFolder()
 {
     path = path + folder;
     if (!checkIfExists(path))
@@ -180,10 +179,20 @@ void Solver::prepareFolder(const std::string &folder)
     }
 }
 
-void Solver::readData()
+void Solver::setResultsFolder(std::string folder)
+{
+    this->folder = folder;
+}
+
+void Solver::setReadFile(const std::string &readFile)
+{
+    this->readFile = readFile;
+}
+
+void Solver::readData(const std::string &readFile)
 {
     std::ifstream inData;
-    inData.open(dir_path + "NASA/indata.txt");
+    inData.open(dir_path + readFile);
     double mass, x, y, z, vx, vy, vz;
     for (auto &it : planets)
     {
@@ -191,7 +200,7 @@ void Solver::readData()
         inData >> x >> y >> z;
         inData >> vx >> vy >> vz;
         it.setMass(mass);
-        systemMass += mass;
+        systemMass += it.getMass();
         it.setPosition(x, y, z);
         it.setVelocity(it.YEARS * vx, it.YEARS * vy, it.YEARS * vz);
     }

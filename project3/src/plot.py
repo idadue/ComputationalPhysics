@@ -10,7 +10,7 @@ import glob
 """
 Plot the solar system orbits from txt files.
 Data is currently required to be plotted in specific order, as spesified in
-main.cpp. 
+main.cpp.
 """
 
 fontsize = 20
@@ -28,7 +28,7 @@ path = os.getcwd()
 files = glob.glob("data/*.txt")
 files.sort()
 
-#Sun, Earth, Jupiter, Saturn, Venus, Mars, Mercury, Uranus, Neptune, Pluto
+# Sun, Earth, Jupiter, Saturn, Venus, Mars, Mercury, Uranus, Neptune, Pluto
 colors = ['yellow', 'royalblue', 'burlywood', 'navajowhite', 'goldenrod',
           'chocolate', 'peru', 'steelblue', 'skyblue', 'mistyrose']
 planets = ['Sun', 'Earth', 'Jupiter', 'Saturn', 'Venus',
@@ -57,10 +57,25 @@ for file in files:
     print(file)
     x, y, z = np.loadtxt(file,
                          delimiter=",", unpack=True)
-    if (planets[i] == "Earth" or planets[i] == "Venus" or planets[i] == "Mercury" or planets[i] == "Mars"):
-        x = x[len(x) - 200: len(x) - 1]
-        y = y[len(y) - 200: len(y) - 1]
-        z = z[len(z) - 200: len(z) - 1]
+
+    dx = x[1] - x[0]
+    dy = y[1] - y[0]
+    dz = z[1] - z[0]
+
+    tol = (np.abs(dx) + np.abs(dy) + np.abs(dz))*1.2
+    orbitlength = len(x)
+    for j in np.arange(2, len(x)):
+        dx = x[j] - x[0]
+        dy = y[j] - y[0]
+        dz = z[j] - z[0]
+        diff = np.abs(dx) + np.abs(dy) + np.abs(dz)
+        if diff < tol:
+            orbitlength = j + 2
+            break
+
+    x = x[:orbitlength]
+    y = y[:orbitlength]
+    z = z[:orbitlength]
 
     ax.plot(x, y, z, color=colors[i])
     ax.scatter(x[0], y[0], z[0], color=colors[i],

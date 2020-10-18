@@ -100,6 +100,16 @@ void Planet::setVelocity(double vx, double vy, double vz)
     velocity[2] = vz;
 }
 
+void Planet::setPos(int index, double pos)
+{
+    position[index] = pos;
+}
+
+void Planet::setVel(int index, double vel)
+{
+    velocity[index] = vel;
+}
+
 double Planet::getPosition(int i) const
 {
     return position[i];

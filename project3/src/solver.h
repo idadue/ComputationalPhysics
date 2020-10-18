@@ -1,10 +1,10 @@
 #pragma once
 #include "planet.h"
-#include <cmath>
 #include <iostream>
 #include <filesystem>
 #include <fstream>
-#include <string>
+#include <time.h>
+
 namespace fs = std::filesystem;
 
 /*
@@ -21,22 +21,28 @@ public:
     void addPlanet(const Planet &planet);
     void forwardEulerMethod(int endingTime, unsigned int N);
     void verletMethod(int endingTime, unsigned int N, bool read = true);
-    void readData();
+    void readData(const std::string &readFile);
+    void setResultsFolder(std::string folder);
+    void setReadFile(const std::string &readFile);
 
 private:
     double systemMass = 0;
     std::vector<Planet> planets;
     const double G = 4 * pow(M_PI, 2);
+    //const double G = 39.478;
 
     void gravitationalForce(Planet current, double &Fx, double &Fy, double &Fz);
     double centerMassPosition(uint16_t index);
     double centerMassVelocity(uint16_t index);
     void printer(std::ofstream &out, double x, double y, double z);
-    void prepareFolder(const std::string &folder);
+    void prepareFolder();
+    void init();
 
     void delete_dir_content(const fs::path &dir_path);
     bool checkIfEmpty(const std::string &path);
     bool checkIfExists(const std::string &path);
     std::string path;
     std::string dir_path;
+    std::string folder = "data";
+    std::string readFile = dir_path + "NASA/indata.txt";
 };

@@ -22,13 +22,10 @@ public:
     double getMass() const;
     double getID() const;
 
-    bool operator==(const Planet &rhs)
-    {
-        return (id == rhs.id) ? true : false;
-    }
-
     void setPosition(double x, double y, double z);
     void setVelocity(double vx, double vy, double vz);
+    void setPos(int index, double pos);
+    void setVel(int index, double vel);
 
     double getPosition(int i) const;
     double getVelocity(int i) const;
