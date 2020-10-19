@@ -10,3 +10,5 @@ Here you can find the [code](https://github.com/idadue/ComputationalPhysics/tree
 Here you can find the [code](https://github.com/idadue/ComputationalPhysics/tree/master/project2/src).
 
 ## Project 3: The solar system
+Here you can find the [code](https://github.com/idadue/ComputationalPhysics/tree/euler/project3/src) and the [report](https://github.com/idadue/ComputationalPhysics/tree/euler/project3/doc).
+
