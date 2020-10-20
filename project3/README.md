@@ -1,4 +1,4 @@
-# Project 2: The solar system
+# Project 3: The solar system
 
 ## The report
 
