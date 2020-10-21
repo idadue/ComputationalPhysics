@@ -1,0 +1,76 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+\appendix
+\renewcommand{\theequation}{A\arabic{equation}}
+\setcounter{equation}{0}
+\section{Appendix}
+\subsection{Source code}
+Github repository with codes and figures can be found at \url{https://github.com/idadue/ComputationalPhysics/tree/master/project3}.
+
+\subsection{Generalization of Newton's gravitational law}\label{sec:appendix_generalized_grav_law}
+The modified gravitational force is given by 
+\begin{align}
+    \vec{F}=G\frac{M_{\odot} M_{\textnormal{\text{Earth}}}}{r^{\beta}}\vec{e}_r,
+\end{align} where \ensuremath{\vec{r}} is the position vector of the Earth relative to the sun and with \ensuremath{\beta \in [2,3]}. The corresponding potential can then be written
+
+\begin{align}
+    V = \frac{1}{\beta-1}\frac{M_{\odot} M_{\textnormal{\text{Earth}}}}{r^{\beta-1}}=\frac{1}{\alpha}\frac{GM_{\odot} M_{\text{Earth}}}{r^{\alpha}}, 
+\end{align} with \ensuremath{\alpha = \beta - 1}. 
+
+First we look at this problem in two dimensions, where the Earth has two degrees of freedom. The system can be described by two generalized coordinates \ensuremath{r} and \ensuremath{\theta}. The position vector of the Earth is given by
+
+\begin{align*}
+    \vec{r}=r(\cos\theta,\sin\theta).
+\end{align*}
+
+We want to investigate the stability of Earths orbit for different values of \ensuremath{\beta}. The Lagrangian of the system is given by
+
+\begin{align*}
+    \mathcal{L}=\frac{1}{2}M_{\text{Earth}}(\dot{r}^2+r^2\dot{\theta}^2)-\left(-\frac{1}{\alpha}\frac{GM_{\odot} M_{\text{Earth}}}{r^{\alpha}}\right).
+\end{align*}
+
+It is trivial to see that we have two constants of motion because we have conservation of total energy and angular momentum. We set up Lagrange's equation for $\theta$, which gives
+
+\begin{align*}
+    \frac{d}{dt}\left(\frac{\partial L}{\partial \dot{\theta}}\right)-\frac{\partial L}{\partial \theta} = 0.
+\end{align*}
+
+The angular momentum of the Earth relative to the sun is given by
+\begin{align*}
+    \frac{\partial L}{\partial \dot{\theta}}= M_{\text{Earth}}r^2\dot{\theta}\equiv l.
+\end{align*} We use the equation above to eliminate the \ensuremath{\dot{\theta}} dependence in the equation of motion for the \ensuremath{r}-coordinate, which gives 
+
+\begin{align*}
+    \frac{d}{dt}\left(\frac{\partial L}{\partial \dot{r}}\right)-\frac{\partial L}{\partial r} &= 0 \\
+    M_{\text{Earth}}\ddot{r}-\left(\frac{l^2}{M_{\text{Earth}}r^3}-\frac{GM_{\odot}M_{\text{Earth}}}{r^{\alpha}}\right) &= 0,
+\end{align*} where we have used that
+
+\begin{align*}
+    \dot{\theta}=\frac{l}{M_{\text{Earth}}r^2}.
+\end{align*}
+
+We get the same equation of motion from a one dimensional Lagrangian
+\begin{align*}
+    \mathcal{L}=\frac{1}{2}M_{\text{Earth}}\dot{r}^2-V_{\textnormal{eff}}(r), 
+\end{align*}
+
+where the effective potential is defined by 
+\begin{align*}
+    V_{\textnormal{eff}}(r)=\frac{1}{2}\frac{l^2}{M_{\text{Earth}}}\frac{1}{r^2}-\frac{1}{\beta-1}\frac{GM_{\odot}M_{\text{Earth}}}{r^{\alpha}} \equiv \frac{1}{2}\frac{k}{r^2}-\frac{1}{\alpha}\frac{c}{r^{\alpha}}.
+\end{align*}
+
+In a stable equilibrium, this effective potential must have a minimum. Thus, we set the derivative with respect to \ensuremath{r} equal to zero: 
+\begin{align*}
+    \frac{dV_{\text{eff}}}{dr}=0 \\
+    -\frac{k}{r^3}+\frac{c}{r^{\alpha+1}}=0 \\
+    r^{\alpha-2}=\frac{c}{k}
+\end{align*}
+
+To have a minimum we get the condition 
+\begin{align*}
+    \frac{d^2V_{\text{eff}}}{dr}&>0 \\
+    3\frac{k}{r^4}-(\alpha+1)\frac{c}{r^{\alpha+2}}&>0 \\
+    &\vdots \\
+    \beta &< 3r^{\alpha-2}\frac{k}{c} = 3,    
+\end{align*}  which gives \ensuremath{\beta < 3} for a stable equilibrium. The Earth will have a stable orbit for all \ensuremath{\beta<3}, while the \ensuremath{r}-coordinate will diverge. 
+\end{document}

@@ -3,4 +3,14 @@
 \begin{document}
 \section{Introduction}\label{sec:introduction}
 
+%The purpose of this project is to simulate the solar system and the path of celestial objects. 
+
+The solar system is a complicated system with many interacting bodies, and it is impossible to solve analytically for instance the path of every object in the solar system. However, this complexity allows for a numerical approach in the solutions. In particular, the planetary motions in the solar system can be modelled as coupled differential equations, and these equations can be written in general forms, such that the solutions can be found using general numerical methods. Differential equations are ubiquitous in physics, appearing in almost every field in some fashion, and so the methods used in this project have wide-ranging applications.
+
+We will solve first the Earth-Sun system, ignoring all other planets and objects, using the Euler method and the velocity Verlet method, comparing the two solutions and their performance. Then, having made code that can simulate a specific system, testing various quantities such as the escape velocity and conservation of angular momentum to ensure that the algorithms work well, we will extend the framework to a three-body problem, and further to the entire solar system. Finally we check the perihelion precession of Mercury, relating to relativistic calculations of gravity.
+
+Structure of the report:
+
+First we review some important astronomical and mechanical laws, before explaining the method with which the solar system is simulated. We present images of the simulated solar system, testing escape velocity, the perihelion precession of Mercury and different forms of the gravitational force, adding relativistic corrections. We compare the Forward Euler and Velocity Verlet method on stability and energy conservation.
+
 \end{document}
