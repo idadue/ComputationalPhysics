@@ -3,4 +3,91 @@
 \begin{document}
 \section{Method}\label{sec:method}
 
+There are two numerical iterative methods used in this project to compute the path of the celestial bodies, the forward Euler and the Velocity Verlet methods. Following is a short explanation of both methods.
+
+\subsection{Forward Euler}
+
+In this project we are working with coupled differential equations of the form
+
+\begin{align}
+    \begin{split}
+        x'(t) = v(t,x)\\
+        v'(t,x) = a(t,x),
+    \end{split}
+    \label{eq:differential-euler}
+\end{align}
+
+where $x$ is the position of a celestial body, $v$ is the velocity of this body, and $a$ is the acceleration. We know that for a conservative force such as gravity, there is for the force, and therefore also the acceleration no dependence on the velocity of the body. We discretize the functions $x(t), v(t,x), a(t,x)$ with the time values $t = \{t_0, t_1, \ldots , t_n\}$, such that $\frac{t_n - t_0}{n} = h$ and $t_{i+1} = t_i + h$. Now we can Taylor expand the discretized functions $x(t_i) = x_i$ and $v(t_i) = v_i$ as
+
+\begin{align*}
+    x_{i+1} = & x_i + h x'_i + \mathcal{O}(h^2) \\
+    v_{i+1} = & v_i + h v'_i + \mathcal{O}(h^2).
+\end{align*}
+
+Using the differential equations \cref{eq:differential-euler} and suppressing the truncation error, we can write this as
+
+\begin{align}
+    \begin{split}
+        y_{i+1} = & y_i + h v_i\\
+        v_{i+1} = & v_i + h a_i.
+    \end{split}
+    \label{eq:euler}
+\end{align}
+
+With \cref{eq:euler}, simulating the solar system is possible, albeit with an error in the form of conservation of energy. Euler's method does not conserve energy \cite{}, but with a simple modification, we obtain the Euler-Cromer method,
+
+\begin{align}
+    \begin{split}
+        y_{i+1} = & y_i + h v_{i+1}\\
+        v_{i+1} = & v_i + h a_i,
+    \end{split}
+    \label{eq:euler-cromer}
+\end{align}
+
+and this does conserve the energy of the system. 
+
+
+The forward Euler method can be represented by the recursive relation
+
+\begin{align}
+    y_{i+1}=y_i+hf(t_i,y_i)+\mathcal{O}(h^2).
+\end{align} We see that the next element of the function \ensuremath{y(t)} is given explicitly by the previous element.  
+
+\iffalse
+\begin{algorithm}[H]
+\SetAlgoLined
+ 
+ \caption{Forward Euler}
+\end{algorithm}
+\fi
+
+\subsection{Velocity Verlet}
+The velocity Verlet method is a commonly used integration algorithm which calculates the velocity and position at the same value of the time variable \cite{Verlet1967}. It  is  frequently  used  to  calculate  trajectories  of  particles  in  molecular  dynamics  simulations, and is also well suited to calculate the trajectories of our celestial bodies.  The method is easy to implement and offers good numerical stability, as well as other properties that are important in physical systems such as time-reversibility and area preserving properties. 
+
+The velocity Verlet method can be represented by the recursive relation
+
+\begin{align}
+    y_{i+1} = & y_i+hv_i+\frac{h^2}{a_i}+\mathcal{O}(h^3) \\
+    v_{i+1} = & v_i+\frac{h}{2}(a_{i+1}+a_i)+\mathcal{O}(h^3).
+\end{align} note that \ensuremath{a_{i+1}} depends on the position \ensuremath{y_{i+1}}. Thus, we have to calculate the position at the updated time \ensuremath{t_{i+1}} before we compute the next velocity. 
+
+\iffalse
+\begin{algorithm}[H]
+\SetAlgoLined
+ 
+ \caption{Velocity Verlet}
+\end{algorithm}
+\fi
+
+\subsection{Implemented classes/object orientation}
+In this work, we make use of the advantages of writing object oriented code by implementing classes. 
+
+\texttt{planet} class
+
+\texttt{solver} class for solving n-body problem
+
+Describe our implemented classes and structure of code ... 
+
+\subsection{Data}
+The initial conditions used to start the differential equation solver is extracted from the HORIZON Web-Interface, provided by the Jet Propulsion Laboratory (NASA) at the California institute of technology \cite{Horizon}.
 \end{document}

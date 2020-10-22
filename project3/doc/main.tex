@@ -5,7 +5,7 @@
 \usepackage{subfiles}   % Include subfiles
 \usepackage{hyperref}   % Nice referencing with clickable links
 \usepackage{amsmath}    % Math
-%\usepackage{biblatex}   % Citations
+\usepackage[style=ieee]{biblatex}   % Citations
 \usepackage[english]{babel}
 \usepackage{csquotes}   % Inline and display quotations
 \usepackage[nameinlink,noabbrev]{cleveref}
@@ -14,11 +14,29 @@
 \graphicspath{{figures/}{../figures/}}
 \usepackage[parfill]{parskip}
 \usepackage{float}
-\usepackage{breakurl}
+%\usepackage{breakurl}
 \usepackage{siunitx}
 \usepackage{xcolor}
+\usepackage{listings}
 
-\title{}
+% set the default code style
+\lstset{
+    frame=tb, % draw a frame at the top and bottom of the code block
+    tabsize=4, % tab space width
+    showstringspaces=false, % don't mark spaces in strings
+    numbers=left, % display line numbers on the left
+    commentstyle=\color{green}, % comment color
+    keywordstyle=\color{blue}, % keyword color
+    stringstyle=\color{red} % string color
+}
+
+\addbibresource{project3/doc/references.bib} %Import the bibliography file
+
+%\bibliography{references.bib}
+
+
+
+\title{A model for the solar system using ordinary differential equations}
 \author{Daniel Pinjusic, Gudmund Gunnarsen and Ida Due-Sørensen}
 \date{\today}
 
@@ -40,41 +58,9 @@
 
 \subfile{sections/conclusion}
 
-\section{Appendix}
+\printbibliography
 
-Github repository with codes and figures can be found at \burl{https://github.com/idadue/ComputationalPhysics/tree/master/project3}.
-
-
-\begin{thebibliography}{9}
-\bibitem{Taut}
-Taut, M. \textit{Two electrons in an external oscillator potential: Particular analytic solutions of a Coulomb potential correlation problem} Physical Review A, Vol. 48, number 5, 1993.
-
-\bibitem{matrix-computations}
-Van Loan, C. F. and Golub, G. H.: \textit{Matrix Computations}, chapter 8.5. The John Hopkins University Press, Baltimore, Maryland, 2013.
-
-\bibitem{arma1}
-C. Sanderson and R. Curtin.
-\textit{Armadillo: a template-based C++ library for linear algebra.}
-Journal of Open Source Software, Vol. 1, pp. 26, 2016.
-
-\bibitem{arma2}
-Sanderson, C. and  Curtin, R.:
-\textit{A User-Friendly Hybrid Sparse Matrix Class in C++.}
-Lecture Notes in Computer Science (LNCS), Vol. 10931, pp. 422-430, 2018. 
-
-\bibitem{project2}
-Hjort-Jensen, M: Project2,
-\\\texttt{\burl{https://github.com/CompPhysics/ComputationalPhysics/blob/master/doc/Projects/2020/Project2/pdf/Project2.pdf}}
-
-\bibitem{compphy} 
-Hjort-Jensen, M: Computational Physics,
-%\\\texttt{\href{https://github.com/CompPhysics/ComputationalPhysics/blob/master/doc/Lectures/lectures2015.pdf}{Find on course Github: ./doc/lectures/}}
-\\\texttt{\burl{https://github.com/CompPhysics/ComputationalPhysics/blob/master/doc/Lectures/lectures2015.pdf}}
-
-
-
-
-\end{thebibliography}
-% \printbibliography
+\clearpage
+\subfile{sections/appendix}
 
 \end{document}
