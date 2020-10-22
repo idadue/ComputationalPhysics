@@ -19,8 +19,9 @@ public:
     Solver();
 
     void addPlanet(const Planet &planet);
-    void forwardEulerMethod(int endingTime, unsigned int N);
-    void verletMethod(int endingTime, unsigned int N, bool read = true);
+    void forwardEulerMethod(int endingTime, unsigned int N, bool read = true);
+    void verletMethod(double endingTime, unsigned int N, bool read = true);
+    //void specialForce();
     void readData(const std::string &readFile);
     void setResultsFolder(std::string folder);
     void setReadFile(const std::string &readFile);
@@ -30,7 +31,14 @@ private:
     std::vector<Planet> planets;
     const double G = 4 * pow(M_PI, 2);
     //const double G = 39.478;
+    double cmp[3];
+    double cmv[3];
+    double pos[3];
+    double vel[3];
+    double acc[3];
+    double force[3];
 
+    void initialisePlanets(bool read = true);
     void gravitationalForce(Planet current, double &Fx, double &Fy, double &Fz);
     double centerMassPosition(uint16_t index);
     double centerMassVelocity(uint16_t index);
@@ -43,6 +51,6 @@ private:
     bool checkIfExists(const std::string &path);
     std::string path;
     std::string dir_path;
-    std::string folder = "data";
-    std::string readFile = dir_path + "NASA/indata.txt";
+    std::string folder = "results";
+    std::string readFile = dir_path + "data/solar_system.txt";
 };

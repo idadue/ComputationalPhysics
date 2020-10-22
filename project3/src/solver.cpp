@@ -11,41 +11,48 @@ Solver::Solver()
     dir_path = path;
 }
 
-void Solver::forwardEulerMethod(int endingTime, unsigned int N)
+void Solver::addPlanet(const Planet &planet)
+{
+    planets.push_back(planet);
+    systemMass += planet.getMass();
+}
+
+void Solver::initialisePlanets(bool read)
+{
+    if (read)
+        readData(readFile);
+
+    prepareFolder();
+
+    for (int i = 0; i < 3; i++)
+    {
+        cmp[i] = centerMassPosition(i);
+        cmv[i] = centerMassVelocity(i);
+    }
+
+    int i = 0;
+    for (auto &it : planets)
+    {
+        std::ofstream out;
+        std::string filename = path + "/planet_" + std::to_string(i) + ".txt";
+        out.open(filename, std::ios::app);
+        it.setPosition(it.getPosition(0) - cmp[0], it.getPosition(1) - cmp[1], it.getPosition(2) - cmp[2]);
+        it.setVelocity(it.getVelocity(0) - cmv[0], it.getVelocity(1) - cmv[1], it.getVelocity(2) - cmv[2]);
+        printer(out, it.getPosition(0), it.getPosition(1), it.getPosition(2));
+        ++i;
+    }
+}
+
+void Solver::forwardEulerMethod(int endingTime, unsigned int N, bool read)
 {
     /*
     Pass
     */
     double dt = double(endingTime) / double(N);
     double elapsedTime = 0;
-}
-
-/*
-Solve diff equation using the Verlet velocity method.
-*/
-void Solver::verletMethod(int endingTime, unsigned int N, bool read)
-{
-    double dt = endingTime / double(N);
-    double elapsedTime = 0;
     time_t start, finish;
 
-    double cmp[3];
-    double cmv[3];
-    double pos[3];
-    double vel[3];
-    double acc[3];
-    double force[3];
-
-    if (read)
-    {
-        readData(readFile);
-    }
-    for (int i = 0; i < 3; i++)
-    {
-        cmp[i] = centerMassPosition(i);
-        cmv[i] = centerMassVelocity(i);
-    }
-    prepareFolder();
+    initialisePlanets(read);
 
     start = clock();
     while (elapsedTime <= endingTime)
@@ -56,52 +63,96 @@ void Solver::verletMethod(int endingTime, unsigned int N, bool read)
             std::string filename = path + "/planet_" + std::to_string(i) + ".txt";
             out.open(filename, std::ios::app);
 
-            if (elapsedTime == 0.0)
+            for (int j = 0; j < 3; ++j)
             {
-                for (int j = 0; j < 3; ++j)
-                {
-                    pos[j] = planets[i].getPosition(j) - cmp[j];
-                    vel[j] = planets[i].getVelocity(j) - cmv[j];
-                    planets[i].setPos(j, pos[j]);
-                }
-            }
-            else
-            {
-                for (int j = 0; j < 3; ++j)
-                {
-                    pos[j] = planets[i].getPosition(j);
-                    vel[j] = planets[i].getVelocity(j);
-                }
+                pos[j] = planets[i].getPosition(j);
+                vel[j] = planets[i].getVelocity(j);
             }
             gravitationalForce(planets[i], force[0], force[1], force[2]);
 
             for (int j = 0; j < 3; ++j)
             {
                 acc[j] = force[j] / planets[i].getMass();
-                pos[j] += vel[j] * dt + acc[j] * pow(dt, 2) * 0.5;
+                pos[j] += vel[j] * dt;
+                vel[j] += acc[j] * dt;
+
                 planets[i].setPos(j, pos[j]);
+                planets[i].setVel(j, vel[j]);
             }
+            printer(out, pos[0], pos[1], pos[2]);
+        }
+        elapsedTime += dt;
+    }
+    finish = clock();
+    printf("Execution time for forward euler is: %f seconds. \n", double(finish - start) / double(CLOCKS_PER_SEC));
+
+    /*
+    if (method == 1)
+    {
+        x = x + vx * dt;
+        y = y + vy * dt;
+        z = z + vz * dt;
+
+        planets[i].setPosition(x, y, z);
+
+        vx = vx + (ax * dt);
+        vy = vy + (ay * dt);
+        vz = vz + (az * dt);
+    }
+    else if (method == 2)
+    {
+        vx = vx + (ax * dt);
+        vy = vy + (ay * dt);
+        vz = vz + (az * dt);
+
+        x = x + vx * dt;
+        y = y + vy * dt;
+        z = z + vz * dt;
+    }*/
+}
+
+/*
+Solve diff equation using the Verlet velocity method.
+*/
+void Solver::verletMethod(double endingTime, unsigned int N, bool read)
+{
+    double dt = endingTime / double(N);
+    double elapsedTime = 0;
+    time_t start, finish;
+
+    initialisePlanets(read);
+
+    start = clock();
+    while (elapsedTime <= endingTime)
+    {
+        for (long unsigned int i = 0; i < planets.size(); ++i)
+        {
+            std::ofstream out;
+            std::string filename = path + "/planet_" + std::to_string(i) + ".txt";
+            out.open(filename, std::ios::app);
 
             gravitationalForce(planets[i], force[0], force[1], force[2]);
-            printer(out, pos[0], pos[1], pos[2]);
+
+            for (int j = 0; j < 3; ++j)
+            {
+                acc[j] = force[j] / planets[i].getMass();
+                pos[j] = planets[i].getPosition(j) + planets[i].getVelocity(j) * dt + acc[j] * pow(dt, 2) * 0.5;
+                planets[i].setPos(j, pos[j]);
+            }
+            gravitationalForce(planets[i], force[0], force[1], force[2]);
 
             for (int j = 0; j < 3; ++j)
             {
                 acc[j] += force[j] / planets[i].getMass();
-                vel[j] += acc[j] * (0.5 * dt);
+                vel[j] = planets[i].getVelocity(j) + acc[j] * (0.5 * dt);
                 planets[i].setVel(j, vel[j]);
             }
+            printer(out, pos[0], pos[1], pos[2]);
         }
         elapsedTime += dt;
     }
     finish = clock();
     printf("Execution time is : %f seconds. \n", double(finish - start) / double(CLOCKS_PER_SEC));
-}
-
-void Solver::addPlanet(const Planet &planet)
-{
-    planets.push_back(planet);
-    systemMass += planet.getMass();
 }
 
 void Solver::gravitationalForce(Planet current, double &Fx, double &Fy, double &Fz)
@@ -112,9 +163,9 @@ void Solver::gravitationalForce(Planet current, double &Fx, double &Fy, double &
     {
         if (it->getID() != current.getID())
         {
-            x += (it->getMass() * (current.getPosition(0) - it->getPosition(0)) / pow(current.distance(*it), 3));
-            y += (it->getMass() * (current.getPosition(1) - it->getPosition(1)) / pow(current.distance(*it), 3));
-            z += (it->getMass() * (current.getPosition(2) - it->getPosition(2)) / pow(current.distance(*it), 3));
+            x += (it->getMass() * (current.getPosition(0) - it->getPosition(0)) / (pow(current.distance(*it), 3)));
+            y += (it->getMass() * (current.getPosition(1) - it->getPosition(1)) / (pow(current.distance(*it), 3)));
+            z += (it->getMass() * (current.getPosition(2) - it->getPosition(2)) / (pow(current.distance(*it), 3)));
         }
     }
     Fx = -G * current.getMass() * x;
@@ -167,7 +218,18 @@ bool Solver::checkIfExists(const std::string &path)
 
 void Solver::prepareFolder()
 {
-    path = path + folder;
+    path = dir_path + folder;
+    //std::string path = this->path + folder;
+    if (path == dir_path)
+    {
+        printf("Cannot delete contents of root directory!\n");
+        return;
+    }
+    else if (folder == "results")
+    {
+        printf("This will delete all folders/files in /results. \n Are you sure you want to do this?\n");
+    }
+
     if (!checkIfExists(path))
     {
         fs::create_directory(path);
@@ -181,7 +243,7 @@ void Solver::prepareFolder()
 
 void Solver::setResultsFolder(std::string folder)
 {
-    this->folder = folder;
+    this->folder += "/" + folder;
 }
 
 void Solver::setReadFile(const std::string &readFile)

@@ -25,8 +25,12 @@ plt.rcParams.update(newparams)
 os.chdir("../")
 path = os.getcwd()
 
-files = glob.glob("data/*.txt")
+files = glob.glob("results/solar_system/*.txt")
+#files3 = glob.glob("results//*.txt")
+files2 = glob.glob("results/sun_earth/*.txt")
 files.sort()
+files2.sort()
+# files3.sort()
 
 # Sun, Earth, Jupiter, Saturn, Venus, Mars, Mercury, Uranus, Neptune, Pluto
 colors = ['yellow', 'royalblue', 'burlywood', 'navajowhite', 'goldenrod',
@@ -38,18 +42,19 @@ sizes = [110, 1, 11, 9, 0.9, 0.5, 0.33, 4, 3.9, 0.2]
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-"""
-plt.gca().patch.set_facecolor('white')
-ax.w_xaxis.set_pane_color((0.5, 0.5, 0.5, 1.0))
-ax.w_yaxis.set_pane_color((0.5, 0.5, 0.5, 1.0))
-ax.w_zaxis.set_pane_color((0.5, 0.5, 0.5, 1.0))
+
+plt.gca().patch.set_facecolor('dimgray')
+pane = 0.15
+ax.w_xaxis.set_pane_color((pane, pane, pane, 1.0))
+ax.w_yaxis.set_pane_color((pane, pane, pane, 1.0))
+ax.w_zaxis.set_pane_color((pane, pane, pane, 1.0))
 """
 # Make bg black and remove grids
 ax.set_facecolor('black')
 ax.w_xaxis.set_pane_color((0.0, 0.0, 0.0, 0.0))
 ax.w_yaxis.set_pane_color((0.0, 0.0, 0.0, 0.0))
 ax.w_zaxis.set_pane_color((0.0, 0.0, 0.0, 0.0))
-ax.grid(False)
+ax.grid(False)"""
 
 
 i = 0
@@ -83,7 +88,8 @@ for file in files:
     i += 1
 
 
-# plt.xlabel("x")
-# plt.ylabel("y")
+plt.xlabel(r"$x$[Au]", labelpad=20)
+plt.ylabel(r"$y$[Au]", labelpad=20)
+ax.set_zlabel(r"$z$[Au]", labelpad=20)
 plt.legend()
 plt.show()
