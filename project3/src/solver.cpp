@@ -5,7 +5,7 @@ Solver::Solver()
     //Finds current path, but deletes lasts 3 chars, which in this case means
     //returning to the ./project3 folder
     //Note: This only works if current folder is src or other 3 letter length word
-    path = fs::current_path();
+    std::string path = fs::current_path();
     int str_len = path.length();
     path = path.erase(str_len - 3, 3);
     dir_path = path;
@@ -34,7 +34,7 @@ void Solver::initialisePlanets(bool read)
     for (auto &it : planets)
     {
         std::ofstream out;
-        std::string filename = path + "/planet_" + std::to_string(i) + ".txt";
+        std::string filename = dir_path + folder + "/planet_" + std::to_string(i) + ".txt";
         out.open(filename, std::ios::app);
         it.setPosition(it.getPosition(0) - cmp[0], it.getPosition(1) - cmp[1], it.getPosition(2) - cmp[2]);
         it.setVelocity(it.getVelocity(0) - cmv[0], it.getVelocity(1) - cmv[1], it.getVelocity(2) - cmv[2]);
@@ -43,14 +43,13 @@ void Solver::initialisePlanets(bool read)
     }
 }
 
+/*
+Solve diff equation using forward euler method
+*/
 void Solver::forwardEulerMethod(int endingTime, unsigned int N, bool read)
 {
-    /*
-    Pass
-    */
     double dt = double(endingTime) / double(N);
     double elapsedTime = 0;
-    time_t start, finish;
 
     initialisePlanets(read);
 
@@ -59,22 +58,14 @@ void Solver::forwardEulerMethod(int endingTime, unsigned int N, bool read)
     {
         for (long unsigned int i = 0; i < planets.size(); ++i)
         {
-            std::ofstream out;
-            std::string filename = path + "/planet_" + std::to_string(i) + ".txt";
-            out.open(filename, std::ios::app);
-
-            for (int j = 0; j < 3; ++j)
-            {
-                pos[j] = planets[i].getPosition(j);
-                vel[j] = planets[i].getVelocity(j);
-            }
+            std::ofstream out = outputStream(i);
             gravitationalForce(planets[i], force[0], force[1], force[2]);
 
             for (int j = 0; j < 3; ++j)
             {
                 acc[j] = force[j] / planets[i].getMass();
-                pos[j] += vel[j] * dt;
-                vel[j] += acc[j] * dt;
+                pos[j] = planets[i].getPosition(j) + planets[i].getVelocity(j) * dt;
+                vel[j] = planets[i].getVelocity(j) + acc[j] * dt;
 
                 planets[i].setPos(j, pos[j]);
                 planets[i].setVel(j, vel[j]);
@@ -85,30 +76,41 @@ void Solver::forwardEulerMethod(int endingTime, unsigned int N, bool read)
     }
     finish = clock();
     printf("Execution time for forward euler is: %f seconds. \n", double(finish - start) / double(CLOCKS_PER_SEC));
+}
 
-    /*
-    if (method == 1)
+/*
+Solve diff equation using euler-cromer method
+*/
+void Solver::eulerCromerMethod(int endingTime, unsigned int N, bool read)
+{
+    double dt = double(endingTime) / double(N);
+    double elapsedTime = 0;
+
+    initialisePlanets(read);
+
+    start = clock();
+    while (elapsedTime <= endingTime)
     {
-        x = x + vx * dt;
-        y = y + vy * dt;
-        z = z + vz * dt;
+        for (long unsigned int i = 0; i < planets.size(); ++i)
+        {
+            std::ofstream out = outputStream(i);
+            gravitationalForce(planets[i], force[0], force[1], force[2]);
 
-        planets[i].setPosition(x, y, z);
+            for (int j = 0; j < 3; ++j)
+            {
+                acc[j] = force[j] / planets[i].getMass();
+                vel[j] = planets[i].getVelocity(j) + acc[j] * dt;
+                pos[j] = planets[i].getPosition(j) + vel[j] * dt;
 
-        vx = vx + (ax * dt);
-        vy = vy + (ay * dt);
-        vz = vz + (az * dt);
+                planets[i].setPos(j, pos[j]);
+                planets[i].setVel(j, vel[j]);
+            }
+            printer(out, pos[0], pos[1], pos[2]);
+        }
+        elapsedTime += dt;
     }
-    else if (method == 2)
-    {
-        vx = vx + (ax * dt);
-        vy = vy + (ay * dt);
-        vz = vz + (az * dt);
-
-        x = x + vx * dt;
-        y = y + vy * dt;
-        z = z + vz * dt;
-    }*/
+    finish = clock();
+    printf("Execution time for euler-cromer is: %f seconds. \n", double(finish - start) / double(CLOCKS_PER_SEC));
 }
 
 /*
@@ -118,7 +120,6 @@ void Solver::verletMethod(double endingTime, unsigned int N, bool read)
 {
     double dt = endingTime / double(N);
     double elapsedTime = 0;
-    time_t start, finish;
 
     initialisePlanets(read);
 
@@ -127,10 +128,7 @@ void Solver::verletMethod(double endingTime, unsigned int N, bool read)
     {
         for (long unsigned int i = 0; i < planets.size(); ++i)
         {
-            std::ofstream out;
-            std::string filename = path + "/planet_" + std::to_string(i) + ".txt";
-            out.open(filename, std::ios::app);
-
+            std::ofstream out = outputStream(i);
             gravitationalForce(planets[i], force[0], force[1], force[2]);
 
             for (int j = 0; j < 3; ++j)
@@ -178,6 +176,14 @@ void Solver::printer(std::ofstream &out, double x, double y, double z)
     out << x << ", " << y << ", " << z << std::endl;
 }
 
+std::ofstream Solver::outputStream(int i)
+{
+    std::ofstream out;
+    std::string filename = dir_path + folder + "/planet_" + std::to_string(i) + ".txt";
+    out.open(filename, std::ios::app);
+    return out;
+}
+
 double Solver::centerMassPosition(uint16_t index)
 {
     double res = 0;
@@ -198,57 +204,32 @@ double Solver::centerMassVelocity(uint16_t index)
     return res / systemMass;
 }
 
-void Solver::delete_dir_content(const fs::path &dir_path)
-{
-    for (auto &path : fs::directory_iterator(dir_path))
-    {
-        fs::remove_all(path);
-    }
-}
-
-bool Solver::checkIfEmpty(const std::string &path)
-{
-    return fs::is_empty(path);
-}
-
-bool Solver::checkIfExists(const std::string &path)
-{
-    return fs::exists(path);
-}
-
 void Solver::prepareFolder()
 {
-    path = dir_path + folder;
-    //std::string path = this->path + folder;
-    if (path == dir_path)
-    {
-        printf("Cannot delete contents of root directory!\n");
-        return;
-    }
-    else if (folder == "results")
-    {
-        printf("This will delete all folders/files in /results. \n Are you sure you want to do this?\n");
-    }
+    std::string path = dir_path + folder;
 
-    if (!checkIfExists(path))
+    if (!fs::exists(path))
     {
         fs::create_directory(path);
     }
-    if (!checkIfEmpty(path))
+    if (!fs::is_empty(path))
     {
-        fs::path p = path;
-        delete_dir_content(p);
+        fs::path dir = path;
+        for (auto &p : fs::directory_iterator(dir))
+        {
+            fs::remove_all(p);
+        }
     }
 }
 
 void Solver::setResultsFolder(std::string folder)
 {
-    this->folder += "/" + folder;
+    this->folder = "results/" + folder;
 }
 
 void Solver::setReadFile(const std::string &readFile)
 {
-    this->readFile = readFile;
+    this->readFile = dir_path + "/" + readFile;
 }
 
 void Solver::readData(const std::string &readFile)

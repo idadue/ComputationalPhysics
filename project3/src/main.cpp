@@ -52,11 +52,16 @@ void earth_sun_system()
     //v_e = (sqrt(2) * 2 * M_PI)
     Solver solve;
     Planet sun(1.989e30, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-    Planet earth(5.972e24, 1.0, 0.0, 0.0, 0.0, (sqrt(2) * 2 * M_PI) / sun.YEARS, 0.0);
+    Planet earth(5.972e24, 1.0, 0.0, 0.0, 0.0, (2 * M_PI) / sun.YEARS, 0.0);
     solve.addPlanet(sun);
     solve.addPlanet(earth);
+    solve.setReadFile("data/sun_earth.txt");
+
     solve.setResultsFolder("sun_earth");
-    solve.verletMethod(1, 10000.0, false);
+    //solve.verletMethod(1, 10000.0, false);
+    solve.forwardEulerMethod(50, 10000.0, false);
+    solve.setResultsFolder("sun_earth_e_cromer");
+    solve.eulerCromerMethod(50, 10000.0, false);
 }
 
 int main()
@@ -67,8 +72,8 @@ int main()
     in AU/year, so convert velocity by multiplying by 365. This is done elsewhere in code
     Also have to measure mass in terms of solar mass, also done elsewhere
     */
-    //earth_sun_system();
-    all_planets();
+    earth_sun_system();
+    //all_planets();
 
     return 0;
 }
