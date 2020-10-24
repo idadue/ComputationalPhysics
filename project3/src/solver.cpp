@@ -171,6 +171,41 @@ void Solver::gravitationalForce(Planet current, double &Fx, double &Fy, double &
     Fz = -G * current.getMass() * z;
 }
 
+void Solver::gravitationalForceRel(Planet current, double &Fx, double &Fy, double &Fz)
+{
+    double x, y, z;
+    x = y = z = 0;
+    double relCorrect;
+    for (auto it = planets.begin(); it != planets.end(); ++it)
+    {
+        if (it->getID() != current.getID())
+        {
+            relCorrect = 1 + (3*angularMom(current)) / (pow(current.distance(*it), 2) * pow(lightSpeed, 2));
+
+            x += (it->getMass() * (current.getPosition(0) - it->getPosition(0)) / (pow(current.distance(*it), 3))) * relCorrect;
+            y += (it->getMass() * (current.getPosition(1) - it->getPosition(1)) / (pow(current.distance(*it), 3))) * relCorrect;
+            z += (it->getMass() * (current.getPosition(2) - it->getPosition(2)) / (pow(current.distance(*it), 3))) * relCorrect;
+        }
+    }
+    Fx = -G * current.getMass() * x;
+    Fy = -G * current.getMass() * y;
+    Fz = -G * current.getMass() * z;
+}
+
+double Solver::angularMom(Planet current)
+{
+  double lSquare = 0;
+
+  ang[0] = current.getPosition(1) * current.getVelocity(2) - current.getPosition(2) * current.getVelocity(1);
+  ang[1] = current.getPosition(2) * current.getVelocity(0) - current.getPosition(0) * current.getVelocity(2);
+  ang[2] = current.getPosition(0) * current.getVelocity(1) - current.getPosition(1) * current.getVelocity(0);
+  for (int i = 0; i < 3; ++i)
+  {
+    lSquare += pow(ang[i], 2);
+  }
+  return lSquare;
+}
+
 void Solver::printer(std::ofstream &out, double x, double y, double z)
 {
     out << x << ", " << y << ", " << z << std::endl;

@@ -37,11 +37,16 @@ private:
     double cmp[3], cmv[3];
     double pos[3], vel[3], acc[3];
     double force[3];
+    double ang[3];
+    double lightSpeed = 173.1;
 
     time_t start, finish;
 
     void initialisePlanets(bool read = true);
     void gravitationalForce(Planet current, double &Fx, double &Fy, double &Fz);
+    void gravitationalForceRel(Planet current, double &Fx, double &Fy, double &Fz);
+    double angularMom(Planet current);
+
     double centerMassPosition(uint16_t index);
     double centerMassVelocity(uint16_t index);
 
