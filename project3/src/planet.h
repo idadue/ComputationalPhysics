@@ -2,8 +2,6 @@
 #include <cmath>
 #include <random>
 
-//CONSIDER: IF G DOES NOT NEED TO BE CHANGED, THEN MAKE IT A PART OF THE PRIVATE VARS.
-
 class Planet
 {
 public:
@@ -13,9 +11,10 @@ public:
     void assignID();
 
     void setMass(double mass);
-    double distance(const Planet &otherPlanet);
-    double gravitationalForce(const Planet &otherPlanet, const double G);
-    double acceleration(const Planet &otherPlanet, const double G);
+    double distance(const Planet &otherPlanet) const;
+    double gravitationalForce(const Planet &otherPlanet, const double G, const double beta);
+    void componentGravitationalForce(const Planet &other, double &Fx, double &Fy, double &Fz, const double G, const double beta);
+    double acceleration(const Planet &otherPlanet, const double G, const double beta = 2.0);
     double kineticEnergy();
     double potentialEnergy(const Planet &otherPlanet, const double G, double epsilon);
 
@@ -24,11 +23,17 @@ public:
 
     void setPosition(double x, double y, double z);
     void setVelocity(double vx, double vy, double vz);
+    void setInitialPosition(double x, double y, double z);
+    void setInitialVelocity(double vx, double vy, double vz);
+
     void setPos(int index, double pos);
     void setVel(int index, double vel);
 
     double getPosition(int i) const;
     double getVelocity(int i) const;
+
+    double getInitPos(int i) const;
+    double getInitVel(int i) const;
 
     const double YEARS = 365.242199;
     const double solarMass = 1.989e30;
@@ -40,4 +45,6 @@ private:
     double velocity[3];
     double potential;
     double kinetic;
+    double initPos[3];
+    double initVel[3];
 };

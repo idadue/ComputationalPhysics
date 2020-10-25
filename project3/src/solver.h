@@ -21,9 +21,10 @@ public:
     void addPlanet(const Planet &planet);
 
     //Solver methods
-    void forwardEulerMethod(int endingTime, unsigned int N, bool read = true);
-    void eulerCromerMethod(int endingTime, unsigned int N, bool read = true);
-    void verletMethod(double endingTime, unsigned int N, bool read = true);
+    void forwardEulerMethod(int endingTime, double N, bool read = true);
+    void eulerCromerMethod(int endingTime, double N, bool read = true);
+    void verletMethod(double endingTime, double N, bool read = true);
+    void variableBeta(int endingTime, double N, double beta);
 
     void readData(const std::string &readFile);
     void setResultsFolder(std::string folder);
@@ -41,7 +42,7 @@ private:
     time_t start, finish;
 
     void initialisePlanets(bool read = true);
-    void gravitationalForce(Planet current, double &Fx, double &Fy, double &Fz);
+    void gravitationalForce(const Planet &current, double &Fx, double &Fy, double &Fz);
     double centerMassPosition(uint16_t index);
     double centerMassVelocity(uint16_t index);
 

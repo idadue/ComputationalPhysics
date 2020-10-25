@@ -33,11 +33,11 @@ void Solver::initialisePlanets(bool read)
     int i = 0;
     for (auto &it : planets)
     {
-        std::ofstream out;
-        std::string filename = dir_path + folder + "/planet_" + std::to_string(i) + ".txt";
-        out.open(filename, std::ios::app);
-        it.setPosition(it.getPosition(0) - cmp[0], it.getPosition(1) - cmp[1], it.getPosition(2) - cmp[2]);
-        it.setVelocity(it.getVelocity(0) - cmv[0], it.getVelocity(1) - cmv[1], it.getVelocity(2) - cmv[2]);
+        std::ofstream out = outputStream(i);
+        it.setPosition(it.getInitPos(0) - cmp[0], it.getInitPos(1) - cmp[1], it.getInitPos(2) - cmp[2]);
+        it.setVelocity(it.getInitVel(0) - cmv[0], it.getInitVel(1) - cmv[1], it.getInitVel(2) - cmv[2]);
+        //it.setPosition(it.getPosition(0) - cmp[0], it.getPosition(1) - cmp[1], it.getPosition(2) - cmp[2]);
+        //it.setVelocity(it.getVelocity(0) - cmv[0], it.getVelocity(1) - cmv[1], it.getVelocity(2) - cmv[2]);
         printer(out, it.getPosition(0), it.getPosition(1), it.getPosition(2));
         ++i;
     }
@@ -46,7 +46,7 @@ void Solver::initialisePlanets(bool read)
 /*
 Solve diff equation using forward euler method
 */
-void Solver::forwardEulerMethod(int endingTime, unsigned int N, bool read)
+void Solver::forwardEulerMethod(int endingTime, double N, bool read)
 {
     double dt = double(endingTime) / double(N);
     double elapsedTime = 0;
@@ -81,7 +81,7 @@ void Solver::forwardEulerMethod(int endingTime, unsigned int N, bool read)
 /*
 Solve diff equation using euler-cromer method
 */
-void Solver::eulerCromerMethod(int endingTime, unsigned int N, bool read)
+void Solver::eulerCromerMethod(int endingTime, double N, bool read)
 {
     double dt = double(endingTime) / double(N);
     double elapsedTime = 0;
@@ -116,10 +116,10 @@ void Solver::eulerCromerMethod(int endingTime, unsigned int N, bool read)
 /*
 Solve diff equation using the Verlet velocity method.
 */
-void Solver::verletMethod(double endingTime, unsigned int N, bool read)
+void Solver::verletMethod(double endingTime, double N, bool read)
 {
     double dt = endingTime / double(N);
-    double elapsedTime = 0;
+    double elapsedTime = 0.0;
 
     initialisePlanets(read);
 
@@ -137,6 +137,7 @@ void Solver::verletMethod(double endingTime, unsigned int N, bool read)
                 pos[j] = planets[i].getPosition(j) + planets[i].getVelocity(j) * dt + acc[j] * pow(dt, 2) * 0.5;
                 planets[i].setPos(j, pos[j]);
             }
+            //printf("acc = %f, %f, %f \n", acc[0], acc[1], acc[2]);
             gravitationalForce(planets[i], force[0], force[1], force[2]);
 
             for (int j = 0; j < 3; ++j)
@@ -145,6 +146,11 @@ void Solver::verletMethod(double endingTime, unsigned int N, bool read)
                 vel[j] = planets[i].getVelocity(j) + acc[j] * (0.5 * dt);
                 planets[i].setVel(j, vel[j]);
             }
+            /*if (i == 1)
+            {
+                double energy = planets[i].kineticEnergy() + planets[i].potentialEnergy(planets[0], G, 0.0);
+                printf("Total energy = %f \n", energy);
+            }*/
             printer(out, pos[0], pos[1], pos[2]);
         }
         elapsedTime += dt;
@@ -153,7 +159,46 @@ void Solver::verletMethod(double endingTime, unsigned int N, bool read)
     printf("Execution time is : %f seconds. \n", double(finish - start) / double(CLOCKS_PER_SEC));
 }
 
-void Solver::gravitationalForce(Planet current, double &Fx, double &Fy, double &Fz)
+void Solver::variableBeta(int endingTime, double N, double beta)
+{
+    double dt = double(endingTime) / double(N);
+    double elapsedTime = 0;
+
+    initialisePlanets(false);
+
+    start = clock();
+    while (elapsedTime <= endingTime)
+    {
+        for (long unsigned int i = 0; i < planets.size(); ++i)
+        {
+            std::ofstream out = outputStream(i);
+            if (i == 0)
+            {
+                planets[i].componentGravitationalForce(planets[1], force[0], force[1], force[2], G, beta);
+            }
+            else
+            {
+                planets[i].componentGravitationalForce(planets[0], force[0], force[1], force[2], G, beta);
+            }
+
+            for (int j = 0; j < 3; ++j)
+            {
+                acc[j] = force[j] / planets[i].getMass();
+                vel[j] = planets[i].getVelocity(j) + acc[j] * dt;
+                pos[j] = planets[i].getPosition(j) + vel[j] * dt;
+
+                planets[i].setPos(j, pos[j]);
+                planets[i].setVel(j, vel[j]);
+            }
+            printer(out, pos[0], pos[1], pos[2]);
+        }
+        elapsedTime += dt;
+    }
+    finish = clock();
+    printf("Execution time for euler-cromer w/ custom beta is: %f seconds. \n", double(finish - start) / double(CLOCKS_PER_SEC));
+}
+
+void Solver::gravitationalForce(const Planet &current, double &Fx, double &Fy, double &Fz)
 {
     double x, y, z;
     x = y = z = 0;
@@ -189,7 +234,8 @@ double Solver::centerMassPosition(uint16_t index)
     double res = 0;
     for (auto it = planets.begin(); it != planets.end(); ++it)
     {
-        res += it->getMass() * it->getPosition(index);
+        res += it->getMass() * it->getInitPos(index);
+        //res += it->getMass() * it->getPosition(index);
     }
     return res / systemMass;
 }
@@ -199,7 +245,8 @@ double Solver::centerMassVelocity(uint16_t index)
     double res = 0;
     for (auto it = planets.begin(); it != planets.end(); ++it)
     {
-        res += it->getMass() * it->getVelocity(index);
+        res += it->getMass() * it->getInitVel(index);
+        //res += it->getMass() * it->getVelocity(index);
     }
     return res / systemMass;
 }
@@ -229,7 +276,7 @@ void Solver::setResultsFolder(std::string folder)
 
 void Solver::setReadFile(const std::string &readFile)
 {
-    this->readFile = dir_path + "/" + readFile;
+    this->readFile = "/" + readFile;
 }
 
 void Solver::readData(const std::string &readFile)
@@ -244,7 +291,9 @@ void Solver::readData(const std::string &readFile)
         inData >> vx >> vy >> vz;
         it.setMass(mass);
         systemMass += it.getMass();
-        it.setPosition(x, y, z);
-        it.setVelocity(it.YEARS * vx, it.YEARS * vy, it.YEARS * vz);
+        it.setInitialPosition(x, y, z);
+        it.setInitialVelocity(it.YEARS * vx, it.YEARS * vy, it.YEARS * vz);
+        //it.setPosition(x, y, z);
+        //it.setVelocity(it.YEARS * vx, it.YEARS * vy, it.YEARS * vz);
     }
 }

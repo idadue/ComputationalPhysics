@@ -6,6 +6,8 @@ Planet::Planet() : mass(0)
     {
         position[i] = 0;
         velocity[i] = 0;
+        initPos[i] = 0;
+        initVel[i] = 0;
     }
     assignID();
 }
@@ -17,9 +19,16 @@ Planet::Planet(double mass) : mass{mass / solarMass}
 
 Planet::Planet(double mass, double x, double y, double z, double vx, double vy, double vz) : mass{mass / solarMass}
 {
-    position[0] = x, velocity[0] = YEARS * vx;
-    position[1] = y, velocity[1] = YEARS * vy;
-    position[2] = z, velocity[2] = YEARS * vz;
+    initPos[0] = x, initVel[0] = YEARS * vx;
+    initPos[1] = y, initVel[1] = YEARS * vy;
+    initPos[2] = z, initVel[2] = YEARS * vz;
+
+    for (int i = 0; i < 3; i++)
+    {
+        position[i] = initPos[i];
+        velocity[i] = initVel[i];
+    }
+
     assignID();
 }
 
@@ -39,7 +48,7 @@ void Planet::setMass(double mass)
     this->mass = mass / solarMass;
 }
 
-double Planet::distance(const Planet &otherPlanet)
+double Planet::distance(const Planet &otherPlanet) const
 {
     double x = position[0] - otherPlanet.position[0];
     double y = position[1] - otherPlanet.position[1];
@@ -48,16 +57,30 @@ double Planet::distance(const Planet &otherPlanet)
     return sqrt(x * x + y * y + z * z);
 }
 
-double Planet::gravitationalForce(const Planet &otherPlanet, const double G)
+double Planet::gravitationalForce(const Planet &otherPlanet, const double G, const double beta)
 {
     double r = distance(otherPlanet);
     double otherMass = otherPlanet.mass;
-    return (r != 0) ? G * mass * otherMass / (r * r) : 0;
+    //return (r != 0) ? G * mass * otherMass / pow(r, 2) : 0;
+    return G * mass * otherMass / pow(r, beta);
 }
 
-double Planet::acceleration(const Planet &otherPlanet, const double G)
+void Planet::componentGravitationalForce(const Planet &other, double &Fx, double &Fy, double &Fz, const double G, const double beta)
 {
-    double force = gravitationalForce(otherPlanet, G);
+    double x, y, z;
+
+    x = this->getPosition(0) - other.getPosition(0);
+    y = this->getPosition(1) - other.getPosition(1);
+    z = this->getPosition(2) - other.getPosition(2);
+
+    Fx = -G * this->getMass() * other.getMass() * x / pow(distance(other), beta);
+    Fy = -G * this->getMass() * other.getMass() * y / pow(distance(other), beta);
+    Fz = -G * this->getMass() * other.getMass() * z / pow(distance(other), beta);
+}
+
+double Planet::acceleration(const Planet &otherPlanet, const double G, const double beta)
+{
+    double force = gravitationalForce(otherPlanet, G, beta);
     return (force != 0) ? force / mass : 0;
 }
 
@@ -100,6 +123,20 @@ void Planet::setVelocity(double vx, double vy, double vz)
     velocity[2] = vz;
 }
 
+void Planet::setInitialPosition(double x, double y, double z)
+{
+    initPos[0] = x;
+    initPos[1] = y;
+    initPos[2] = z;
+}
+
+void Planet::setInitialVelocity(double vx, double vy, double vz)
+{
+    initVel[0] = vx;
+    initVel[1] = vy;
+    initVel[2] = vz;
+}
+
 void Planet::setPos(int index, double pos)
 {
     position[index] = pos;
@@ -117,4 +154,14 @@ double Planet::getPosition(int i) const
 double Planet::getVelocity(int i) const
 {
     return velocity[i];
+}
+
+double Planet::getInitPos(int i) const
+{
+    return initPos[i];
+}
+
+double Planet::getInitVel(int i) const
+{
+    return initVel[i];
 }
