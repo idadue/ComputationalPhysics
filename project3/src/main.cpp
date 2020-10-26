@@ -64,16 +64,35 @@ void earth_sun_system()
     solve.eulerCromerMethod(50, 10000.0, false);
 }
 
+void perihelion()
+{
+    //Sun and Mercury system with mercury beginning at perihelion.
+    //Using classical and relativistic corrected gravity
+    //Perihelion at 0.3075 AU
+    //v_m = 12.44 AU/yr = 0.03408219178082192 AU/day
+    Solver solve;
+    Planet sun(1.989e30, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    Planet mercury(3.285e23, 0.3075, 0.0, 0.0, 0.0, 0.03408219178082192, 0.0);
+    solve.addPlanet(sun);
+    solve.addPlanet(mercury);
+    solve.setReadFile("data/sun_mercury.txt");
+
+    solve.setResultsFolder("sun_mercury_cla");
+    solve.verletMethod(100, 1000000.0, false, true);
+    solve.setResultsFolder("sun_mercury_rel");
+    solve.verletMethod(100, 1000000.0, true, true);
+}
+
 int main()
 {
     /*
     NASA data is distance in AU, velocity in AU/day. days as earth days.
-    I am using G = 4*pi^2, which assumes velocity 
+    I am using G = 4*pi^2, which assumes velocity
     in AU/year, so convert velocity by multiplying by 365. This is done elsewhere in code
     Also have to measure mass in terms of solar mass, also done elsewhere
     */
-    earth_sun_system();
+    //earth_sun_system();
     //all_planets();
-
+    perihelion();
     return 0;
 }

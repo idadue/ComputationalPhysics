@@ -23,7 +23,7 @@ public:
     //Solver methods
     void forwardEulerMethod(int endingTime, unsigned int N, bool read = true);
     void eulerCromerMethod(int endingTime, unsigned int N, bool read = true);
-    void verletMethod(double endingTime, unsigned int N, bool read = true);
+    void verletMethod(double endingTime, unsigned int N, bool rel = false, bool read = true);
 
     void readData(const std::string &readFile);
     void setResultsFolder(std::string folder);
@@ -38,14 +38,13 @@ private:
     double pos[3], vel[3], acc[3];
     double force[3];
     double ang[3];
-    double lightSpeed = 173.1;
+    double lightSpeed = 63198;
 
     time_t start, finish;
 
     void initialisePlanets(bool read = true);
     void gravitationalForce(Planet current, double &Fx, double &Fy, double &Fz);
     void gravitationalForceRel(Planet current, double &Fx, double &Fy, double &Fz);
-    double angularMom(Planet current);
 
     double centerMassPosition(uint16_t index);
     double centerMassVelocity(uint16_t index);
