@@ -41,6 +41,7 @@ Next we will generalize equation (\ref{eq:y_1}), by writing in terms of steps, s
 where $\mathcal{O}(h^{p + 1})$ is the truncation error. To determine $\Delta$, we can Taylor expand (\ref{eq:y_general}), which gives us 
 \begin{equation}
     y_{i + 1} = y(t= t_i + h) = y(t_i) + h \left( y'(t_i) + ... + y^{p}(t_i) \frac{h^{p - 1}}{p!} \right) + \mathcal{O}(h^{p + 1})
+    \label{eq:y-taylor}
 \end{equation}
 
 \subsection{Conservation of angular momentum}
@@ -70,6 +71,38 @@ The area of the wedge is given by
     \frac{dA}{dt}=\frac{1}{2}\frac{L}{m}=\textnormal{const.}
 \end{align*} Which shows that the angular momentum is conserved. 
 
+\subsection{Circular Orbits}
+
+For the Earth-Sun system, a circular orbit means that the distance between the center of mass of the Sun and the Earth is equal to a constant radius $r_E = 1 \text{AU}$. Thus the Newtonian gravitational potential energy
+
+\begin{align}
+    E_p(r) = -\frac{G M_\odot M_E}{r}
+\end{align}
+
+will remain constant for a circular orbit. Since the overall sum of the kinetic energy and potential energy of a system is conserved, conservation of the potential energy also implies conservation of kinetic energy, since in the inertial frame of the Sun, the kinetic and potential energy of the Sun is always constant.
+
+The force between the Earth and the Sun is given by
+\begin{equation}\label{eq:f_earth}
+    F = M_E a = \frac{GM_\odot M_E}{r^2}.
+\end{equation}
+Using the fact that for a circular orbit $a = \frac{v^2}{r}$, we can rewrite (\ref{eq:f_earth}) to find
+\begin{align}
+\begin{split}
+    \frac{v^2}{r} &= \frac{GM_\odot}{r^2}\\
+    v &= \sqrt{\frac{GM_\odot}{r}}.
+\end{split}
+\label{eq:circular-velocity}
+\end{align}
+
+This can also be used to find a convenient expression for $GM_\odot$. Since $v_E = 2\pi \frac{\text{AU}}{\text{Year}}$, we can use \cref{eq:circular-velocity} to find
+
+\begin{align}
+    G M_\odot = 4 \pi^2 \frac{\text{AU}^3}{\text{Year}^2}
+    \label{eq:GM-sun}
+\end{align}
+
+This lends itself to a natural length and time scale of the system, using $\text{AU}$ and $\text{years}$, leading to simplified equations.
+
 \subsection{Escape velocity}
 
 The kinetic energy of a body escaping the gravitational influence of another is given by \begin{equation}
@@ -88,7 +121,7 @@ To escape the gravitational influence of another body, the kinetic energy of the
     v_{e} = \sqrt{\frac{2GM}{r_0}},
     \label{eq:escape-velocity}
 \end{align}
-which is the solution for the escape velocity. For the Earth-Sun system, inserting $r_0 = 1 \text{AU}$, $M = 1 M_\odot$ and $G = 4\pi^2 \frac{\text{AU}^3}{\text{yr}^2 \text{M}_\odot}$ yields $v_e = 2\sqrt{2} \pi\frac{\text{AU}}{\text{yr}}  \approx 2.433 \cdot 10^{-2} \frac{\text{AU}}{\text{day}}$.
+which is the solution for the escape velocity. For the Earth-Sun system, inserting $r_0 = 1 \text{AU}$, $M = M_\odot$ and \cref{eq:GM-sun} yields $v_e = 2\sqrt{2} \pi\frac{\text{AU}}{\text{yr}}$.
 
 \iffalse
 We are tasked with finding the initial velocity that will let a planet 1AU from the sun escape the sun. This initial velocity needs either to be equal to or bigger than the escape velocity to escape the sun, or it can be smaller, but then it would have to have an elliptical orbit that would speed it up enough to reach the escape velocity, if such a thing is possible. Either way, a velocity equal to the escape velocity at some point in orbit will guarantee an escape from the suns influence.
@@ -146,23 +179,5 @@ The angle of the perihelion can be calculated by
     \theta_p=\arctan\left(\frac{y_p}{x_p}\right),
 \end{align*} where $y_p$ and $x_p$ is the position of Mercury at perihelion. 
 
-\subsection{Circular Orbits}
 
-For the Earth-Sun system, a circular orbit means that the distance between the center of mass of the Sun and the Earth is equal to the constant radius $r_E$. Thus the Newtonian gravitational potential energy
-
-\begin{align}
-    E_p(r) = -\frac{G M_\odot M_E}{r}
-\end{align}
-
-will remain constant for a circular orbit. Since the overall sum of the kinetic energy and potential energy of a planetary body is conserved, conservation of the potential energy also implies conservation of kinetic energy.
-
-The force between the Earth and the Sun is given by
-\begin{equation}\label{eq:f_earth}
-    F = M_E a = \frac{GM_\odot M_E}{r^2}.
-\end{equation}
-Using the fact that for a circular orbit $a = \frac{v^2}{r}$, we can rewrite (\ref{eq:f_earth}) to find
-\begin{align}
-    \frac{v^2}{r} &= \frac{GM_\odot}{r^2}\\
-    v &= \sqrt{\frac{GM_\odot}{r}}.
-\end{align}
 \end{document}

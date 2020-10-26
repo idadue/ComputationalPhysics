@@ -8,6 +8,7 @@ The astronomical unit (AU)
 \fi
 
 \subsection{Algorithms}
+
 There are two numerical iterative methods used in this project to compute the path of the celestial bodies, the forward Euler and the velocity Verlet methods. Following is a short explanation of both methods.
 
 \subsubsection{Forward Euler}
@@ -23,7 +24,7 @@ In this project we are working with coupled differential equations of the form
     \label{eq:differential-euler}
 \end{align}
 
-where $x$ is the position of a celestial body, $v$ is the velocity of this body, and $a$ is the acceleration. We know that for a conservative force such as gravity, there is no dependence on the velocity of the body, and thus the acceleration is also independent of the velocity. We discretize the functions $x(t), v(t,x), a(t,x)$ with the time values $t = \{t_0, t_1, \ldots , t_n\}$, such that $\frac{t_n - t_0}{n} = h$ and $t_{i+1} = t_i + h$. Now we can Taylor expand the discretized functions $x(t_i) = x_i$ and $v(t_i) = v_i$ as
+where $x$ is the position of a celestial body, $v$ is the velocity of this body, and $a$ is the acceleration. We know that for a conservative force such as gravity, there is no dependence on the velocity of the body, and thus the acceleration is also independent of the velocity. We discretize the functions $x(t), v(t,x), a(t,x)$ with the time values $t = \{t_0, t_1, \ldots , t_n\}$, such that $\frac{t_n - t_0}{n} = h$ and $t_{i+1} = t_i + h$. Now we canuse \cref{eq:y-taylor} with $p = 1$, expanding the discretized functions $x(t_i) = x_i$ and $v(t_i) = v_i$ as
 
 \begin{align*}
     x_{i+1} = & x_i + h x'_i + \mathcal{O}(h^2) \\
@@ -81,7 +82,7 @@ The velocity Verlet method can be represented by the recursive relation
     \label{eq:verlet}
 \end{align} note that \ensuremath{a_{i+1}} depends on the position \ensuremath{y_{i+1}}. Thus, we have to calculate the position at the updated time \ensuremath{t_{i+1}} before we compute the next velocity. 
 
-The advantage of the velocity Verlet method over the Euler-Cromer method is its accuracy. The error in \cref{eq:verlet} is $\mathcal{O}(h^3)$, such that when cumulating over many steps $n \propto \frac{1}{h}$, the total error is $\mathcal{O}(h^2)$, which is smaller than for the Euler-Cromer method above. The velocity Verlet method also conserves energy as a symplectic method \cite{Verlet1967}.
+The advantage of the velocity Verlet method over the Euler-Cromer method is its accuracy. The error in \cref{eq:verlet} is $\mathcal{O}(h^3)$, such that when accumulating over many steps $n \propto \frac{1}{h}$, the total error is $\mathcal{O}(h^2)$, which is smaller than for the Euler-Cromer method above. The velocity Verlet method also conserves energy as a symplectic method \cite{Verlet1967}.
 
 \iffalse
 \begin{algorithm}[H]
