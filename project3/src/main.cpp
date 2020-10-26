@@ -1,8 +1,9 @@
 #include "planet.h"
 #include "solver.h"
-#include "catch.hpp"
-//#define CATCH_CONFIG_MAIN
 
+/*
+Check if a planet is bound to the system or not
+*/
 void check_if_bound(double energy, double kinetic, double potential, std::string method)
 {
     if (energy < 0.0)
@@ -21,6 +22,9 @@ void check_if_bound(double energy, double kinetic, double potential, std::string
     }
 }
 
+/*
+Run a simulaton of all planets in the solar system, including pluto
+*/
 void all_planets()
 {
 
@@ -52,12 +56,11 @@ void all_planets()
     solver.verletMethod(248, 10000.0);
 }
 
+/*
+Run various test of the program using just the Earth and the Sun
+*/
 void earth_sun_system(bool stability = true, bool timing = false, bool var_beta = false, bool escape = false)
 {
-    //Sun and earth system with earth having a perfectly circular orbit.
-    //Sun and earth system with earth having escape velocity.
-    //circ orbit : v = 2 * M_PI
-    //v_e = (sqrt(2) * 2 * M_PI)
     Solver solve;
     Planet sun(1.989e30, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     Planet earth(5.972e24, 1.0, 0.0, 0.0, 0.0, (2 * M_PI) / sun.YEARS, 0.0);
@@ -158,6 +161,10 @@ void earth_sun_system(bool stability = true, bool timing = false, bool var_beta 
     }
 }
 
+/*
+Run simulation of the three body system, checking what happens when the mass of Jupiter increases by a 
+factor of 10 and 1000
+*/
 void three_body_problem()
 {
     Solver solver;
@@ -184,6 +191,10 @@ void three_body_problem()
     solver.verletMethod(years, 10000);
 }
 
+/*
+Simulate a system of just the Sun and mercury, using both a classical force of gravity, and a force
+containing a relativistic correction term. 
+*/
 void perihelion()
 {
     //Sun and Mercury system with mercury beginning at perihelion.
@@ -206,6 +217,8 @@ void perihelion()
 
 int main()
 {
+    //Uncomment to run desired simulation
+
     //earth_sun_system(false, false, false, true);
     //all_planets();
     //three_body_problem();
