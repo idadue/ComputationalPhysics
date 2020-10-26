@@ -153,6 +153,56 @@ def plot_earth_sun():
     plt.legend()
     plt.show()
 
+# Plot the two body problem, the sun and the earth, comparing forward euler with euler-cromer
+
+
+def plot_compare_euler():
+    string = "results/sun_earth/stability/"
+
+    file2 = np.sort(
+        glob.glob(string + "euler/**/*.txt"))
+    file3 = np.sort(
+        glob.glob(string + "euler_cromer/**/*.txt"))
+
+    results = [file2, file3]
+
+    size = np.arange(0, 8, 2)
+    z_factor = np.linspace(1, 1.3, 4)
+    steps = ["100", "1000", "10000", "100000"]
+
+    titles = ["Forward Euler", "Euler-Cromer"]
+    fig = plt.figure()
+
+    for k in range(len(results)):
+        f = 0
+        ax = fig.add_subplot(1, 2, k + 1, projection='3d')
+        pane_settings(ax, 0.15, 'white')
+        ax.w_zaxis.line.set_lw(0.)
+        ax.set_zticks([])
+
+        for i in size:
+            for j in range(i, i+2):
+                x, y, z = np.loadtxt(results[k][j], delimiter=",", unpack=True)
+                z = z-z_factor[f]
+
+                if (j % 2 == 0):
+                    ax.plot(x, y, z, color=colors[0])
+                    ax.scatter(x[0], y[0], z[0], color=colors[0],
+                               s=sizes[0])
+                else:
+                    ax.plot(x, y, z)
+                    ax.scatter(x[0], y[0], z[0],
+                               s=sizes[0], label=r"$N = $" + steps[f])
+            ax.view_init(15, 45)
+            f += 1
+
+        plt.title(titles[k])
+        plt.xlabel(r"$x$[Au]", labelpad=20)
+        plt.ylabel(r"$y$[Au]", labelpad=20)
+    ax.set_zlabel("", labelpad=20)
+    plt.legend()
+    plt.show()
+
 
 def plot_escape_vel():
     i = 0
@@ -350,8 +400,9 @@ Uncomment any function to produce desired figures
 """
 
 # plot_earth_sun()
+# plot_compare_euler()
 # plot_variable_beta()
-plot_escape_vel()
+# plot_escape_vel()
 # plot_three_body_problem()
 # plot_system()
 # plot_peri_precession()
