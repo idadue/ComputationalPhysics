@@ -5,13 +5,10 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 import glob
 import matplotlib.colors as mcolors
-
-# mpl.style.use('fivethirtyeight')
+from scipy.signal import find_peaks
 
 """
 Plot the solar system orbits from txt files.
-Data is currently required to be plotted in specific order, as spesified in
-main.cpp.
 """
 
 fontsize = 20
@@ -27,11 +24,12 @@ os.chdir("../")
 path = os.getcwd()
 
 # Sun, Earth, Jupiter, Saturn, Venus, Mars, Mercury, Uranus, Neptune, Pluto
-colors = ['yellow', 'royalblue', 'burlywood', 'navajowhite', 'goldenrod',
+colors = ['yellow', 'b', 'burlywood', 'navajowhite', 'goldenrod',
           'chocolate', 'peru', 'steelblue', 'skyblue', 'mistyrose']
 planets = ['Sun', 'Earth', 'Jupiter', 'Saturn', 'Venus',
            'Mars', 'Mercury', 'Uranus', 'Neptune', 'Pluto']
-# Approximate scales
+
+# Approximate scales of planets in solar system
 sizes = [110, 1, 11, 9, 0.9, 0.5, 0.33, 4, 3.9, 0.2]
 
 
@@ -40,6 +38,8 @@ def pane_settings(ax, pane, bgcolor):
     ax.w_xaxis.set_pane_color((pane, pane, pane, 1.0))
     ax.w_yaxis.set_pane_color((pane, pane, pane, 1.0))
     ax.w_zaxis.set_pane_color((pane, pane, pane, 1.0))
+
+# Find what values of an array constitutes the final orbit of the sun
 
 
 def find_last_orbit(x, y, z):
@@ -61,13 +61,13 @@ def find_last_orbit(x, y, z):
     return orbitlength
 
 
+# Make a plot of the entire solar system
+
+
 def plot_system():
     file1 = np.sort(glob.glob("results/solar_system/*.txt"))
-    # file2 = np.sort(glob.glob("results/sun_earth/*.txt"))
-    # file3 = np.sort(glob.glob("results/sun_earth_e_cromer/*.txt"))
-    file2 = np.sort(glob.glob("results/f_euler/*.txt"))
 
-    results = [file1, file2]
+    results = [file1]
 
     for files in results:
         i = 0
@@ -75,14 +75,9 @@ def plot_system():
         fig = plt.figure()
         ax = fig.gca(projection='3d')
 
-        plt.gca().patch.set_facecolor('dimgray')
-        pane = 0.15
-        ax.w_xaxis.set_pane_color((pane, pane, pane, 1.0))
-        ax.w_yaxis.set_pane_color((pane, pane, pane, 1.0))
-        ax.w_zaxis.set_pane_color((pane, pane, pane, 1.0))
+        pane_settings(ax, 0.15, 'dimgray')
 
         for file in files:
-            print(file)
             x, y, z = np.loadtxt(file,
                                  delimiter=",", unpack=True)
 
@@ -92,16 +87,20 @@ def plot_system():
             y = y[:orbitlength]
             z = z[:orbitlength]
 
-            ax.plot(x, y, z, color=colors[i])
+            ax.plot(x, y, z, color=colors[i],
+                    label=planets[i])
             ax.scatter(x[0], y[0], z[0], color=colors[i],
-                       s=sizes[i], label="%s inital position" % planets[i])
+                       s=sizes[i])
             i += 1
 
         plt.xlabel(r"$x$[Au]", labelpad=20)
         plt.ylabel(r"$y$[Au]", labelpad=20)
         ax.set_zlabel(r"$z$[Au]", labelpad=20)
         plt.legend()
+        # plt.title("Solar system")
         plt.show()
+
+# Plot the two body problem, the sun and the earth, with differing step sizes and methods
 
 
 def plot_earth_sun():
@@ -111,24 +110,30 @@ def plot_earth_sun():
         glob.glob(string + "verlet/**/*.txt"))
     file2 = np.sort(
         glob.glob(string + "euler/**/*.txt"))
+    file3 = np.sort(
+        glob.glob(string + "euler_cromer/**/*.txt"))
 
-    results = [file1, file2]
+    results = [file1, file2, file3]
 
     size = np.arange(0, 8, 2)
     z_factor = np.linspace(1, 1.3, 4)
-    stepsize = ["100", "1000", "10000", "100000"]
+    # stepsize = ["0.03", "0.003", "0.0003", "0.00003"]
+    steps = ["100", "1000", "10000", "100000"]
 
-    titles = ["Verlet", "Euler"]
-    for k in range(len(results)):
-        fig = plt.figure()
-        ax = fig.gca(projection='3d')
-        pane_settings(ax, 0.15, 'dimgray')
+    titles = ["Velocity Verlet", "Forward Euler", "Euler-Cromer"]
+    fig = plt.figure()
+
+    for k in range(len(results) - 1):
         f = 0
+        ax = fig.add_subplot(1, 2, k + 1, projection='3d')
+        pane_settings(ax, 0.15, 'white')
+        ax.w_zaxis.line.set_lw(0.)
+        ax.set_zticks([])
 
         for i in size:
             for j in range(i, i+2):
                 x, y, z = np.loadtxt(results[k][j], delimiter=",", unpack=True)
-                z = z+z_factor[f]
+                z = z-z_factor[f]
 
                 if (j % 2 == 0):
                     ax.plot(x, y, z, color=colors[0])
@@ -137,50 +142,216 @@ def plot_earth_sun():
                 else:
                     ax.plot(x, y, z)
                     ax.scatter(x[0], y[0], z[0],
-                               s=sizes[0], label=r"$\Delta t = $" + stepsize[f])
+                               s=sizes[0], label=r"$N = $" + steps[f])
+            ax.view_init(15, 45)
             f += 1
 
-        plt.title(titles[k] + " method")
+        plt.title(titles[k])
         plt.xlabel(r"$x$[Au]", labelpad=20)
         plt.ylabel(r"$y$[Au]", labelpad=20)
-        ax.set_zlabel(r"$z$[Au]", labelpad=20)
-        plt.legend()
-        plt.show()
+    ax.set_zlabel("", labelpad=20)
+    plt.legend()
+    plt.show()
+
+
+def plot_escape_vel():
+    i = 0
+    files = np.sort(
+        glob.glob("results/sun_earth/escape/*.txt"))
+
+    for file in files:
+        x, y, z = np.loadtxt(file,
+                             delimiter=",", unpack=True)
+        plt.plot(x[0], y[0], 'o', color=colors[i], label=planets[i])
+        plt.plot(x, y, color=colors[i])
+        i += 1
+
+    plt.ylabel(r"$y[Au]$", labelpad=10)
+    plt.xlabel(r"$x[Au]$")
+    plt.grid(color="black")
+    plt.legend()
+    plt.title("Earth escaping Suns influence")
+    ax = plt.gca()
+    ax.set_facecolor('dimgrey')
+    plt.show()
+
+# Plot of the sun and the earth with a varying force law
 
 
 def plot_variable_beta():
     files = np.sort(
         glob.glob("results/sun_earth/variable_beta/**/*.txt"))
+    files2 = np.sort(
+        glob.glob("results/sun_earth/variable_beta_ellipse/**/*.txt"))
 
-    # names = list(mcolors.CSS4_COLORS)
-    names = list(mcolors.TABLEAU_COLORS)
+    results = [files, files2]
+
+    fig, axs = plt.subplots(2, sharex=True)
+    orbit = ["Cirular orbit", "Elliptical orbit"]
 
     count = 0
-    for i in range(len(files)):
-        if (i % 2 != 0):
-            x, y, _ = np.loadtxt(files[i],
-                                 delimiter=",", unpack=True)
+    for file in results:
+        for i in range(len(file)):
+            if (i % 2 != 0):
+                x, _, _ = np.loadtxt(file[i],
+                                     delimiter=",", unpack=True)
+                legnd = float(files[i][32:-18]) - 1
+                b = np.linspace(0, 3, len(x))
+                if (file[i] == files2[1]):
+                    axs[count].plot(b, x, label=r"$\beta =  %s $" %
+                                    str(legnd), linewidth=5)
+                else:
+                    axs[count].plot(b, x, label=r"$\beta =  %s $" %
+                                    legnd)
+                plt.ylim(-2, 2)
+                axs[count].legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+                axs[count].set_title(
+                    "Varying force law: " + orbit[count])
 
-            legnd = files[i][32:-18]
-            b = np.linspace(0, 1, len(x))
-            num = np.random.randint(0, len(names) - 1)
+        count += 1
+    fig.add_subplot(111, frameon=False)
+    plt.tick_params(labelcolor='none', top=False,
+                    bottom=False, left=False, right=False)
+    plt.grid(False)
+    plt.ylabel(r"$x[Au]$", labelpad=10)
+    plt.xlabel(r"$t$[years]")
 
-            if (i == 1):
-                plt.plot(b, x, linewidth=5, label=r"$\beta =  %s $" %
-                         legnd, color=names[count])
-            else:
-                plt.plot(b, x, linewidth=2, label=r"$\beta =  %s $" %
-                         legnd, color=names[count])
-            # plt.plot(b, y, color=names[i])
-            count += 1
+    plt.show()
 
-    plt.ylabel(r"$x$[Au]")
-    plt.gca().patch.set_facecolor('white')
-    plt.ylim(-2, 2)
-    plt.legend()
+# Plot of the three body problem, consisting of the sun, earth and
+# jupiter, with different masses for jupiter
+
+
+def plot_three_body_problem():
+    string = "results/three_body_problem/"
+
+    files = np.sort(
+        glob.glob(string + "/**/*.txt"))
+
+    mass = [r"$M_j$", r"$10M_j$", r"$1000M_j$"]
+    color = ['tab:pink', 'r', 'tab:orange']
+
+    fig, axs = plt.subplots(3, sharex=True, sharey=True)
+
+    i = 0
+    j = 0
+    k = 1
+    for file in files:
+        x, y, _ = np.loadtxt(file, delimiter=",", unpack=True)
+
+        if (k == 3):
+            axs[i].plot(x[0], y[0], 'o', color=color[j],
+                        label=mass[j])
+            axs[i].plot(x, y, color=color[j])
+            j += 1
+        else:
+            axs[i].plot(x[0], y[0], 'o', color=colors[k - 1])
+            axs[i].plot(x, y, color=colors[k - 1])
+
+        axs[i].set_facecolor('dimgrey')
+        axs[i].grid(color="black")
+
+        if (k % 3 == 0):
+            i += 1
+            k = 0
+
+        k += 1
+
+    fig.add_subplot(111, frameon=False)
+    plt.tick_params(labelcolor='none', top=False,
+                    bottom=False, left=False, right=False)
+    plt.grid(False)
+    fig.legend()
+    plt.title(r"Three body problem with different $M_j$ values")
+    plt.xlabel(r"$x[Au]$")
+    plt.ylabel(r"$y[Au]$")
     plt.show()
 
 
-plot_earth_sun()
-# plot_system()
+perihelionCla = np.sort(glob.glob("results/sun_mercury_cla/*.txt"))
+perihelionRel = np.sort(glob.glob("results/sun_mercury_rel/*.txt"))
+results = [perihelionCla, perihelionRel]
+
+
+def distance(x1, x2):
+    r = np.abs(np.linalg.norm(x1-x2, axis=1))
+    return r
+
+# Calculate the perihelion precession of mercury
+
+
+def perihelion_precession(perihelion):
+    with open(perihelion[1]) as openfileobject:
+        # Reading up to 3 sets of coordinates
+        w = np.zeros((3, 3))
+        w[0, 0], w[0, 1], w[0, 2] = map(
+            float, openfileobject.readline().split(','))
+        w[1, 0], w[1, 1], w[1, 2] = map(
+            float, openfileobject.readline().split(','))
+
+        # X is the coordinates of each perihelion. The data begins at perihelion.
+        X = np.transpose(np.zeros((3, 1)))
+        X[0] = w[0]
+        # Noting down the time at perihelion for plotting.
+        peakTime = np.zeros(1)
+        n_points = 1.0
+
+        for line in openfileobject:
+            w[2, 0], w[2, 1], w[2, 2] = map(float, line.split(','))
+            r = distance(w, 0)
+
+            # Comparing 3 different sets of distances to find if perihelion is reached
+            if r[1] < r[0] and r[1] < r[2]:
+                X = np.append(X, w[1].reshape((-1, 3)), axis=0)
+                peakTime = np.append(peakTime, n_points)
+
+            # Counting number of points
+            n_points += 1
+            w[0] = w[1]
+            w[1] = w[2]
+        # Calculating angle at perihelion with the x-axis, in arcseconds.
+        periAngle = np.arctan2(X[:, 1], X[:, 0])*(180*3600)/np.pi
+
+        # Optional checking that the perihelion remains about 0.3075 AU.
+        # R = distance(X,0)
+        # print(R)
+
+    return periAngle, peakTime/n_points
+
+# Plot the perihelion precession of mercury
+
+
+def plot_peri_precession():
+    fig, ax = plt.subplots()
+
+    periAngleCla, peakTimeCla = perihelion_precession(perihelionCla)
+    periAngleRel, peakTimeRel = perihelion_precession(perihelionRel)
+
+    n_years = 100
+    n_peaks = periAngleCla.shape[0]
+    periObs = (np.linspace(0, 43*n_years/100, n_peaks))
+
+    ax.plot(n_years*peakTimeCla, periObs, colors[1],   label="Observed Values")
+    ax.plot(n_years*peakTimeCla, periAngleCla,
+            colors[5], label="Simulated Classic Newtonian")
+    ax.plot(n_years*peakTimeRel, periAngleRel, 'g',
+            label="Simulated with Relativistic Correction")
+
+    plt.xlabel(r"Time [Years]", labelpad=20)
+    plt.ylabel(r"Perihelion Angle [Arcseconds]", labelpad=20)
+    plt.legend()
+    plt.title("Perihelion Precession of Mercury")
+    plt.grid(color='grey', linestyle='-', linewidth=0.5)
+    plt.show()
+
+
+"""
+Uncomment any function to produce desired figures
+"""
+
+# plot_earth_sun()
 # plot_variable_beta()
+plot_escape_vel()
+# plot_three_body_problem()
+# plot_system()
+# plot_peri_precession()

@@ -2,6 +2,10 @@
 #include <cmath>
 #include <random>
 
+/*
+Class containing the information associated with a Planet, such as mass, position and velocity.
+*/
+
 class Planet
 {
 public:
@@ -12,9 +16,6 @@ public:
 
     void setMass(double mass);
     double distance(const Planet &otherPlanet) const;
-    double gravitationalForce(const Planet &otherPlanet, const double G, const double beta);
-    void componentGravitationalForce(const Planet &other, double &Fx, double &Fy, double &Fz, const double G, const double beta);
-    double acceleration(const Planet &otherPlanet, const double G, const double beta = 2.0);
     double kineticEnergy();
     double potentialEnergy(const Planet &otherPlanet, const double G, double epsilon);
 
