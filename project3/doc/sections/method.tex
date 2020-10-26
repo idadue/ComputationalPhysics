@@ -2,10 +2,16 @@
 
 \begin{document}
 \section{Method}\label{sec:method}
+\iffalse
+\subsection{Units}
+The astronomical unit (AU)
+\fi
 
-There are two numerical iterative methods used in this project to compute the path of the celestial bodies, the forward Euler and the Velocity Verlet methods. Following is a short explanation of both methods.
+\subsection{Algorithms}
+There are two numerical iterative methods used in this project to compute the path of the celestial bodies, the forward Euler and the velocity Verlet methods. Following is a short explanation of both methods.
 
-\subsection{Forward Euler}
+\subsubsection{Forward Euler}
+\label{sec:euler}
 
 In this project we are working with coupled differential equations of the form
 
@@ -17,7 +23,7 @@ In this project we are working with coupled differential equations of the form
     \label{eq:differential-euler}
 \end{align}
 
-where $x$ is the position of a celestial body, $v$ is the velocity of this body, and $a$ is the acceleration. We know that for a conservative force such as gravity, there is for the force, and therefore also the acceleration no dependence on the velocity of the body. We discretize the functions $x(t), v(t,x), a(t,x)$ with the time values $t = \{t_0, t_1, \ldots , t_n\}$, such that $\frac{t_n - t_0}{n} = h$ and $t_{i+1} = t_i + h$. Now we can Taylor expand the discretized functions $x(t_i) = x_i$ and $v(t_i) = v_i$ as
+where $x$ is the position of a celestial body, $v$ is the velocity of this body, and $a$ is the acceleration. We know that for a conservative force such as gravity, there is no dependence on the velocity of the body, and thus the acceleration is also independent of the velocity. We discretize the functions $x(t), v(t,x), a(t,x)$ with the time values $t = \{t_0, t_1, \ldots , t_n\}$, such that $\frac{t_n - t_0}{n} = h$ and $t_{i+1} = t_i + h$. Now we can Taylor expand the discretized functions $x(t_i) = x_i$ and $v(t_i) = v_i$ as
 
 \begin{align*}
     x_{i+1} = & x_i + h x'_i + \mathcal{O}(h^2) \\
@@ -34,7 +40,7 @@ Using the differential equations \cref{eq:differential-euler} and suppressing th
     \label{eq:euler}
 \end{align}
 
-With \cref{eq:euler}, simulating the solar system is possible, albeit with an error in the form of conservation of energy. Euler's method does not conserve energy \cite{}, but with a simple modification, we obtain the Euler-Cromer method,
+With \cref{eq:euler}, simulating the solar system is possible, albeit with an error in the form of conservation of energy. Euler's method does not conserve energy, but with a simple modification, we obtain the Euler-Cromer method \cite{VeselyFranzJ1994Cp:a},
 
 \begin{align}
     \begin{split}
@@ -44,14 +50,15 @@ With \cref{eq:euler}, simulating the solar system is possible, albeit with an er
     \label{eq:euler-cromer}
 \end{align}
 
-and this does conserve the energy of the system. 
+and this does conserve the energy of the system. In both \cref{eq:euler} and \cref{eq:euler-cromer} we suppress the truncation error $\mathcal{O}(h^2)$. When computing a large number of steps $n \propto \frac{1}{h}$, the total error is of the order $\mathcal{O}(h)$.
 
-
+\iffalse
 The forward Euler method can be represented by the recursive relation
 
 \begin{align}
     y_{i+1}=y_i+hf(t_i,y_i)+\mathcal{O}(h^2).
 \end{align} We see that the next element of the function \ensuremath{y(t)} is given explicitly by the previous element.  
+\fi
 
 \iffalse
 \begin{algorithm}[H]
@@ -61,15 +68,20 @@ The forward Euler method can be represented by the recursive relation
 \end{algorithm}
 \fi
 
-\subsection{Velocity Verlet}
+\subsubsection{Velocity Verlet}
 The velocity Verlet method is a commonly used integration algorithm which calculates the velocity and position at the same value of the time variable \cite{Verlet1967}. It  is  frequently  used  to  calculate  trajectories  of  particles  in  molecular  dynamics  simulations, and is also well suited to calculate the trajectories of our celestial bodies.  The method is easy to implement and offers good numerical stability, as well as other properties that are important in physical systems such as time-reversibility and area preserving properties. 
 
 The velocity Verlet method can be represented by the recursive relation
 
 \begin{align}
-    y_{i+1} = & y_i+hv_i+\frac{h^2}{a_i}+\mathcal{O}(h^3) \\
+    \begin{split}
+    y_{i+1} = & y_i+h v_i+h^2 a_i + \mathcal{O}(h^3) \\
     v_{i+1} = & v_i+\frac{h}{2}(a_{i+1}+a_i)+\mathcal{O}(h^3).
+    \end{split}
+    \label{eq:verlet}
 \end{align} note that \ensuremath{a_{i+1}} depends on the position \ensuremath{y_{i+1}}. Thus, we have to calculate the position at the updated time \ensuremath{t_{i+1}} before we compute the next velocity. 
+
+The advantage of the velocity Verlet method over the Euler-Cromer method is its accuracy. The error in \cref{eq:verlet} is $\mathcal{O}(h^3)$, such that when cumulating over many steps $n \propto \frac{1}{h}$, the total error is $\mathcal{O}(h^2)$, which is smaller than for the Euler-Cromer method above. The velocity Verlet method also conserves energy as a symplectic method \cite{Verlet1967}.
 
 \iffalse
 \begin{algorithm}[H]
@@ -79,15 +91,15 @@ The velocity Verlet method can be represented by the recursive relation
 \end{algorithm}
 \fi
 
+\subsection{Comparison of Algorithms}
+
+From \cref{eq:euler} and \cref{eq:euler-cromer} we see that the Euler and Euler-Cromer method both require $4$ floating point operations (FLOPs) for each point for each dimension, in addition to the number of FLOPs from calculating the acceleration. The acceleration requires $6$ FLOPs as seen in \cref{eq:a-grav}, but this is only true for a 2-body problem. Additional planets will add $6$ FLOPs each to the calculation of each planet's acceleration. In total then, the Forward Euler and Euler-Cromer methods require $10$ FLOPs per dimension.
+
+Meanwhile, the velocity Verlet method requires $8$ FLOPs from \cref{eq:verlet}, assuming $h^2$ and $\frac{h}{2}$ are precalculated. Furthermore, $v_{i+1}$ requires both $a_{i}$ and $a_{i+1}$, but $a_{i+1}$ can be saved in the memory to be used for the calculation of the next point. In total therefore, the Verlet method should require 14 FLOPs per dimension. In our program, we have left out certain precalculations as well as calculating the force separately from acceleration, which requires an additional two FLOPs to add and remove the mass of each planet. Thus, the expected time differences will be somewhat different, as each point of acceleration requires an additional two FLOPs, the values $h^2$ and $\frac{h}{2}$ are not precalculated and the acceleration is computed twice for each point. Thus the true number of FLOPs in our program should be $12$ for the Euler methods, and $26$ for the velocity Verlet method.
+
 \subsection{Implemented classes/object orientation}
-In this work, we make use of the advantages of writing object oriented code by implementing classes. 
-
-\texttt{planet} class
-
-\texttt{solver} class for solving n-body problem
-
-Describe our implemented classes and structure of code ... 
+In this work, we make use of the advantages of writing object oriented code by implementing classes. We implement the \texttt{planet} class for setting up the planets. Further, we implement the \texttt{solver} class for solving n-body problems for the particular differential equation of particles (planets) interacting in only a conservative gravitational field, using either the velocity Verlet, Euler's forward or Euler-Cromer method. 
 
 \subsection{Data}
-The initial conditions used to start the differential equation solver is extracted from the HORIZON Web-Interface, provided by the Jet Propulsion Laboratory (NASA) at the California institute of technology \cite{Horizon}.
+The initial conditions used to start the differential equation solver is extracted from the HORIZON Web-Interface, provided by the Jet Propulsion Laboratory (NASA) at the California institute of technology \cite{Horizon}. The extracted data has length unit AU and velocity unit AU per day. We convert the velocities to AU per year for our simulation. 
 \end{document}
