@@ -57,33 +57,6 @@ double Planet::distance(const Planet &otherPlanet) const
     return sqrt(x * x + y * y + z * z);
 }
 
-double Planet::gravitationalForce(const Planet &otherPlanet, const double G, const double beta)
-{
-    double r = distance(otherPlanet);
-    double otherMass = otherPlanet.mass;
-    //return (r != 0) ? G * mass * otherMass / pow(r, 2) : 0;
-    return G * mass * otherMass / pow(r, beta);
-}
-
-void Planet::componentGravitationalForce(const Planet &other, double &Fx, double &Fy, double &Fz, const double G, const double beta)
-{
-    double x, y, z;
-
-    x = this->getPosition(0) - other.getPosition(0);
-    y = this->getPosition(1) - other.getPosition(1);
-    z = this->getPosition(2) - other.getPosition(2);
-
-    Fx = -G * this->getMass() * other.getMass() * x / pow(distance(other), beta);
-    Fy = -G * this->getMass() * other.getMass() * y / pow(distance(other), beta);
-    Fz = -G * this->getMass() * other.getMass() * z / pow(distance(other), beta);
-}
-
-double Planet::acceleration(const Planet &otherPlanet, const double G, const double beta)
-{
-    double force = gravitationalForce(otherPlanet, G, beta);
-    return (force != 0) ? force / mass : 0;
-}
-
 double Planet::kineticEnergy()
 {
     double vel2 = (velocity[0] * velocity[0] + velocity[1] * velocity[1] + velocity[2] * velocity[2]);

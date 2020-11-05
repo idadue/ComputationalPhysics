@@ -3,14 +3,26 @@
 \begin{document}
 \section{Theory}\label{sec:theory}
 
-\subsection{ODEs?}
-\textcolor{red}{løst skrevet}
-Newtons second law:
+\subsection{The differential equations}
+%\textcolor{red}{løst skrevet}
+Newton's gravitational law governs the trajectory of the objects in the solar system, and is given by  
+
+\begin{align}
+    \vec{F}_{ij}=G\frac{M_iM_j}{r^2}
+    \label{eq:newton-grav}
+\end{align} where $G$ is the gravitational constant, $M_i$ and $M_j$ are the masses of the considered objects and $r$ is the distance between them. By employing Newton's second law of motion the acceleration due to gravitational pull is given by
+ 
+\begin{align}
+    \vec{a} = GM_i\frac{x}{r^3}\vec{r}, 
+    \label{eq:a-grav}
+\end{align} where $\vec{r}$ gives the position of the body. 
+
+We now consider Newton's second law of motion on the form 
 \begin{equation}\label{eq:newtons2}
     m\frac{d^2 x(t)}{dt^2} = -kx(t),
 \end{equation} where $k$ is the force constant.
 
-Rewrite equation (\ref{eq:newtons2}) using $x(t) = y^{(1)}(t)$ and $\frac{d y^{(1)}(t)}{dt} =  y^{(2)}(t)$ such that %$v(t) = y^{(2)}(t)$ such that  
+We rewrite equation (\ref{eq:newtons2}) using $x(t) = y^{(1)}(t)$ and $\frac{d y^{(1)}(t)}{dt} =  y^{(2)}(t)$ such that %$v(t) = y^{(2)}(t)$ such that  
 
 \begin{equation}
     my^{(2)}(t) = -ky^{(1)}(t),
@@ -24,11 +36,12 @@ and so on. Depending on how well behaved the function is in the defined domain $
 
 Next we will generalize equation (\ref{eq:y_1}), by writing in terms of steps, so that we get
 \begin{equation}\label{eq:y_general}
-    y_{i + 1} = y(t= t_i + h) = y(t_i) + h \Delta (t_i , y_i (t_i)) + O(h^{p + 1}), 
+    y_{i + 1} = y(t= t_i + h) = y(t_i) + h \Delta (t_i , y_i (t_i)) + \mathcal{O}(h^{p + 1}), 
 \end{equation}
-where $O(h^{p + 1})$ is the truncation error. To determine $\Delta$, we can Taylor expand (\ref{eq:y_general}), which gives us 
+where $\mathcal{O}(h^{p + 1})$ is the truncation error. To determine $\Delta$, we can Taylor expand (\ref{eq:y_general}), which gives us 
 \begin{equation}
-    y_{i + 1} = y(t= t_i + h) = y(t_i) + h \left( y'(t_i) + ... + y^{p}(t_i) \frac{h^{p - 1}}{p!} \right) + O(h^{p + 1})
+    y_{i + 1} = y(t= t_i + h) = y(t_i) + h \left( y'(t_i) + ... + y^{p}(t_i) \frac{h^{p - 1}}{p!} \right) + \mathcal{O}(h^{p + 1})
+    \label{eq:y-taylor}
 \end{equation}
 
 \subsection{Conservation of angular momentum}
@@ -58,6 +71,38 @@ The area of the wedge is given by
     \frac{dA}{dt}=\frac{1}{2}\frac{L}{m}=\textnormal{const.}
 \end{align*} Which shows that the angular momentum is conserved. 
 
+\subsection{Circular Orbits}
+
+For the Earth-Sun system, a circular orbit means that the distance between the center of mass of the Sun and the Earth is equal to a constant radius $r_E = 1 \text{AU}$. Thus the Newtonian gravitational potential energy
+
+\begin{align}
+    E_p(r) = -\frac{G M_\odot M_E}{r}
+\end{align}
+
+will remain constant for a circular orbit. Since the overall sum of the kinetic energy and potential energy of a system is conserved, conservation of the potential energy also implies conservation of kinetic energy, since in the inertial frame of the Sun, the kinetic and potential energy of the Sun is always constant.
+
+The force between the Earth and the Sun is given by
+\begin{equation}\label{eq:f_earth}
+    F = M_E a = \frac{GM_\odot M_E}{r^2}.
+\end{equation}
+Using the fact that for a circular orbit $a = \frac{v^2}{r}$, we can rewrite (\ref{eq:f_earth}) to find
+\begin{align}
+\begin{split}
+    \frac{v^2}{r} &= \frac{GM_\odot}{r^2}\\
+    v &= \sqrt{\frac{GM_\odot}{r}}.
+\end{split}
+\label{eq:circular-velocity}
+\end{align}
+
+This can also be used to find a convenient expression for $GM_\odot$. Since $v_E = 2\pi \frac{\text{AU}}{\text{Year}}$, we can use \cref{eq:circular-velocity} to find
+
+\begin{align}
+    G M_\odot = 4 \pi^2 \frac{\text{AU}^3}{\text{Year}^2}
+    \label{eq:GM-sun}
+\end{align}
+
+This lends itself to a natural length and time scale of the system, using $\text{AU}$ and $\text{years}$, leading to simplified equations.
+
 \subsection{Escape velocity}
 
 The kinetic energy of a body escaping the gravitational influence of another is given by \begin{equation}
@@ -74,8 +119,10 @@ To escape the gravitational influence of another body, the kinetic energy of the
     \frac{1}{2} m v_{e}^{2} = \frac{GMm}{r_0} \\
     v_{e}^{2} = \frac{2GM}{r_0} \\
     v_{e} = \sqrt{\frac{2GM}{r_0}},
+    \label{eq:escape-velocity}
 \end{align}
-which is the solution for the escape velocity. 
+which is the solution for the escape velocity. For the Earth-Sun system, inserting $r_0 = 1 \text{AU}$, $M = M_\odot$ and \cref{eq:GM-sun} yields $v_e = 2\sqrt{2} \pi\frac{\text{AU}}{\text{yr}}$.
+
 \iffalse
 We are tasked with finding the initial velocity that will let a planet 1AU from the sun escape the sun. This initial velocity needs either to be equal to or bigger than the escape velocity to escape the sun, or it can be smaller, but then it would have to have an elliptical orbit that would speed it up enough to reach the escape velocity, if such a thing is possible. Either way, a velocity equal to the escape velocity at some point in orbit will guarantee an escape from the suns influence.
 We need not consider the effects of the other planets on our escaping body, as the speed needed to escape the suns influence would be bigger than any contributions from the other planets. Ans should be about 40km/s
@@ -118,29 +165,19 @@ In \cref{sec:appendix_generalized_grav_law}, we also show that we must have \ens
 
 \subsection{Perihelion precession}
 
-Adding a relativistic correction to the Newtonian gravitational force will change the orbit of the object, which in general is not closed without the inverse square form of the Newtonian gravitational force. For small corrections, this means that the object will follow an almost elliptical orbit, which can be thought of as an elliptical orbit that rotates slowly. We add a relativistic correction to the general Newtonian equation \cref{eq:} such that
+Adding a relativistic correction to the Newtonian gravitational force will change the orbit of the object, which in general is not closed without the inverse square form of the Newtonian gravitational force. For small corrections, this means that the object will follow an almost elliptical orbit, which can be thought of as an elliptical orbit that rotates slowly. Mercury, as the nearest planet to the sun, experiences the greatest perihelion drift. The observed perihelion shift is 43 arc-seconds per century \cite{Pollock2003}. We add a relativistic correction to the general Newtonian gravitation equation \cref{eq:newton-grav} and find the corrected gravitational force on Mercury, given by
 
 \begin{align}
-    F_G = \frac{G M_\odot M_{\textnormal{Mercury}}}{r^2} \left(1 + \frac{3l^2}{r^2 c^2} \right).
+    F_G = \frac{G M_\odot M_{\textnormal{Mercury}}}{r^2} \left(1 + \frac{3l^2}{r^2 c^2} \right),
+    \label{eq:rel-correction}
 \end{align}
 
-\subsection{Circular Orbits}
+with $l = \vert \vec{r} \times \vec{v} \vert$, the angular momentum per unit mass and $c$ the speed of light in a vacuum.
 
-For the Earth-Sun system, a circular orbit means that the distance between the center of mass of the Sun and the Earth is equal to the constant radius $r_E$. Thus the Newtonian gravitational potential energy
+The angle of the perihelion can be calculated by
+\begin{align*}
+    \theta_p=\arctan\left(\frac{y_p}{x_p}\right),
+\end{align*} where $y_p$ and $x_p$ is the position of Mercury at perihelion. 
 
-\begin{align}
-    E_p(r) = -\frac{G M_\odot M_E}{r}
-\end{align}
 
-will remain constant for a circular orbit. Since the overall sum of the kinetic energy and potential energy of a planetary body is conserved, conservation of the potential energy also implies conservation of kinetic energy.
-
-The force between the Earth and the Sun is given by
-\begin{equation}\label{eq:f_earth}
-    F = M_E a = \frac{GM_\odot M_E}{r^2}.
-\end{equation}
-Using the fact that for a circular orbit $a = \frac{v^2}{r}$, we can rewrite (\ref{eq:f_earth}) to find
-\begin{align}
-    \frac{v^2}{r} &= \frac{GM_\odot}{r^2}\\
-    v &= \sqrt{\frac{GM_\odot}{r}}.
-\end{align}
 \end{document}
