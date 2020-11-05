@@ -12,3 +12,5 @@ Here you can find the [code](https://github.com/idadue/ComputationalPhysics/tree
 ## Project 3: The solar system
 Here you can find the [code](https://github.com/idadue/ComputationalPhysics/tree/master/project3/src) and the [report](https://github.com/idadue/ComputationalPhysics/tree/master/project3/doc).
 
+## Project 4: The Ising model
+
