@@ -4,6 +4,9 @@
 \section{Method}\label{sec:method}
 
 \subsection{Boundary conditions}
+When studying analytically solvable systems in statistical mechanics, we often let the systems approach the thermodynamic limit, that is, the number of particles approaches infinity. Numerically, we have to restrict our study to a finite $L\times L$ lattice size. The maximum system size we will use is $100\times 100$. We use periodic boundary conditions to approximate a larger system. This ensures that our system will not have any boundaries as we are effectively projecting the two dimensional square lattice onto a sphere, as the upper row are in contact with the bottom row, and the same for the left and right side. Each spin now has four neighbours, and we are approximating the thermodynamic limit, as the boundaries play no role in the thermodynamic limit. 
+
+We can avoid if-tests and other time consuming operations to account for the periodic boundary conditions by introducing an index vector with the values \ensuremath{[L-1, 0, 1, 2, \ldots, L-2, L-1, 0]}. The value of the index-vector will be used as the spin-matrix-index.
 
 \subsection{The Metropolis Algorithm}
 The Markov chain Monte Carlo based Metropolis algorithm, which simulate the time-evolution of stochastic systems, is used to simulate the Ising model. The advantage of using the Metropolis algorithm, is that we avoid having to calculate the probability distribution function (PDF). Calculating the (PDF) requires heavy computations for every single possible state, which is numerically uneconomical. The Metropolis algorithm circumvents this problem because it only requires a function $f$ proportional to the distribution density.
