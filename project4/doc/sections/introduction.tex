@@ -2,9 +2,12 @@
 
 \begin{document}
 \section{Introduction}\label{sec:introduction}
+The Ising model \cite{Ising1925} represents one of the simplest, yet most frequently studied models of ferromagnetism in statistical mechanics. Despite the simplicity and the fact that the model was originally proposed for a theoretical description of insulating magnetic materials, the Ising model and its variants have an extraordinary capability of elucidating co-operative phenomena of seemingly diverse physical origin. Apart from the traditional applications in magnetism, the Ising-like models have also found manifold  applications from seemingly diverse research areas \cite{StreckaJozef2015Abao} such as: biophysics \cite{MONOD196588, Thompson1968}, neuroscience, medicine \cite{TorquatoSalvatore2011TaIm}, linguistic change of language \cite{Stauffer2008}, electronics and socio-economics \cite{Stauffer2008}. The aforementioned list of applications is far from complete, but it demonstrates the versatility and the importance of the Ising-like models in modern science 
 
+In this work, we will confine ourselves to the study of phase transitions in a magnetic system for different lattice sizes and temperatures. Calculating expressions for the expectation values of physical parameters like the energy and magnetization of a thermodynamic system quickly gets computationally heavy due to high number of possible spin configurations. This problem is tackled by using the Monte Carlo based Metropolis algorithm for sampling the probability distribution of the system. With this method, we can simulate the system accurately and calculate the physical observables of interest, while avoiding the numerically toughest calculations. 
 
+We begin by benchmarking our algorithm with analytical results for a \ensuremath{2\times2} lattice. Then, we increase the system to a \ensuremath{20\times20} lattice, and estimate the time it takes to reach equilibrium. 
 
 %Structure of the report:
-
+The organization of this report is as follows. First, we review some important concepts in statistical mechanics, before explaining the key aspects of the implemented algorithm. \textcolor{red}{results, discussion, conclusion \ldots}
 \end{document}
