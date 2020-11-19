@@ -7,5 +7,95 @@
 \subsection{Source code}
 Github repository with codes and figures can be found at \url{https://github.com/idadue/ComputationalPhysics/tree/master/project4}.
 
+\subsection{Possible changes of energy}
+
+\begin{table}[!htb]
+\caption{The five different possible changes in energy, $\Delta E$} in a two dimensional lattice, when only interacting with the nearest neighbours. 
+\begin{center}
+\begin{tabular}{ c c c c c}
+\toprule
+Initial state & Flipped state & Initial \ensuremath{E} & Flipped \ensuremath{E} & \ensuremath{\Delta E}\\ 
+\midrule
+$\begin{matrix}& \uparrow & \\ \uparrow & \uparrow & \uparrow \\ & \uparrow & \\ & & & \end{matrix}$         & $\begin{matrix}& \uparrow & \\ \uparrow & \downarrow & \uparrow \\ & \uparrow & \\ & & & \end{matrix}$ & -4J & 4J &     8J                 \\
+$\begin{matrix}& \downarrow & \\ \uparrow & \uparrow & \uparrow \\ & \uparrow & \\ & & & \end{matrix}$       & $\begin{matrix}& \downarrow & \\ \uparrow & \downarrow & \uparrow \\ & \uparrow & \\ & & & \end{matrix}$ & -2J &  2J    & 4J                  \\
+$\begin{matrix}& \downarrow & \\ \downarrow & \uparrow & \uparrow \\ & \uparrow & \\ & & & \end{matrix}$     & $\begin{matrix}& \downarrow & \\ \downarrow & \downarrow & \uparrow \\ & \uparrow & \\ & & & \end{matrix}$ & 0 & 0   & 0                  \\
+$\begin{matrix}& \downarrow & \\ \downarrow & \uparrow & \downarrow \\ & \uparrow & \\ & & & \end{matrix}$   & $\begin{matrix}& \downarrow & \\ \downarrow & \downarrow & \downarrow \\ & \uparrow & \\ & & & \end{matrix}$ & 2J & -2J  & -4J                 \\
+$\begin{matrix}& \downarrow & \\ \downarrow & \uparrow & \downarrow \\ & \downarrow & \\ & & & \end{matrix}$ & $\begin{matrix}& \downarrow & \\ \downarrow & \downarrow & \downarrow \\ & \downarrow & \\ & & & \end{matrix}$ & 4J & -4J & -8J                 \\ 
+
+\bottomrule
+\end{tabular}
+\end{center}
+\label{tab:possible-delta-E}
+\end{table}
+
+\subsection{Analytical expressions for a simple \ensuremath{2\times2} lattice}
+Consider a $2\times2$ lattice, each lattice point with spin $\pm1$, this model has \ensuremath{s=2^4=16} different configurations as shown in \cref{tab:configurations}. With the size of this model, it is possible to calculate analytically the expectation values with the partition function, as it only contains 16 elements (most of which are zero).
+
+\begin{table}[!htb]
+\caption{All configurations of a $2\times2$ Ising model. The table displays the degeneracy, energy and magnetization where \ensuremath{N_{\uparrow}} is the number of spins up.} 
+\begin{center}
+\begin{tabular}{ c c c c }
+\toprule
+\ensuremath{N_{\uparrow}} & \ensuremath{\Omega(E_i)} & \ensuremath{E_i} & \ensuremath{M_i}\\ 
+\midrule
+4 & 1 & \SI{-8}{\joule} & 4 \\  
+3 & 4 & 0 & 2 \\
+2 & 4 & 0 & 0 \\
+2 & 2 & \SI{8}{\joule} & 0 \\
+1 & 4 & 0 & -2 \\
+0 & 1 & \SI{-8}{\joule} & -4 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\label{tab:configurations}
+\end{table}
+
+The partition function for the $2\times2$ lattice is given by 
+\begin{align*}
+    Z=\sum_i e^{-E_i\beta}=12+2e^{8\beta}+2e^{-8\beta}=4(3+\cosh8\beta),
+\end{align*} where \ensuremath{\beta=1/k_BT}.
+
+The expected energy is then 
+
+\begin{align*}
+    \braket{E}=-\frac{\partial}{\partial\beta}\ln Z = - \frac{\partial}{\partial\beta}\ln(4\cosh(\beta8J)+12)=-8J\frac{\sinh(8\beta J)}{\cosh(8\beta J)+3}, 
+\end{align*} and the variance of the mean energy is 
+
+\begin{align*}
+    \sigma_E^2&=\braket{E^2}-\braket{E}^2 \\
+    &=\frac{1}{2e^{-\beta8J}+2e^{\beta8J}+12}(2\cdot(-8J)^2\cdot e^{\beta8J}+2\cdot(8J)^2\cdot e^{-\beta8J}- \left(-8j\frac{\sinh(8\beta J)}{\cosh(8\beta J)+3}\right)^2 \\
+    &= 64J^2\left(\frac{\cosh(8\beta J)}{\cosh(8\beta J)+3}\left(\frac{\sinh(8\beta J)}{\cosh(8\beta J)+3}\right)^2\right).
+\end{align*}
+
+We can now simply insert the variance of the mean energy to get the expression for the specific heat capacity
+\begin{align*}
+    C_V&=\frac{\sigma_E^2}{k_BT^2} \\
+    &=\frac{1}{k_BT^2}64J^2\left(\frac{\cosh(8\beta J)}{\cosh(8\beta J)+3}\left(\frac{\sinh(8\beta J)}{\cosh(8\beta J)+3}\right)^2\right).
+\end{align*}
+
+The mean magnetisation is found by adding all possible states and dividing by the partition function
+
+\begin{align*}
+    \braket{M}=\frac{1}{Z}\sum_iM_ie^{-\beta E_i}=\frac{1}{Z}(-4e^{8\beta J}-8e^0+8e^0+4e^{8\beta J}) = 0.
+\end{align*}
+
+The expected absolute magnetisation is non-zero and given by
+\begin{align*}
+    \braket{|M|}=\frac{1}{Z}\sum_i|M_i|e^{-\beta E_i}=\frac{1}{Z}(4e^{8\beta J}+8e^0+8e^0+4e^{8\beta J})=\frac{4+2e^{8\beta J}}{\cosh(8\beta J) + 3}.
+\end{align*}
+
+We calculate the variance of the mean magnetization, needed for the calculation of the magnetic susceptibility
+\begin{align*}
+    \sigma_M^2&=\braket{M^2}-\braket{M}^2 \\
+    &=\frac{32}{Z}(e^{8\beta J}+1)-0 \\
+    &=\frac{8(e^{8\beta J}+1)}{\cosh(8\beta J)+3}.
+\end{align*}
+
+The magnetic susceptibility is then
+\begin{align*}
+    \chi&=\frac{1}{k_BT}\sigma_M^2 \\
+    &= \frac{1}{k_BT}\frac{8(e^{8\beta J}+1)}{\cosh(8\beta J)+3}. 
+\end{align*}
+
 
 \end{document}
