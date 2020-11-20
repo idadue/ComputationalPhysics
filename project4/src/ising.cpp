@@ -53,7 +53,7 @@ arma::vec ising::transitionProb(double temperature)
   return probability;
 }
 
-arma::vec ising::metropolis(int n_spins, int mcc, double temperature)
+arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::string filename)
 {
   //initializing values
   double energy = 0.;
@@ -62,6 +62,16 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature)
   arma::vec exp = arma::zeros<arma::vec>(5);
   arma::mat spin_mat = arma::zeros<arma::mat>(n_spins, n_spins);
   initialize(n_spins, spin_mat, energy, mag_mom);
+
+  // Prepare file
+  filename = filename + ".txt";
+  std::ofstream out;
+  out.open(filename);
+
+  // Printing initial state pre-mcc
+  arma::vec init = arma::zeros<arma::vec>(5);
+  init(0) += energy;  init(1) += energy*energy;  init(2) += mag_mom;  init(3) += mag_mom*mag_mom;  init(4) += std::abs(mag_mom);
+  output(n_spins, 1, init, temperature, out);
 
   // Initialize rng
   std::random_device rd;
@@ -72,7 +82,7 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature)
   // Set up transition probability vector
   arma::vec probVec = transitionProb(temperature);
   probVec.print();
-  for (int cycles = 1; cycles < mcc; cycles++)
+  for (int cycles = 1; cycles <= mcc; cycles++)
   {
     std::cout << "Cycle #" << cycles << std::endl;
     for (arma::uword i = 0; i < n_spins; i++)
@@ -101,31 +111,56 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature)
         }
       }
     }
-    if (cycles > mcc*0.1)
+    if (cycles > mcc*0.0)
     {
       exp(0) += energy;
       exp(1) += energy*energy;
       exp(2) += mag_mom;
       exp(3) += mag_mom*mag_mom;
       exp(4) += std::abs(mag_mom);
+
+      output(n_spins, cycles, exp, temperature, out);
     }
   }
-  exp /= (mcc*0.9);
+  //exp /= (mcc*1.0);
+  out.close();
   std::cout << "Fission Mailed Successfully" << std::endl;
-  return exp;
+  return exp/mcc;
 }
 
-void ising::output(int n_spins, arma::vec exp, double temperature)
+void ising::output(int n_spins, int cycles, arma::vec exp, double temperature, std::ofstream& out)
 {
+  exp /= cycles;
   double exp_energy = exp(0);
   double var_energy = (exp(1) - exp(0)*exp(0));
   double exp_magmom = exp(2);
   double var_magmom = (exp(3) - exp(2)*exp(2));
+  double exp_magmom_abs = exp(4);
 
   double spec_heat = var_energy / temperature / temperature;
   double mag_suscept = var_magmom / temperature;
+
+  double L2 = n_spins * n_spins;
+
+  out << std::setw(15) << std::setprecision(8) <<  exp_energy/L2;
+  out << std::setw(15) << std::setprecision(8) <<  exp_magmom_abs/L2;
+  out << std::setw(15) << std::setprecision(8) <<  spec_heat/L2;
+  out << std::setw(15) << std::setprecision(8) <<  mag_suscept/L2 << std::endl;
+
+  /*
+  out << std::fixed << std::setprecision(15) << exp_energy/L2;
+  out << std::fixed << std::setprecision(15) << exp_magmom_abs/L2;
+  out << std::fixed << std::setprecision(15) << spec_heat/L2;
+  out << std::fixed << std::setprecision(15) << mag_suscept/L2 << std::endl;*/
+  /*
+  std::cout << "E(E)/L² = " << exp_energy/L2 << ", Var(E)/L² = " << var_energy/L2 << std::endl;
+  std::cout << "E(M)/L² = " << exp_magmom/L2 << ", Var(M)/L² = " << var_magmom/L2 << std::endl;
+  std::cout << "C_V/L² = " << spec_heat/L2 << ", X/L² = " << mag_suscept/L2 << std::endl;
+  std::cout << "E(|M|)/L² = " << exp_magmom_abs/L2 << std::endl;
+  */
+  /*
   std::cout << "E(E) = " << exp_energy << ", Var(E) = " << var_energy << std::endl;
   std::cout << "E(M) = " << exp_magmom << ", Var(M) = " << var_magmom << std::endl;
   std::cout << "C_V = " << spec_heat << ", X = " << mag_suscept << std::endl;
-
+  */
 }
