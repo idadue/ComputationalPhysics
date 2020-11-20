@@ -13,7 +13,8 @@ plt.rcParams.update(newparams)
 # Monte Carlo cycles + 1 for the initial state
 MCC = int(sys.argv[1])+1
 L = int(sys.argv[2])
-filename = sys.argv[3]
+temperature = float(sys.argv[3])
+filename = sys.argv[4]
 filename += ".txt"
 
 infile = open(filename)

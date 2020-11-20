@@ -5,8 +5,8 @@ int main(int argc, char* argv[])
 {
   int mcc = std::atoi(argv[1]);
   arma::sword n_spins = std::atoi(argv[2]);
-  std::string filename = argv[3];
-  double temperature = 5;
+  double temperature = std::atof(argv[3]);
+  std::string filename = argv[4];
 
   ising isi;
 
@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 
 
   //isi.transitionProb(temperature).print();
-  
+
   arma::vec exp = isi.metropolis(n_spins, mcc, temperature, filename);
   return 0;
 }
