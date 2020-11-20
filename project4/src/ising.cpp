@@ -1,12 +1,18 @@
 #include "ising.h"
 
 //initialize energy, magnetization
-void ising::initialize(int n_spins, arma::mat & spin_mat, double& E, double& M)
+void ising::initialize(int n_spins, arma::mat & spin_mat, double& E, double& M, int random_start)
 {
+  // Initialize rng
+  std::random_device rd;
+	std::mt19937_64 gen(rd());
+
+	std::uniform_int_distribution<int> RandomInt(0,1);
+
   //setup spin matrix
   for (arma::sword i = 0; i < n_spins; i++){
     for (arma::sword j = 0; j < n_spins; j++){
-      spin_mat(i,j) = 1;
+      spin_mat(i,j) = 1 - 2 * random_start * RandomInt(gen);
       M += (float) spin_mat(i,j);
     }
   }
@@ -53,7 +59,7 @@ arma::vec ising::transitionProb(double temperature)
   return probability;
 }
 
-arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::string filename)
+arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::string filename, int random_start=0)
 {
   //initializing values
   double energy = 0.;
@@ -61,7 +67,15 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
   double mag_mom = 0.;
   arma::vec exp = arma::zeros<arma::vec>(5);
   arma::mat spin_mat = arma::zeros<arma::mat>(n_spins, n_spins);
-  initialize(n_spins, spin_mat, energy, mag_mom);
+
+  // Initialize rng
+  std::random_device rd;
+  std::mt19937_64 gen(rd());
+
+  std::uniform_real_distribution<double> RandomNumberGenerator(0.0,1.0);
+
+  // Initialize spin matrix
+  initialize(n_spins, spin_mat, energy, mag_mom, random_start);
 
   // Prepare file
   filename = filename + ".txt";
@@ -70,14 +84,10 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
 
   // Printing initial state pre-mcc
   arma::vec init = arma::zeros<arma::vec>(5);
-  init(0) += energy;  init(1) += energy*energy;  init(2) += mag_mom;  init(3) += mag_mom*mag_mom;  init(4) += std::abs(mag_mom);
+  init(0) = energy;  init(1) = energy*energy;  init(2) = mag_mom;  init(3) = mag_mom*mag_mom;  init(4) = std::abs(mag_mom);
   output(n_spins, 1, init, temperature, out);
 
-  // Initialize rng
-  std::random_device rd;
-  std::mt19937_64 gen(rd());
 
-  std::uniform_real_distribution<double> RandomNumberGenerator(0.0,1.0);
 
   // Set up transition probability vector
   arma::vec probVec = transitionProb(temperature);

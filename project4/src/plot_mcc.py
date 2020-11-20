@@ -14,7 +14,8 @@ plt.rcParams.update(newparams)
 MCC = int(sys.argv[1])+1
 L = int(sys.argv[2])
 temperature = float(sys.argv[3])
-filename = sys.argv[4]
+random_start = int(sys.argv[4])
+filename = sys.argv[5]
 filename += ".txt"
 
 infile = open(filename)
