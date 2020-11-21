@@ -16,11 +16,11 @@ void ising::initialize(int n_spins, arma::mat & spin_mat, double& E, double& M, 
       M += (float) spin_mat(i,j);
     }
   }
-  E = energy(spin_mat);
+  E = compute_energy(spin_mat);
 }
 
 // Calculates the energy of a lattice
-double ising::energy(arma::mat spin_mat)
+double ising::compute_energy(arma::mat spin_mat)
 {
   double energy = 0;
   arma::sword n_spins = spin_mat.n_rows;
@@ -67,6 +67,9 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
   double mag_mom = 0.;
   arma::vec exp = arma::zeros<arma::vec>(5);
   arma::mat spin_mat = arma::zeros<arma::mat>(n_spins, n_spins);
+  arma::vec energy_level_count = arma::zeros<arma::vec>(n_spins*n_spins + 1);
+  bool equilibrium = true;
+  int equilibrium_cycles = 0;
 
   // Initialize rng
   std::random_device rd;
@@ -131,9 +134,26 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
 
       output(n_spins, cycles, exp, temperature, out);
     }
+    if (equilibrium == true)
+    {
+      arma::uword energy_coordinate = (arma::uword) ((compute_energy(spin_mat) + 2 * n_spins * n_spins)/4);
+      energy_level_count(energy_coordinate) += 1.0;
+      equilibrium_cycles += 1;
+    }
   }
   //exp /= (mcc*1.0);
   out.close();
+
+  if (equilibrium == true)
+  {
+    std::cout << "Energy Distribution: " << std::endl;
+    energy_level_count /= equilibrium_cycles;
+    for (int i = 0; i < n_spins*n_spins + 1; i++)
+    {
+      std::cout << std::setw(5) << i * 4 - n_spins * n_spins * 2 << " J: " << energy_level_count(i) << std::endl;
+    }
+  }
+
   std::cout << "Fission Mailed Successfully" << std::endl;
   return exp/mcc;
 }

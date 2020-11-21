@@ -8,7 +8,7 @@ class ising
 {
 public:
 	void initialize(int, arma::mat&, double&, double&, int);
-	double energy(arma::mat);
+	double compute_energy(arma::mat);
 	arma::sword pbc(arma::sword, arma::sword);
 
 	arma::vec transitionProb(double);

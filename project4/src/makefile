@@ -1,6 +1,6 @@
 MCC = 200000
-L = 5
-temperature = 2.1
+L = 3
+temperature = 2.0
 filename = test
 random_start = 1
 
