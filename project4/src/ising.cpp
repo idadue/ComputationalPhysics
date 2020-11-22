@@ -59,6 +59,68 @@ arma::vec ising::transitionProb(double temperature)
   return probability;
 }
 
+void ising::mc_temp(int n_spins, int mcc, double temperature_start, double temperature_end, int n_temperature, std::string filename, int random_start=0)
+{
+  // Prepare files
+  std::string filename_energy = filename + "_energy.txt";
+  std::string filename_temp = filename + "_temp.txt";
+  out_energy.open(filename_energy);
+  out_temp.open(filename_temp);
+
+  // Coung configurations
+  arma::vec config_acceptance = arma::zeros<arma::vec>(n_temperature);
+
+  double dT = (temperature_end - temperature_start) + 2;
+
+  if (n_temperature > 1)
+  {
+    dT = (temperature_end - temperature_start)/(n_temperature - 1);
+  }
+
+  int i = 0;
+  arma::vec thermo_temp = arma::zeros<arma::vec>(4);
+
+  for (double temp = temperature_start; temp <= temperature_end; temp += dT)
+  {
+    std::string filename_thermo = filename + "_thermo_" + std::to_string(i) + ".txt";
+    out_thermo.open(filename_thermo);
+    // Metropolis algorithm to find thermo values
+    thermo_temp = metropolis(n_spins, mcc, temp, filename, random_start);
+    // Save final values for temperature plot
+    output(thermo_temp, out_temp);
+
+    config_acceptance(i) = flip_count;
+
+    out_thermo.close();
+    i++;
+  }
+
+  output(config_acceptance, out_mcc);
+
+  out_energy.close();
+  out_temp.close();
+
+}
+
+void ising::mc_mcc(int n_spins, int mcc, double temperature_start, double temperature_end, int n_temperature, std::string filename, int random_start=0)
+{
+  // Prepare files
+  std::string filename_mcc = filename + "_mcc.txt";
+  out_mcc.open(filename_mcc);
+
+  int i = 0;
+
+  for (int mcc_loop = 10; mcc_loop <= mcc; mcc_loop *= 10)
+  {
+    // mc_temp to find accepted configs as function of temperature
+    mc_temp(n_spins, mcc_loop, temperature_start, temperature_end, n_temperature, filename, random_start);
+  }
+
+  out_mcc.close();
+
+}
+
+
 arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::string filename, int random_start=0)
 {
   //initializing values
@@ -70,6 +132,9 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
   arma::vec energy_level_count = arma::zeros<arma::vec>(n_spins*n_spins + 1);
   bool equilibrium = true;
   int equilibrium_cycles = 0;
+  int equilibrium_time = 0;
+  flip_count = 0;
+  arma::vec thermo_values = arma::zeros<arma::vec>(4);
 
   // Initialize rng
   std::random_device rd;
@@ -80,24 +145,18 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
   // Initialize spin matrix
   initialize(n_spins, spin_mat, energy, mag_mom, random_start);
 
-  // Prepare file
-  filename = filename + ".txt";
-  std::ofstream out;
-  out.open(filename);
-
   // Printing initial state pre-mcc
   arma::vec init = arma::zeros<arma::vec>(5);
   init(0) = energy;  init(1) = energy*energy;  init(2) = mag_mom;  init(3) = mag_mom*mag_mom;  init(4) = std::abs(mag_mom);
-  output(n_spins, 1, init, temperature, out);
-
-
+  thermo_values = data_conversion(n_spins, 1, init, temperature);
+  output(thermo_values, out_thermo);
 
   // Set up transition probability vector
   arma::vec probVec = transitionProb(temperature);
   probVec.print();
   for (int cycles = 1; cycles <= mcc; cycles++)
   {
-    std::cout << "Cycle #" << cycles << std::endl;
+    //std::cout << "Cycle #" << cycles << std::endl;
     for (arma::uword i = 0; i < n_spins; i++)
     {
       for (arma::uword j = 0; j < n_spins; j++)
@@ -117,6 +176,7 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
 
         if (RandomNumberGenerator(gen) < probVec(energyCoordinate))
         {
+          flip_count += 1;
           spin_mat(i_flip, j_flip) *= -1;
           energy += dEnergy;
           mag_mom += 2*spin_mat(i_flip, j_flip);
@@ -124,6 +184,7 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
         }
       }
     }
+
     if (cycles > mcc*0.0)
     {
       exp(0) += energy;
@@ -132,9 +193,15 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
       exp(3) += mag_mom*mag_mom;
       exp(4) += std::abs(mag_mom);
 
-      output(n_spins, cycles, exp, temperature, out);
+      thermo_values = data_conversion(n_spins, cycles, exp, temperature);
+      output(thermo_values, out_thermo);
     }
-    if (equilibrium == true)
+
+    equilibrium_time += 1;
+
+    //equilibrium = is_equilibrium();
+
+    if (equilibrium)
     {
       arma::uword energy_coordinate = (arma::uword) ((compute_energy(spin_mat) + 2 * n_spins * n_spins)/4);
       energy_level_count(energy_coordinate) += 1.0;
@@ -142,10 +209,10 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
     }
   }
   //exp /= (mcc*1.0);
-  out.close();
 
   if (equilibrium == true)
   {
+    output(energy_level_count, out_energy);
     std::cout << "Energy Distribution: " << std::endl;
     energy_level_count /= equilibrium_cycles;
     for (int i = 0; i < n_spins*n_spins + 1; i++)
@@ -153,12 +220,19 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
       std::cout << std::setw(5) << i * 4 - n_spins * n_spins * 2 << " J: " << energy_level_count(i) << std::endl;
     }
   }
-
+  std::cout << (float) (100.0*flip_count/(mcc*n_spins*n_spins)) << "% accepted configurations." << std::endl;
   std::cout << "Fission Mailed Successfully" << std::endl;
-  return exp/mcc;
+  return thermo_values;
 }
 
-void ising::output(int n_spins, int cycles, arma::vec exp, double temperature, std::ofstream& out)
+bool is_equilibrium()
+{
+  bool equilibrium = true;
+
+  return equilibrium;
+}
+
+arma::vec ising::data_conversion(int n_spins, int cycles, arma::vec exp, double temperature)
 {
   exp /= cycles;
   double exp_energy = exp(0);
@@ -172,10 +246,22 @@ void ising::output(int n_spins, int cycles, arma::vec exp, double temperature, s
 
   double L2 = n_spins * n_spins;
 
-  out << std::setw(15) << std::setprecision(8) <<  exp_energy/L2;
-  out << std::setw(15) << std::setprecision(8) <<  exp_magmom_abs/L2;
-  out << std::setw(15) << std::setprecision(8) <<  spec_heat/L2;
-  out << std::setw(15) << std::setprecision(8) <<  mag_suscept/L2 << std::endl;
+  arma::vec thermo_values = arma::zeros<arma::vec>(4);
+  thermo_values(0) = exp_energy/L2;
+  thermo_values(1) = exp_magmom_abs/L2;
+  thermo_values(2) = spec_heat/L2;
+  thermo_values(3) = mag_suscept/L2;
+
+  return thermo_values;
+}
+
+void ising::output(arma::vec thermo_values, std::ofstream& out)
+{
+  for (int n = 0; n <  thermo_values.n_elem; n++)
+  {
+    out << std::setw(15) << std::setprecision(8) << thermo_values(n);
+  }
+  out << std::endl;
 
   /*
   out << std::fixed << std::setprecision(15) << exp_energy/L2;
