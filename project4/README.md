@@ -1,2 +1,2 @@
-# Project 3: The Ising model
+# Project 4: The Ising model
 
