@@ -82,6 +82,7 @@ void ising::mc_temp(int n_spins, int mcc, double temperature_start, double tempe
 
   for (double temp = temperature_start; temp <= temperature_end; temp += dT)
   {
+    std::cout << "T = " << temp << std::endl;
     std::string filename_thermo = filename + "_thermo_" + std::to_string(i) + ".txt";
     out_thermo.open(filename_thermo);
     // Metropolis algorithm to find thermo values
@@ -113,6 +114,7 @@ void ising::mc_mcc(int n_spins, int mcc, double temperature_start, double temper
   for (int mcc_loop = 10; mcc_loop <= mcc; mcc_loop *= 10)
   {
     // mc_temp to find accepted configs as function of temperature
+    std::cout << "MCC = " << mcc_loop << std::endl;
     mc_temp(n_spins, mcc_loop, temperature_start, temperature_end, n_temperature, filename, random_start);
   }
 
@@ -153,7 +155,7 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
 
   // Set up transition probability vector
   arma::vec probVec = transitionProb(temperature);
-  probVec.print();
+
   for (int cycles = 1; cycles <= mcc; cycles++)
   {
     //std::cout << "Cycle #" << cycles << std::endl;
@@ -213,14 +215,16 @@ arma::vec ising::metropolis(int n_spins, int mcc, double temperature, std::strin
   if (equilibrium == true)
   {
     output(energy_level_count, out_energy);
-    std::cout << "Energy Distribution: " << std::endl;
+    //std::cout << "Energy Distribution: " << std::endl;
     energy_level_count /= equilibrium_cycles;
-    for (int i = 0; i < n_spins*n_spins + 1; i++)
+    /*for (int i = 0; i < n_spins*n_spins + 1; i++)
     {
       std::cout << std::setw(5) << i * 4 - n_spins * n_spins * 2 << " J: " << energy_level_count(i) << std::endl;
-    }
+    }*/
   }
   std::cout << (float) (100.0*flip_count/(mcc*n_spins*n_spins)) << "% accepted configurations." << std::endl;
+  std::cout << "E, |M|, C_V, X" << std::endl;
+  thermo_values.print();
   std::cout << "Fission Mailed Successfully" << std::endl;
   return thermo_values;
 }

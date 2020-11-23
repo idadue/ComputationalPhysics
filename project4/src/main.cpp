@@ -10,6 +10,7 @@ int main(int argc, char* argv[])
   int n_temperature = std::atoi(argv[5]);
   int random_start = std::atoi(argv[6]);
   std::string filename = argv[7];
+  int compute_mcc = std::atoi(argv[8]);
 
   ising isi;
   /*
@@ -22,7 +23,10 @@ int main(int argc, char* argv[])
 
   isi.mc_temp(n_spins, mcc, temperature_start, temperature_end, n_temperature, filename, random_start);
 
-  isi.mc_mcc(n_spins, mcc, temperature_start, temperature_end, n_temperature, filename, random_start);
+  if (compute_mcc == 1)
+  {
+    isi.mc_mcc(n_spins, mcc, temperature_start, temperature_end, n_temperature, filename, random_start);
+  }
   //arma::vec exp = isi.metropolis(n_spins, mcc, temperature, filename, random_start);
 
   //std::cout << "L = " << n_spins << ", T = " << temperature << std::endl;
