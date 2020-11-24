@@ -9,4 +9,4 @@ in the terminal to see where on your computer the include and lib folders are lo
 
 Then just run ```make``` with whatever values are desired.
 
-Running the code in /no_mpi is as simple as just running ```make``` in terminal.
+Running the code in /no_mpi requires that the armadillo libraby is added to path, then simple run ```make``` in terminal.
