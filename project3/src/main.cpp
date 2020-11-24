@@ -215,8 +215,28 @@ void perihelion()
     solve.relVerletMethod(100, 10000000.0);
 }
 
+void perihelion()
+{
+    //Sun and Mercury system with mercury beginning at perihelion.
+    //Using classical and relativistic corrected gravity
+    //Perihelion at 0.3075 AU
+    //v_m = 12.44 AU/yr = 0.03408219178082192 AU/day
+    Solver solve;
+    Planet sun(1.989e30, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    Planet mercury(3.285e23, 0.3075, 0.0, 0.0, 0.0, 0.03408219178082192, 0.0);
+    solve.addPlanet(sun);
+    solve.addPlanet(mercury);
+    solve.setReadFile("data/sun_mercury.txt");
+
+    solve.setResultsFolder("sun_mercury_cla");
+    solve.verletMethod(100, 1000000.0, false, true);
+    solve.setResultsFolder("sun_mercury_rel");
+    solve.verletMethod(100, 1000000.0, true, true);
+}
+
 int main()
 {
+
     //Uncomment to run desired simulation
 
     //earth_sun_system(false, false, false, true);

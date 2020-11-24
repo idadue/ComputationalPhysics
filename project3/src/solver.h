@@ -23,6 +23,7 @@ public:
     void addPlanet(const Planet &planet);
 
     //Solver methods
+
     void forwardEulerMethod(int endingTime, double N, bool read = true);
     void eulerCromerMethod(int endingTime, double N, bool read = true);
     void verletMethod(double endingTime, double N, bool read = true, double beta = 3);
@@ -41,12 +42,15 @@ private:
     double pos[3], vel[3], acc[3];
     double force[3];
     double ang[3];
+
     double lightSpeed = 173.1;
 
     time_t start, finish;
 
     void initialisePlanets(bool read = true);
+
     void gravitationalForce(const Planet &current, double &Fx, double &Fy, double &Fz, double beta = 3);
+
     void gravitationalForceRel(Planet current, double &Fx, double &Fy, double &Fz);
 
     double centerMassPosition(uint16_t index);

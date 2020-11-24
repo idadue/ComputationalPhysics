@@ -6,3 +6,4 @@ compile:
 
 execute:
 	./main
+	python3 plot.py
