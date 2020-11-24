@@ -13,6 +13,7 @@ plt.rcParams.update(newparams)
 
 # step out one folder from current i.e /src -> /project3/
 os.chdir("../")
+os.chdir("../")
 path = os.getcwd() + "/data/"
 
 files = np.sort(glob.glob(path + "*.txt"))
