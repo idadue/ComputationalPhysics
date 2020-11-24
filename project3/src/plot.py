@@ -4,6 +4,7 @@ import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 import os
 import glob
+
 import matplotlib.colors as mcolors
 from scipy.signal import find_peaks
 
@@ -16,18 +17,22 @@ newparams = {'axes.titlesize': fontsize + 5, 'axes.labelsize': fontsize + 2,
              'lines.markersize': 7, 'figure.figsize': [15, 10],
              'ytick.labelsize': fontsize, 'figure.autolayout': True,
              'xtick.labelsize': fontsize, 'legend.loc': 'best',
+
              'legend.fontsize': fontsize + 2}
+
 plt.rcParams.update(newparams)
 
 # step out one folder from current i.e /src -> /project3/
 os.chdir("../")
 path = os.getcwd()
 
+
 # Sun, Earth, Jupiter, Saturn, Venus, Mars, Mercury, Uranus, Neptune, Pluto
 colors = ['yellow', 'b', 'burlywood', 'navajowhite', 'goldenrod',
           'chocolate', 'peru', 'steelblue', 'skyblue', 'mistyrose']
 planets = ['Sun', 'Earth', 'Jupiter', 'Saturn', 'Venus',
            'Mars', 'Mercury', 'Uranus', 'Neptune', 'Pluto']
+
 
 # Approximate scales of planets in solar system
 sizes = [110, 1, 11, 9, 0.9, 0.5, 0.33, 4, 3.9, 0.2]
