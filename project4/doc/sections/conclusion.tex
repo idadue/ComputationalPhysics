@@ -3,5 +3,10 @@
 \begin{document}
 \section{Conclusion}\label{sec:conclusion}
 
+After having made Monte Carlo simulations of the 2-dimensional Ising model for the lattices, we have found results that fit quite well with the analytic results. The $2 \times 2$ lattice was found to have an agreement of $4$ significant digits on expected energy and absolute magnetization, $3$ significant digits on magnetic susceptibility, and $1$ significant digit on heat capacity, all with $10^6$ Monte Carlo cycles. The equilibration time for the $20 \times 20$ lattice seemed to be about $1000$ MC cycles, and we also found the probability distribution of state to conform with the expected Maxwell-Boltzmann distribution. 
+
+The critical temperature we found for a lattice of infinite size was $T_C(L = \infty) = 2.273$ which had just an error of $\delta = 0.17\%$ compared with the known analytical solution, and we discovered that the use of parallel computing techniques could improve the execution time of our program by about a factor of $2$.
+
+Future work could involve further optimization of code, as well as finding ways to automatically determine the equilibration time. There should also be ways of optimizing the pa
 
 \end{document}
