@@ -2,6 +2,7 @@
 #include "random.h"
 #include <fstream>
 #include <iomanip>
+#include <vector>
 
 class Ising
 {
@@ -19,29 +20,16 @@ public:
     void initializeSystem(double temperature);
     void updateSystem(double temperature);
     void Metropolis();
-    void MonteCarloCycler(int cycles);
-    void computeValuesOfInterest(int cycle);
+    void MonteCarloCycler(int cycles, std::vector<double> &expectation);
+    void computeValuesOfInterest(int cycle, std::vector<double> &expectation);
 
-    void writeToFile(std::string filename);
-
-    void print()
-    {
-        for (int row = 0; row < L; row++)
-        {
-            for (int col = 0; col < L; col++)
-            {
-                printf("%3d ", spin_matrix[row * L + col]);
-            }
-            std::cout << "\n";
-        }
-    };
+    void writeToFile(int cycle, std::vector<double> &expectation);
 
 private:
-    int L;                 //Square lattice dimension
-    int N;                 //Number of spins
-    int cycles;            //Number of Monte Carlo cycles to run
-    double w[17];          //energy difference
-    double expectation[5]; //expectation values
+    int L;        //Square lattice dimension
+    int N;        //Number of spins
+    int cycles;   //Number of Monte Carlo cycles to run
+    double w[17]; //energy difference
 
     double E;
     double E_mean = 0;
@@ -56,7 +44,7 @@ private:
 
     Random r; //Object of Random class
     std::string filename;
-    int configurations = pow(2, N);
+    std::ofstream ofile;
     int *spin_matrix;
 
     int periodic(int i, int add);
