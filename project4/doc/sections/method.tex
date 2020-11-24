@@ -9,6 +9,7 @@ When studying analytically solvable systems in statistical mechanics, we often l
 We can avoid if-tests and other time consuming operations to account for the periodic boundary conditions by introducing an index vector with the values \ensuremath{[L-1, 0, 1, 2, \ldots, L-2, L-1, 0]}. The value of the index-vector will be used as the spin-matrix-index.
 
 \subsection{The Metropolis Algorithm}
+\label{subsec:metropolis}
 The Markov chain Monte Carlo based Metropolis algorithm, which simulate the time-evolution of stochastic systems, is used to simulate the Ising model. The advantage of using the Metropolis algorithm, is that we avoid having to calculate the probability distribution function (PDF). Calculating the (PDF) requires heavy computations for every single possible state, which is numerically uneconomical. The Metropolis algorithm circumvents this problem because it only requires a function $f$ proportional to the distribution density.
 
 The following steps describes the Metropolis algorithm in a condensed way:
@@ -26,5 +27,7 @@ When the steps has selected $L^2$ random spins, we have completed a Monte Carlo 
 
 This algorithm can be effectivized by pre-computing the possible energy changes, which are finite and shown to be \ensuremath{\Delta E= 8J, 4J, 0, -4J, -8J} in \cref{sec:energy-magnetization-change}. 
 
-The algorithm determines whether a proposed move is implemented based on a transition probability and an acceptance probability. The advantage of the algorithm is that the transition probability can be uknown.
+The algorithm determines whether a proposed move is implemented based on a transition probability and an acceptance probability. The advantage of the algorithm is that the transition probability can be unknown.
+
+
 \end{document}
