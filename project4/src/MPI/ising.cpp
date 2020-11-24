@@ -12,6 +12,10 @@ Ising::~Ising()
 
 void Ising::updateSystem(double temperature)
 {
+    /*
+    Update the system/matrix using periodic boundary conditions and update the 
+    energy and magnetization of the system.
+    */
     M = 0.0;
     E = 0.0;
     this->temperature = temperature;
@@ -47,6 +51,9 @@ void Ising::updateSystem(double temperature)
 
 void Ising::initializeSystem(double temperature)
 {
+    /*
+    Initialize the system by fillin the spin matrix with random values of 1 and -1.
+    */
     double seed = r.generateMersenneTwisterNumber(0, 10000);
     r.setSeed(seed);
     this->temperature = temperature;
@@ -62,11 +69,17 @@ void Ising::initializeSystem(double temperature)
 
 int Ising::periodic(int i, int add)
 {
+    /*
+    Calculate the position of a spin relative to another given periodic boundary conditions.
+    */
     return (i + L + add) % (L);
 }
 
 void Ising::energyDiff(double temperature)
 {
+    /*
+    Calculate know energies of the system.
+    */
     for (int i = -8; i <= 8; i++)
     {
         w[i + 8] = 0;
@@ -79,8 +92,11 @@ void Ising::energyDiff(double temperature)
 
 void Ising::Metropolis()
 {
+    /*
+    Perform the metropolis algorithm.
+    */
     int deltaE;
-    for (int i = 0; i < L; i++)
+    for (int i = 0; i < N; i++)
     {
         int rand_x = r.generateMersenneTwisterNumber(0.0, 1.0) * L;
         int rand_y = r.generateMersenneTwisterNumber(0.0, 1.0) * L;
@@ -100,6 +116,7 @@ void Ising::Metropolis()
 
 int Ising::getDeltaE(int row, int col)
 {
+    /*Calculate delta of E with respect to neighbors*/
     int up = spin_matrix[row * L + periodic(col, 1)];
     int down = spin_matrix[row * L + periodic(col, -1)];
     int left = spin_matrix[periodic(row, -1) * L + col];
@@ -109,6 +126,7 @@ int Ising::getDeltaE(int row, int col)
 
 void Ising::MonteCarloCycler(int cycles, std::vector<double> &expectation)
 {
+    /*Run a Monte Carlo cycle.*/
     for (int cycle = 1; cycle < cycles + 1; cycle++)
     {
         Metropolis();
@@ -123,6 +141,7 @@ void Ising::MonteCarloCycler(int cycles, std::vector<double> &expectation)
 
 void Ising::computeValuesOfInterest(int cycle, std::vector<double> &expectation)
 {
+    /*Calculate the values we are interested in*/
     double norm = 1 / (double)cycle;
     double expectation_norm[5];
     for (int i = 0; i < 5; i++)
@@ -130,6 +149,7 @@ void Ising::computeValuesOfInterest(int cycle, std::vector<double> &expectation)
         expectation_norm[i] = expectation[i] * norm;
     }
 
+    //Variance of energy
     double E_var = (expectation_norm[1] - pow(expectation_norm[0], 2)) / (double)N;
 
     E_mean = expectation_norm[0] / (double)N;

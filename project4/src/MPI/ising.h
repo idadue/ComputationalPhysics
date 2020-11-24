@@ -9,9 +9,8 @@ class Ising
     /*
     Class for simulating the two-dimensional Ising model. We define 
     the coupling constant as J = 1 and the Boltzmann constant as k_B = 1.
-    Then the temperature has the dimesion [Energy]. Simulation is done using 
-    Monte Carlo cylces via the Metropolis algortihm with periodic 
-    boundary conditions.    
+    Simulation is done using Monte Carlo cylces via 
+    the Metropolis algortihm with periodic boundary conditions.    
     */
 
 public:
@@ -31,12 +30,12 @@ private:
     int cycles;   //Number of Monte Carlo cycles to run
     double w[17]; //energy difference
 
-    double E;
-    double E_mean = 0;
+    double E;          //energy
+    double E_mean = 0; //expectation value of norm of energy
 
-    double M;
-    double M_mean = 0;
-    double M_mean_abs = 0;
+    double M;              //magnetization
+    double M_mean = 0;     //expectation value of norm of magnetization
+    double M_mean_abs = 0; //absolute value of norm of magnetization
 
     double temperature;
     double specific_heat = 0;
@@ -44,7 +43,7 @@ private:
 
     Random r; //Object of Random class
     std::string filename;
-    std::ofstream ofile;
+
     int *spin_matrix;
 
     int periodic(int i, int add);

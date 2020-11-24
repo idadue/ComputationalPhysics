@@ -31,6 +31,9 @@ void Random::setSeed(double seed)
 
 int Random::spin()
 {
+    /*
+    Return a either a -1 or a 1. Used for Ising model simulations.
+    */
     double num = generateMersenneTwisterNumber(0, 1);
     return (num > 0.5) ? 1 : -1;
 }
