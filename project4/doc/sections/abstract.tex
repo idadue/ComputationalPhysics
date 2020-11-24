@@ -3,5 +3,10 @@
 \begin{document}
 \begin{abstract}\label{sec:abstract}
 
+In this work we use Monte Carlo simulations with the Metropolis algorithm to study the 2-dimensional Ising model for finite and infinite spin sites, using lattice sizes up to $100 \times 100$. The purpose is to understand Monte Carlo simulations and parallellization of code, and to compare numerically computed values with analytical values. 
+We find a simulated estimated critical temperature in the infinite lattice limit of $\frac{k_B T}{J} = 2.273$, agreeing with the analytic value to $3$ significant digits. Our computed values for the $2 \times 2$ lattice agree with analytical values of expected energy and absolute magnetization to $4$ significant digits at $10^6$ Monte Carlo cycles, the magnetic susceptibility to $3$ significant digits, while the heat capacity agrees to $1$ significant digit. We find that running simulations on multiple cores in parallel could increase performance by a factor of $2$.
+%Future work
+The accuracy of the critical temperature could be improved by increasing both the number of Monte Carlo cycles and the resolution of the temperature, to more accurately resolve the critical temperature for each of the four lattices and to then estimate the infinite limit more precisely.
+
 \end{abstract}
 \end{document}

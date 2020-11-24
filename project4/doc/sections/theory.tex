@@ -15,12 +15,12 @@ To derive macroscopic systems, and understand the behaviour of many-particle sys
 \end{align} We use the probability of measuring a given state $i$ (\cref{eq:boltzmann-distribution}) to calculate the expectation value of the energy, $E$ and the magnetization, $M$. 
 
 \begin{align}
-    \braket{E}\frac{1}{Z}\sum_i E_i e^{-E_i\beta}
+    \braket{E} = \frac{1}{Z}\sum_i E_i e^{-E_i\beta}
     \label{eq:exp-e}
 \end{align}
 
 \begin{align}
-    \braket{M}\frac{1}{Z}\sum_i M_i e^{-E_i\beta}
+    \braket{M} = \frac{1}{Z}\sum_i M_i e^{-E_i\beta}
     \label{eq:exp-m}
 \end{align} From these expressions we can derive other physical properties such as the heat capacity at constant volume $C_V$ given by
 
@@ -41,6 +41,8 @@ A popular model to simulate phase transitions, is the so-called Ising model. In 
 \begin{align}
     H = -J\sum_{<ij>}s_is_j,
 \end{align} where $H$ is the total energy of the system, $J$ is the coupling constant expressing the strength of the interaction between neighboring spins and the sum describes the spin-spin interaction between the nearest neighbours only. The spins can be either up or down, which we write $s_i=\pm1$. We assume ferromagnetic ordering ($J>0$), which makes it energetically favorable for neighboring spins to align -- leading to spontaneous magnetization at low temperatures, $T$.
+
+
 
 \subsection{Phase transitions}
 A power law behavior can characterize the behavior of many physical quantities near the critical temperature $T_C$. For example, the mean magnetization for the Ising class of models is given by
@@ -69,9 +71,21 @@ A power law behavior can characterize the behavior of many physical quantities n
 \end{split}
 \end{align} Through so-called finite size scaling relations it is possible to relate the behavior at finite lattices with the results for an infinitely large lattice. The critical temperature scales then as
 
-\begin{align}
+\begin{align}\label{eq:critical_temp}
     T_C(L=\infty)=T_C(L)-aL^{-1/\nu},
 \end{align} where $a$ is a constant and $\nu$ is defined in \cref{eq:xi}. 
+
+To estimate the constant $a$, one can compare the results of two lattices $T_C(L_1)$ and $T_C(L_2)$ by 
+
+\begin{equation}
+    (T_C(L_1)-aL_1^{-1/\nu}) - (T_C(L_2)-aL_2^{-1/\nu}) = a(L_1^{-1/\nu} - L_2^{-1/\nu}),
+\end{equation}
+which gives the expression of $a$ as
+
+\begin{equation}
+    a = \frac{T_C(L_1) - T_C(L_2)}{L_1^{-1/\nu} - L_2^{-1/\nu}}.
+\end{equation}\label{eq:a}
+
 
 Lars Onsager, the Norwegian born chemist and physicists was the first to solve the Ising model analytically in two dimensions for a general lattice size $L$ \cite{Onsager1944}. From his work, we have that the analytical critical temperature in the thermodynamic limit is
 
