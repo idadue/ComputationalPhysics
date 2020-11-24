@@ -3,10 +3,12 @@
 \begin{document}
 \section{Conclusion}\label{sec:conclusion}
 
-What did we find?
+%What did we find?
+We have made various simulations of the Solar system, attaining a deeper understanding of object oriented programming and the value of being able to reuse code in different subsystems. The simulations have largely corresponded with theory, for both two-body, three-body and many-body problems. The case of Jupiter increased to near-Sun mass lead to a system similar to a binary star system with the Earth leaving the Solar system, while for $10M_j$ the system seemed perturbed but stable with the Earth changing orbit slowly. Simulating a longer time period might show whether the orbit of the Earth would remain stable.
 
-Did we find what we expected?
+With a generalized Newtonian force of gravity we saw instabilities at $\beta$ values approaching $3$, in accordance with theory. For circular orbits the system is noticeably more stable even for higher values of $\beta$, and future work could involve testing longer time periods to see the rate of decline, or different number of time steps.
 
-Future work.
+The simulated perihelion precession of Mercury over the course of a century was found to oscillate about the observed slope with an error of about $10''$. Simulating the perihelion precession more accurately involves only increasing the number of points, and thus time spent running the program. This could be of interest in order to more accurately determine if general relativity can explain the whole $43''$ precession.
+
 
 \end{document}

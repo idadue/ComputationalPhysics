@@ -5,12 +5,24 @@
 
 \subsection{Earth-Sun System}
 
-We see in \cref{fig:earth-sun-euler} the results of using the Forward Euler method, as the Earth in this simulation gradually escapes the Sun's gravitational field. Since the Euler method does not conserve energy, this type of result is expected.
+We see in \cref{fig:earth-sun-verlet-vs-euler} the results of using the Forward Euler method, as the Earth in this simulation gradually escapes the Sun's gravitational field. This is in accordance with \cref{sec:euler}, as the Forward Euler method should not conserve energy and will therefore in general not lead to closed orbits. As the step size decreases and the number of time steps increase, the orbit becomes more stable, as the error in the energy grows smaller. Meanwhile, the velocity Verlet method remains stable for all step sizes shown, as expected from a symplectic method.
 
-\subsection{Inverse Square Force}
+\Cref{fig:earth-escape-velocity} shows the Earth with an initial velocity of $8.885764876 \text{AU}/\text{yr}$. This velocity was found through trial and error to be approximately enough for the Earth to escape the gravitational pull of the sun. 
 
-\subsection{3-Body Problem}
+\subsection{Generalized Newtonian Gravity}
+
+In figure \cref{fig:varying-beta}, we show the $x$-coordinate of the Earth over time, with different values of the parameter $\beta$. As $\beta$ approaches $3$, the gravitational force seems to be unable to keep the Earth in a bound state, as expected from the discussion in \cref{sec:appendix_generalized_grav_law}. However, it seems that for a circular orbit, there is almost no dependence on $\beta$. In truth, there is a small gradual decline in the radius over time for $\beta = 3$, but it is not resolvable in \cref{fig:varying-beta}. It might be of interest to explore longer term simulations of circular orbits, or with a smaller step size $h$ to see the rate of decline and how long it takes before the system loses stability.
+
+\subsection{Three-body Problem}
+
+The three-body problem illustrated in \cref{fig:three-body-problem} shows the Jupiter-Earth-Sun system for three different values for the mass of Jupiter. We see that for the ordinary case, the Earth's orbit is largely unaffected, while for $10M_j$ the Earth's orbit is no longer closed. For the case of $1000 M_j$, Jupiter has a mass similar to that of the Sun $M_\odot \approx 1047 M_j$ \cite{nasa-const}, which is why the Sun and Jupiter begin orbiting around each other, with the Earth leaving the system behind entirely. This is essentially a system with two stars. The case of $10 M_j$ seems to keep stability for the Earth, although \cref{fig:three-body-problem} only shows the simulation for 10 years. It could be that for a longer simulation, the system loses stability.
 
 \subsection{Perihelion Precession}
+
+We expect precession to occur when adding the relativistic correction in \cref{eq:rel-correction} to the classical Newtonian gravitational force, as the orbit should be almost closed elliptical. The observed perihelion precession of Mercury is about $43''$ per century greater than what the Newtonian contributions from the other bodies in the solar system should add up to \cite{Pollock2003}. Thus we expect that with only the Sun-Mercury system, including the relativistic correction should show a large contribution towards this additional precession. \cref{fig:perihelion-precession} shows that the relativistic corrected path of Mercury fits well with this additional precession, oscillating with $\approx 10''$ about the observed slope.
+
+To resolve the difference of $43$ arcseconds at all, we expect to need at least a resolution of $86$ arcseconds. In a given orbit, there are $1296000$ arcseconds, and in a century Mercury makes approximately $400$ orbits. Thus, to get above the minimum precision of $86''$, we need more than $n \approx 6 \cdot 10^6$ time steps. In \cref{fig:perihelion-precession}, a total of $n = 3 \cdot 10^7$ time steps were used. Thus we can expect to resolve about $\frac{3 \cdot 10^7}{400 \cdot 1296000} \approx 17$ arcseconds, and it is clear that this is enough to get a clear picture of the relativistic contribution to the precession from the figure, also corresponding with the error being of the order $10$ arcseconds as in the figure.
+
+These results seem to indicate that General Relativity can explain most of the additional perihelion precession observed on Mercury, if not all. With even higher number of points, it should be possible to get a more accurate slope for the relativistic contribution to see if there are any other corrections needed, and to lower the resolution even further.
 
 \end{document}

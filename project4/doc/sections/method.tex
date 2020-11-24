@@ -1,0 +1,30 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+\section{Method}\label{sec:method}
+
+\subsection{Boundary conditions}
+When studying analytically solvable systems in statistical mechanics, we often let the systems approach the thermodynamic limit, that is, the number of particles approaches infinity. Numerically, we have to restrict our study to a finite $L\times L$ lattice size. The maximum system size we will use is $100\times 100$. We use periodic boundary conditions to approximate a larger system. This ensures that our system will not have any boundaries as we are effectively projecting the two dimensional square lattice onto a sphere, as the upper row are in contact with the bottom row, and the same for the left and right side. Each spin now has four neighbours, and we are approximating the thermodynamic limit, as the boundaries play no role in the thermodynamic limit. 
+
+We can avoid if-tests and other time consuming operations to account for the periodic boundary conditions by introducing an index vector with the values \ensuremath{[L-1, 0, 1, 2, \ldots, L-2, L-1, 0]}. The value of the index-vector will be used as the spin-matrix-index.
+
+\subsection{The Metropolis Algorithm}
+The Markov chain Monte Carlo based Metropolis algorithm, which simulate the time-evolution of stochastic systems, is used to simulate the Ising model. The advantage of using the Metropolis algorithm, is that we avoid having to calculate the probability distribution function (PDF). Calculating the (PDF) requires heavy computations for every single possible state, which is numerically uneconomical. The Metropolis algorithm circumvents this problem because it only requires a function $f$ proportional to the distribution density.
+
+The following steps describes the Metropolis algorithm in a condensed way:
+
+\begin{enumerate}
+    \item Initialize the system by an initial state which can be randomly generated. Compute the energy $E_1$ of this configuration. 
+    \item Change the initial configuration by flipping the spin of an arbitrary site. Compute the energy of this new trial state $E_2$. 
+    \item Compute the change in energy \ensuremath{\Delta E= E_2-E_1}.
+    \item If \ensuremath{\Delta E\leq0}, the new configuration is accepted. (The energy is lower than it was, and the system is progressing towards an energy minimum.)
+    \item If \ensuremath{\Delta E>0}, compute \ensuremath{w=e^{-\beta\Delta E}}. If \ensuremath{w\geq r}, where $r$ is a random number in the interval [0,1), accept the flipped state. Else the initial state is kept.
+    \item Update the expectation values. 
+\end{enumerate} These steps are repeated until a sufficiently good steady state is reached. 
+
+When the steps has selected $L^2$ random spins, we have completed a Monte Carlo cycle. The Monte Carlo part of the algorithm is the way we choose which spin to flip,  and up-date the expectation values. The Metropolis part is the requirement for flipping a spin or not. Introducing more Monte Carlo cycles increases the precision of our results. For each Monte Carlo cycle the energy, energy squared, magnetization and magnetization squared, as well as the absolute value of the magnetization, are added to an array containing the sum of these values up until this state. After the algorithm is finished we calculate the expectation values for the quantities by dividing with the number of MC cycles.
+
+This algorithm can be effectivized by pre-computing the possible energy changes, which are finite and shown to be \ensuremath{\Delta E= 8J, 4J, 0, -4J, -8J} in \cref{sec:energy-magnetization-change}. 
+
+The algorithm determines whether a proposed move is implemented based on a transition probability and an acceptance probability. The advantage of the algorithm is that the transition probability can be uknown.
+\end{document}

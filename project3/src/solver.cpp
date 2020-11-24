@@ -11,12 +11,20 @@ Solver::Solver()
     dir_path = path;
 }
 
+/*
+Add a Planet object to the planets vector
+*/
 void Solver::addPlanet(const Planet &planet)
 {
     planets.push_back(planet);
     //systemMass += planet.getMass();
 }
 
+/*
+Initialise the system with the option to read in data from file
+Sets all planet inital positions and calculates the center of mass position and
+center of mass velocity.
+*/
 void Solver::initialisePlanets(bool read)
 {
     if (read)
@@ -36,11 +44,9 @@ void Solver::initialisePlanets(bool read)
     int i = 0;
     for (auto &it : planets)
     {
-        std::ofstream out;
-        std::string filename = dir_path + folder + "/planet_" + std::to_string(i) + ".txt";
-        out.open(filename, std::ios::app);
-        it.setPosition(it.getPosition(0) - cmp[0], it.getPosition(1) - cmp[1], it.getPosition(2) - cmp[2]);
-        it.setVelocity(it.getVelocity(0) - cmv[0], it.getVelocity(1) - cmv[1], it.getVelocity(2) - cmv[2]);
+        std::ofstream out = outputStream(i);
+        it.setPosition(it.getInitPos(0) - cmp[0], it.getInitPos(1) - cmp[1], it.getInitPos(2) - cmp[2]);
+        it.setVelocity(it.getInitVel(0) - cmv[0], it.getInitVel(1) - cmv[1], it.getInitVel(2) - cmv[2]);
         printer(out, it.getPosition(0), it.getPosition(1), it.getPosition(2));
         ++i;
     }
@@ -54,7 +60,7 @@ void Solver::initialisePlanets(bool read)
 /*
 Solve diff equation using forward euler method
 */
-void Solver::forwardEulerMethod(int endingTime, unsigned int N, bool read)
+void Solver::forwardEulerMethod(int endingTime, double N, bool read)
 {
     double dt = double(endingTime) / double(N);
     double elapsedTime = 0;
@@ -89,7 +95,7 @@ void Solver::forwardEulerMethod(int endingTime, unsigned int N, bool read)
 /*
 Solve diff equation using euler-cromer method
 */
-void Solver::eulerCromerMethod(int endingTime, unsigned int N, bool read)
+void Solver::eulerCromerMethod(int endingTime, double N, bool read)
 {
     double dt = double(endingTime) / double(N);
     double elapsedTime = 0;
@@ -124,10 +130,12 @@ void Solver::eulerCromerMethod(int endingTime, unsigned int N, bool read)
 /*
 Solve diff equation using the Verlet velocity method.
 */
-void Solver::verletMethod(double endingTime, unsigned int N, bool rel, bool read)
+
+void Solver::verletMethod(double endingTime, double N, bool read, double beta)
+
 {
     double dt = endingTime / double(N);
-    double elapsedTime = 0;
+    double elapsedTime = 0.0;
 
     initialisePlanets(read);
     std::cout << centerMassVelocity(0) << ", " << centerMassVelocity(1) << ", " << centerMassVelocity(2) << std::endl;
@@ -137,39 +145,31 @@ void Solver::verletMethod(double endingTime, unsigned int N, bool rel, bool read
     start = clock();
     while (elapsedTime <= endingTime)
     {
-        for (long unsigned int i = 0; i < planets.size(); ++i)
+        int i = 0;
+        for (auto &it : planets)
         {
             std::ofstream out = outputStream(i);
-            if (rel)
-            {
-              gravitationalForceRel(planets[i], force[0], force[1], force[2]);
-            }
-            else
-            {
-              gravitationalForce(planets[i], force[0], force[1], force[2]);
-            }
+
+            gravitationalForce(it, force[0], force[1], force[2], beta);
+
 
             for (int j = 0; j < 3; ++j)
             {
-                acc[j] = force[j] / planets[i].getMass();
-                pos[j] = planets[i].getPosition(j) + planets[i].getVelocity(j) * dt + acc[j] * pow(dt, 2) * 0.5;
-                planets[i].setPos(j, pos[j]);
+                acc[j] = force[j] / it.getMass();
+                pos[j] = it.getPosition(j) + it.getVelocity(j) * dt + acc[j] * pow(dt, 2) * 0.5;
+                it.setPos(j, pos[j]);
             }
-            if (rel)
-            {
-              gravitationalForceRel(planets[i], force[0], force[1], force[2]);
-            }
-            else
-            {
-              gravitationalForce(planets[i], force[0], force[1], force[2]);
-            }
+
+            gravitationalForce(it, force[0], force[1], force[2], beta);
+
             for (int j = 0; j < 3; ++j)
             {
-                acc[j] += force[j] / planets[i].getMass();
-                vel[j] = planets[i].getVelocity(j) + acc[j] * (0.5 * dt);
-                planets[i].setVel(j, vel[j]);
+                acc[j] += force[j] / it.getMass();
+                vel[j] = it.getVelocity(j) + acc[j] * (0.5 * dt);
+                it.setVel(j, vel[j]);
             }
             printer(out, pos[0], pos[1], pos[2]);
+            ++i;
         }
         elapsedTime += dt;
     }
@@ -179,7 +179,51 @@ void Solver::verletMethod(double endingTime, unsigned int N, bool rel, bool read
 }
 
 
-void Solver::gravitationalForce(Planet current, double &Fx, double &Fy, double &Fz)
+/*
+Solve diff equation using the Verlet velocity method and a relativistic force model
+*/
+void Solver::relVerletMethod(double endingTime, double N, bool read)
+{
+    double dt = endingTime / double(N);
+    double elapsedTime = 0.0;
+
+    initialisePlanets(read);
+    start = clock();
+    while (elapsedTime <= endingTime)
+    {
+        int i = 0;
+        for (auto &it : planets)
+        {
+            std::ofstream out = outputStream(i);
+            gravitationalForceRel(it, force[0], force[1], force[2]);
+
+            for (int j = 0; j < 3; ++j)
+            {
+                acc[j] = force[j] / it.getMass();
+                pos[j] = it.getPosition(j) + it.getVelocity(j) * dt + acc[j] * pow(dt, 2) * 0.5;
+                it.setPos(j, pos[j]);
+            }
+            gravitationalForceRel(it, force[0], force[1], force[2]);
+
+            for (int j = 0; j < 3; ++j)
+            {
+                acc[j] += force[j] / it.getMass();
+                vel[j] = it.getVelocity(j) + acc[j] * (0.5 * dt);
+                it.setVel(j, vel[j]);
+            }
+            printer(out, pos[0], pos[1], pos[2]);
+            ++i;
+        }
+        elapsedTime += dt;
+    }
+    finish = clock();
+    printf("Execution time for Verlet with relativistic force is : %f seconds. \n", double(finish - start) / double(CLOCKS_PER_SEC));
+}
+
+/*
+Find the gravitational force acting on a Planet in the system, in 3 dimensions
+*/
+void Solver::gravitationalForce(const Planet &current, double &Fx, double &Fy, double &Fz, double beta)
 {
     double x, y, z;
     x = y = z = 0;
@@ -187,9 +231,9 @@ void Solver::gravitationalForce(Planet current, double &Fx, double &Fy, double &
     {
         if (it->getID() != current.getID())
         {
-            x += (it->getMass() * (current.getPosition(0) - it->getPosition(0)) / (pow(current.distance(*it), 3)));
-            y += (it->getMass() * (current.getPosition(1) - it->getPosition(1)) / (pow(current.distance(*it), 3)));
-            z += (it->getMass() * (current.getPosition(2) - it->getPosition(2)) / (pow(current.distance(*it), 3)));
+            x += (it->getMass() * (current.getPosition(0) - it->getPosition(0)) / (pow(current.distance(*it), beta)));
+            y += (it->getMass() * (current.getPosition(1) - it->getPosition(1)) / (pow(current.distance(*it), beta)));
+            z += (it->getMass() * (current.getPosition(2) - it->getPosition(2)) / (pow(current.distance(*it), beta)));
         }
     }
     Fx = -G * current.getMass() * x;
@@ -197,7 +241,11 @@ void Solver::gravitationalForce(Planet current, double &Fx, double &Fy, double &
     Fz = -G * current.getMass() * z;
 }
 
+/*
+Find the gravitational force acting on a Planet in the system, in 3 dimensions, with a relativistic correction
+*/
 void Solver::gravitationalForceRel(Planet current, double &Fx, double &Fy, double &Fz)
+
 {
     double x, y, z;
     x = y = z = 0;
@@ -218,14 +266,10 @@ void Solver::gravitationalForceRel(Planet current, double &Fx, double &Fy, doubl
             double lSquare = 0;
             for (int i = 0; i < 3; ++i)
             {
-              lSquare += pow(ang[i], 2);
+                lSquare += pow(ang[i], 2);
             }
-            //std::cout << ang[0] << ", " << ang[1] << ", " << ang[2] << std::endl;
-            //std::cout << "lsquare = "<< lSquare << std::endl;
 
-            relCorrect = 1 + ((3*lSquare) / (pow(current.distance(*it), 2) * pow(lightSpeed, 2)));
-
-            //std::cout << "relcorrect = "<< (3*lSquare) / (pow(current.distance(*it), 2) * pow(lightSpeed, 2)) << std::endl;
+            relCorrect = 1 + ((3 * lSquare) / (pow(current.distance(*it), 2) * pow(lightSpeed, 2)));
 
             x += (it->getMass() * (current.getPosition(0) - it->getPosition(0)) / (pow(current.distance(*it), 3))) * relCorrect;
             y += (it->getMass() * (current.getPosition(1) - it->getPosition(1)) / (pow(current.distance(*it), 3))) * relCorrect;
@@ -237,11 +281,18 @@ void Solver::gravitationalForceRel(Planet current, double &Fx, double &Fy, doubl
     Fz = -G * current.getMass() * z;
 }
 
+
+/*
+Method that writes to a file by appending
+*/
 void Solver::printer(std::ofstream &out, double x, double y, double z)
 {
     out << std::fixed << std::setprecision(15) << x << ", " << y << ", " << z << std::endl;
 }
 
+/*
+Create an output stream for a file
+*/
 std::ofstream Solver::outputStream(int i)
 {
     std::ofstream out;
@@ -250,26 +301,36 @@ std::ofstream Solver::outputStream(int i)
     return out;
 }
 
+/*
+Calculate the center of mass postition of the system
+*/
 double Solver::centerMassPosition(uint16_t index)
 {
     double res = 0;
     for (auto it = planets.begin(); it != planets.end(); ++it)
     {
-        res += it->getMass() * it->getPosition(index);
+        res += it->getMass() * it->getInitPos(index);
     }
     return res / systemMass;
 }
 
+/*
+Calculate the center of mass velocity of the system
+*/
 double Solver::centerMassVelocity(uint16_t index)
 {
     double res = 0;
     for (auto it = planets.begin(); it != planets.end(); ++it)
     {
-        res += it->getMass() * it->getVelocity(index);
+        res += it->getMass() * it->getInitVel(index);
     }
     return res / systemMass;
 }
 
+/*
+Prepars a folder for the addition of files. If folder dpes not exist, it will create one, and if the
+folder already does exists, it will delete the contents. 
+*/
 void Solver::prepareFolder()
 {
     std::string path = dir_path + folder;
@@ -288,21 +349,31 @@ void Solver::prepareFolder()
     }
 }
 
+/*
+Sets the folder to store results
+*/
 void Solver::setResultsFolder(std::string folder)
 {
     this->folder = "results/" + folder;
 }
 
+/*
+Sets the file to read data from
+*/
 void Solver::setReadFile(const std::string &readFile)
 {
     this->readFile = "/" + readFile;
 }
 
+/*
+Read data from readFile and insert relevant values into each planet object., whilst also increasing the system mass
+*/
 void Solver::readData(const std::string &readFile)
 {
     std::ifstream inData;
     inData.open(dir_path + readFile);
     double mass, x, y, z, vx, vy, vz;
+    systemMass = 0;
     for (auto &it : planets)
     {
         inData >> mass;
@@ -310,7 +381,17 @@ void Solver::readData(const std::string &readFile)
         inData >> vx >> vy >> vz;
         it.setMass(mass);
         systemMass += it.getMass();
-        it.setPosition(x, y, z);
-        it.setVelocity(it.YEARS * vx, it.YEARS * vy, it.YEARS * vz);
+        it.setInitialPosition(x, y, z);
+        it.setInitialVelocity(it.YEARS * vx, it.YEARS * vy, it.YEARS * vz);
     }
 }
+
+
+/*
+Return a planet object
+*/
+Planet Solver::getPlanet(int index)
+{
+    return planets[index];
+}
+

@@ -1,0 +1,129 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+\section{Theory}\label{sec:theory}
+\subsection{Boltzmann statistics}
+To derive macroscopic systems, and understand the behaviour of many-particle systems, we model the system statistically. In statistical mechanics we use probability models and microscopic physical laws. The probability distribution of a micro state $i$ is given by the Boltzmann distribution
+
+\begin{align}
+    P_i=\frac{1}{Z}e^{-E_i\beta},
+    \label{eq:boltzmann-distribution}
+\end{align} where $E_i$ is the energy, \ensuremath{\beta=\frac{1}{k_BT}} and $Z$ is the partition function, acting as a normalization factor, given by
+
+\begin{align}
+    Z=\sum_i e^{-\beta E_i}. 
+\end{align} We use the probability of measuring a given state $i$ (\cref{eq:boltzmann-distribution}) to calculate the expectation value of the energy, $E$ and the magnetization, $M$. 
+
+\begin{align}
+    \braket{E}\frac{1}{Z}\sum_i E_i e^{-E_i\beta}
+    \label{eq:exp-e}
+\end{align}
+
+\begin{align}
+    \braket{M}\frac{1}{Z}\sum_i M_i e^{-E_i\beta}
+    \label{eq:exp-m}
+\end{align} From these expressions we can derive other physical properties such as the heat capacity at constant volume $C_V$ given by
+
+\begin{align}
+    C_V=\frac{1}{k_B T^2}\left(\braket{E}^2-\braket{E^2}\right).
+    \label{eq:Cv}
+\end{align} \cref{eq:Cv} describes the amount of energy needed to change the temperature. 
+
+We can find the magnetic susceptibility, $\chi$, in the same manner, we get 
+\begin{align}
+    \chi = \frac{1}{k_BT}\left(\braket{M}^2-\braket{M^2}\right).
+    \label{eq:chi}
+\end{align} The magnetic susceptibility tells us whether the material is attracted into, or repelled out of a magnetic field. 
+
+\subsection{The Ising model}
+A popular model to simulate phase transitions, is the so-called Ising model. In one and two dimensions the Ising model has analytical solutions to several expectation values. The 2-dimensional Ising model for a square lattice in the absence of an external magnetic field is modelled as 
+
+\begin{align}
+    H = -J\sum_{<ij>}s_is_j,
+\end{align} where $H$ is the total energy of the system, $J$ is the coupling constant expressing the strength of the interaction between neighboring spins and the sum describes the spin-spin interaction between the nearest neighbours only. The spins can be either up or down, which we write $s_i=\pm1$. We assume ferromagnetic ordering ($J>0$), which makes it energetically favorable for neighboring spins to align -- leading to spontaneous magnetization at low temperatures, $T$.
+
+\subsection{Phase transitions}
+A power law behavior can characterize the behavior of many physical quantities near the critical temperature $T_C$. For example, the mean magnetization for the Ising class of models is given by
+\begin{align}
+    \braket{M(T)}\sim(T-T_C)^\beta,
+\end{align} where $\beta=1/8$ is the critical exponent. A similar relation is found for the heat capacity
+
+\begin{align}
+    C_v(T)\sim|T_C-T|^\alpha, 
+\end{align} and the magnetic susceptibility
+
+\begin{align}
+    \chi(T)\sim|T_C-T|^\gamma
+\end{align} with critical components $\alpha=0$ and $\gamma=7/4$. Another important quantity is the correlation length, which also has a power law behaviour given by,
+
+\begin{align}
+    \xi=|T_C-T|^{-\nu}.
+    \label{eq:xi}
+\end{align} The correlation length is expected to be of the order of the lattice spacing for $T>>T_C$. The correlation length increases as we get closer to the critical temperature, because the spins become more and more correlated as $T$ approaches $T_C$. For a finite lattice size $L$, the correlation length can be shown to be proportional to $L$ by the following relations
+
+\begin{align}
+\begin{split}
+    \braket{M}\propto L^{-\beta/\nu} \\
+    C_V\propto L^{\alpha/\nu} \\
+    \chi \propto L^{\gamma/\nu}. 
+\end{split}
+\end{align} Through so-called finite size scaling relations it is possible to relate the behavior at finite lattices with the results for an infinitely large lattice. The critical temperature scales then as
+
+\begin{align}
+    T_C(L=\infty)=T_C(L)-aL^{-1/\nu},
+\end{align} where $a$ is a constant and $\nu$ is defined in \cref{eq:xi}. 
+
+Lars Onsager, the Norwegian born chemist and physicists was the first to solve the Ising model analytically in two dimensions for a general lattice size $L$ \cite{Onsager1944}. From his work, we have that the analytical critical temperature in the thermodynamic limit is
+
+\begin{align}
+    k_BT_C/J=2/\ln(1+\sqrt{2})\approx2.269,
+\end{align} and the parameter $\nu=1$.
+
+\subsection{Markov chains}
+A Markov chain takes a state 1 and generates a new state 2 with a \textit{transition probability} \ensuremath{P(1\rightarrow2)}, and is a good description of a system that moves towards a steady state given an initial configuration. The transition probabilities needs to be time-independent and $P(1\rightarrow2)$ should only depend on the states 1 and 2, and is thus also independent of the system's time evolution. Further, the Markov chain must put the system in some state 2 when presented with the state 1. Mathematically this can be expressed 
+
+\begin{align}
+    \sum_iP(1\rightarrow i)=1. 
+\end{align} Note that the transition $1\rightarrow1$ is also permitted. 
+
+We have two conditions for reaching a steady state, namely \textit{ergodicity} and \textit{detailed balance}. 
+
+\subsubsection{Ergodicity}
+The principle of ergodicity states that it is possible to reach any state 2 from any state 1 given a long enough Markov chain. This is an important constraint because every state $i$ in the Boltzmann distribution $P_i$ has a non-zero probability. 
+
+\subsubsection{Detailed balance}
+The condition of detailed balance states that on average, the system makes the transition \ensuremath{1\rightarrow2} as many times as \ensuremath{2\rightarrow1}. This can be expressed mathematically 
+
+\begin{align}
+    P_1P(1\rightarrow)=P_2P(2\rightarrow1).
+    \label{eq:detailed-balance}
+\end{align} \Cref{eq:detailed-balance}, implies that
+
+\begin{align}
+    \frac{P(1\rightarrow2)}{P(2\rightarrow1)}=\frac{P_2}{P_1}=e^{-\beta(E_2-E_1)}.
+\end{align}
+
+\subsection{Change in energy and magnetization by a spin-flip}\label{sec:energy-magnetization-change}
+Every time a spin is flipped, we need to compute the change in energy and magnetization of the system during the Markov chain. We exploit the fact that only one spin is flipped, all remaining spins keep their values fixed meaning \ensuremath{s_k^1=s_k^2}. The energy difference between a state $E_1$ and a state $E_2$ with zero external magnetic field is then
+
+\begin{align}
+    \begin{split}
+        \Delta E &= E_2-E_1 \\
+        &=-J\sum_{<kl>}s_k^1s_l^1-J\sum_{kl}s_k^2s_l^2 \\
+        &= -J\sum_{<kl>}s_k^2(s_l^2-s_l^1), 
+    \end{split}
+\end{align} where the sum runs over the nearest neighbours $k$ of the spin. This term can be simplified by considering the values the flipped spin can take. If $s_l^1=1$, then $s_l^2=-1$ and $s_l^1-s_l^2=2$. Similarly, if $s_l^1=-1$, $s_l^1-s_l^2=-2$. The change in energy can then be written
+
+\begin{align}
+    \Delta E = 2Js_l^1\sum_{<k>}s_k.
+\end{align} By considering all possible configurations (\cref{tab:possible-delta-E}), we find that we only have five possible values for $\Delta E$, \ensuremath{\Delta E= 8J, 4J, 0, -4J, -8J}.
+
+We can compute the change in magnetization as well. Since only one spin at site $k$ is flipped, the change is given by
+\begin{align}
+    \Delta M &= M_2-M_1 \\
+    &= \sum_is^1-\sum_js^2 \\
+    &= s_k^1-s_k^2 \\
+    &= 2s_k^1.
+\end{align}
+
+\end{document}
