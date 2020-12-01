@@ -14,3 +14,7 @@ Here you can find the [code](https://github.com/idadue/ComputationalPhysics/tree
 
 ## Project 4: The Ising model
 Here you can find the [code](https://github.com/idadue/ComputationalPhysics/tree/master/project4) and the [report](https://github.com/idadue/ComputationalPhysics/tree/master/project4/doc).
+
+
+## Project 5: Disease modeling
+Here you can find the [code](https://github.com/idadue/ComputationalPhysics/tree/master/project5) and the [report](https://github.com/idadue/ComputationalPhysics/tree/master/project5/doc).
