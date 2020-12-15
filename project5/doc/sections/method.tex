@@ -2,6 +2,40 @@
 
 \begin{document}
 \section{Method}\label{sec:method}
+\subsection{Populations}
+We investigate the effect of increasing the rate of recovery $b$ and crossing the "threshold" in four different populations. Each population consists of 400 people, 100 of which were initially infected and 300 of which were initially susceptible. The rate of transmission and rate of immunity loss is fixed between populations. We let the rate of recovery be varied because it is the one parameter which can be reasonably controlled by the actions of human society. \Cref{tab:parameters} lists the set of parameters for the four different populations. We treat the population as a continuos variable. 
+\begin{table}[htb]
+    \centering
+    \caption{Parameters for the investigated populations.}
+    \begin{tabular}{c c c c c}
+    \toprule
+    Rate & A & B & C & D \\
+    \midrule
+    a & 4 & 4 & 4 & 4 \\
+    b & 1 & 2 & 3 & 4 \\
+    c & 0.5 & 0.5 & 0.5 & 0.5 \\
+    \bottomrule
+    \end{tabular}
+    \label{tab:parameters}
+\end{table}
 
+\subsection{Fourth order Runge-Kutta method}
+We use the well known fourth-order Runge-Kutta method to solve the differential equations. For a function \ensuremath{f(t, y)}, the fourth-order Runge-Kutta method is given by
+\begin{align}
+    y_{i+1}=y_i+\frac{1}{6}(k_1+2k_2+2k_3+k_4), 
+    \label{eq:rk4}
+\end{align} where
+
+\begin{align}
+    \begin{split}
+        k_1&=hf(t_i, y_i) \\
+        k_2&=hf(t_i+\frac{1}{2}h, y_i+\frac{1}{2}k_1) \\
+        k_3&=hf(t_i+\frac{1}{2}h, y_i+\frac{1}{2}k_2)\\
+        k_4&=hf(t_i+h, y_i+k_3).
+    \end{split}
+\end{align}
+
+We see that the algorithm consists in first calculating $k_1$ with $t_i$, $y_1$ and $f$ as inputs. Then, the step size is increased by \ensuremath{h/2} and $k_2$, $k_3$ and finally $k_4$ is calculated. The global error goes as \ensuremath{\mathcal{O}(h^4)}
+\subsection{Monte Carlo simulation}
 
 \end{document}
