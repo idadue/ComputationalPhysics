@@ -1,0 +1,88 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+\section{Theory}\label{sec:theory}
+\subsection{The SIRS model for transmission of an infectious disease}
+The SIRS model is a modification of the traditional SIR model for epidemics introduced by Kermack and McKendrick \cite{SIRmodel} almost 100 years ago, where immunity lasts only for a short period of time. We consider an isolated population of $N$ people which are divided into three classes: 
+
+\begin{itemize}
+    \item Susceptible ($S$): represents the individuals not yet infected with disease at time, $t$, or those susceptible to the disease of the population. 
+    \item Infected ($I$): denotes the individuals of the population who are currently infected with the disease and are capable of spreading the disease to those in the susceptible category. 
+    \item Recovered ($R$): represents those who have been infected in the past and have developed an immunity to the disease. Thus, the people in this category are not able to be infected again or to transmit the infection to others. 
+\end{itemize}
+
+The flow of this model is cyclic and may be considered as follows: 
+\ensuremath{\mathcal{S}\rightarrow\mathcal{I}\rightarrow\mathcal{R}\rightarrow\mathcal{S}}. We use the rate of transmission, $a$, the rate of recovery, $b$, and the rate of immunity loss, $c$, to help describe the flow of people moving between the three classes. The population is assumed to be fixed and mix homogeneously so that
+
+\begin{align}
+    N=S(t)+I(t)+R(t).
+    \label{eq:N}
+\end{align}
+
+First, we assume that the dynamics of the epidemic occur during a time scale much smaller than the average person's lifetime. Hence, we neglect the effect of the birth and death rate of the population. With these assumptions, we construct a set of coupled differential equations from the classical SIRS model:  
+
+\begin{align}
+\begin{split}
+    S^{'}=cR-\frac{aSI}{N} \\
+    I^{'}=\frac{aSI}{N}-bI \\
+    R^{'}=bI-cR
+\end{split}
+\label{eq:SIRS}
+\end{align}
+
+Note that if we study a small population, we may choose to write \ensuremath{aSI} instead of \ensuremath{\frac{aSI}{N}} since the number of susceptible which become infected depend more on the absolute number of infected people rater than the infected fraction of the population. 
+
+This set (\cref{eq:SIRS}), does not have analytic solutions like the closely-related SIR model, but we can easily obtain the equilibrium solutions. We use the constraint in \cref{eq:N} to reduce this three dimensional system into a two dimensional one, so that we can omit the equation for \ensuremath{R^{'}}:
+
+\begin{align}
+    \begin{split}
+        S^{'}=c(N-S-I)-\frac{aSI}{N} \\
+        I^{'}=\frac{aSI}{N}-bI.
+    \end{split}
+    \label{eq:reduced-SIRS}
+\end{align}
+
+The steady state solution is found by setting both equations in \cref{eq:reduced-SIRS} equal to zero. We let $s$, $i$ and $r$ denote the fractions of people in $S$, $I$ and $R$, respectively. Then we find that the fractions of people inn each group at equilibrium are:
+
+\begin{align}
+    \begin{split}
+        s^*=\frac{b}{a}, \\
+        i^*=\frac{1-\frac{b}{a}}{1-\frac{b}{c}}, \\
+        r^*=\frac{b}{c}\frac{1-\frac{b}{a}}{1+\frac{b}{c}}.
+    \end{split}
+    \label{eq:equilibrium}
+\end{align}
+
+Note that the asterisk is used to signify that these fractions are at equilibrium. Each fraction must be a number between 0 and 1, and the three fractions must add up to 1. Hence, the equations in \cref{eq:equilibrium} suggest that the disease establishes itself in the population only if \ensuremath{b<a}.
+
+In the following, we extend our simple model to include more details about the population and disease. 
+
+\subsubsection{Vital dynamics}
+We add vital dynamics to our system so that the model can describe the spread of diseases which occur over longer stretches of time. Let $e$  be the birth rate. $d$ the death rate, and $d_I$ be the death rate of infected people due to the disease, then the modified differential equations are given by:
+
+\begin{align}
+    \begin{split}
+        S^{'}=cR-\frac{aSI}{N}-dS+eN \\
+        I^{'}=\frac{aSI}{N}-bI-dI-d_II \\
+        R^{'}=bI-cR-dR
+    \end{split}
+\end{align} Where we have assumed that all babies born into the population are initially susceptible. 
+
+\subsubsection{Seasonal variation}
+Some diseases are seasonal, or put differently: The rate of transmission depends largely on the time of year. Common cold viruses are more prevalent during winter and childhood diseases are strongly correlated with the school calendar.  As a consequence, for many diseases, one should consider a rate of transmission which oscillates. We can a periodically varying contact rate by letting the rate of transmission be given by
+
+\begin{align}
+    a(t)=A\cos(\omega t)+a_0.
+\end{align} Here $a_0$ is the average transmission rate, $A$ is the maximum deviation from $a_0$, and $\omega$ is the frequency of oscillation. 
+
+\subsubsection{Vaccination}
+For diseases with available vaccinations, people can move directly from $S$ to $R$, breaking the cyclic structure of the SIRS model. We need to make a couple of assumptions. First, we assume that a susceptible individual's choice to take the vaccine does not depend on how many other susceptibles are vaccinated. Further, we assume that the rate of vaccination, $f$ can depend on time, since this rate may oscillate during the course of a year and/or increase as awareness and medical research increases. Our system of differential equations now become
+
+\begin{align}
+    \begin{split}
+        S^{'}=cR-\frac{aSI}{N}-f \\
+        I^{'}=\frac{aSI}{N}-bI \\
+        R^{'}=bI-cR+f.
+    \end{split}
+\end{align}
+\end{document}
