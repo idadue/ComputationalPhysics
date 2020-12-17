@@ -104,11 +104,11 @@ using namespace std;
        double e = _Parameters[5];
 
        Derivatives.push_back(c*R-a*S*I/N-d*S+e*N);
-       Derivatives.push_back(a*S*I/N-b*I-d*I-d_i);
+       Derivatives.push_back(a*S*I/N-b*I-d*I-d_i*I);
        Derivatives.push_back(b*I-c*R-d*R);
 
      //###################################################################
-     // Harmonic SIR to model seasonal variations
+     // Harmonic SIRS to model seasonal variations
      //   Compartments[0] = S
      //   Compartments[1] = I
      //   Compartments[2] = R
