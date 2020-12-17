@@ -77,6 +77,35 @@ Finally, we look at $b=4$ in \cref{fig:b=4}. As expected, the disease does not e
 \end{figure}
 
 \subsection{SIRS model with seasonal variation}
-
+\begin{figure}[htb!]
+    \centering
+    \begin{subfigure}[b]{0.475\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../figures/SIRS_harmonical_rk4_b=1.png}
+    \caption{}
+    \label{fig:seasonal_b=1}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.475\textwidth}
+    \includegraphics[width=0.9\textwidth]{../figures/SIRS_harmonical_rk4_b=2.png}
+    \caption{}
+    \label{fig:seasonal_b=2}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.475\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../figures/SIRS_harmonical_rk4_b=3.png}
+    \caption{}
+    \label{fig:seasonal_b=3}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.475\textwidth}
+    \includegraphics[width=0.9\textwidth]{../figures/SIRS_harmonical_rk4_b=4.png}
+    \caption{}
+    \label{fig:seasonal_b=4}
+    \end{subfigure}
+    \caption{The numerical solution of the SIRS model with seasonal variations using the fourth-order Runge-Kutta method with $N=400$, $I(0)=100$, $a=4$, $c=0.5$, $A=2.0$, $\omega=0.05\cdot2\pi$ fixed and the comparison of $S$, $I$, $R$ for (a)  $b=1$, (b) $b=2$, (c) $b=3$ and (d) $b=4$.}
+    \label{fig:SIRS_rk4_seasonal}
+\end{figure}
 \subsection{Vaccination}
 \end{document}
