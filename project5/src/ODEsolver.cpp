@@ -40,9 +40,9 @@ using namespace std;
 // For _ModelType==2 (SIRS model with vital dynamics)
 //    Compartments are (in order) S I R
 //    and the parameters in _Parameters are (in order) a b c d d_i e
-// For _ModelType==3 (harmonic SIR model)
+// For _ModelType==3 (harmonic SIRS model)
 //    Compartments are (in order) S I R
-//    and the parameters in _Parameters are (in order) a0 epsilon phi gamma
+//    and the parameters in _Parameters are (in order) a0 b c A omega
 //  For _ModelType==4 (vaccination model)
 //    Compartments are (in order) S I R
 //    and the parameters in _Parameters are (in order) a b c f
@@ -154,6 +154,7 @@ using namespace std;
        double b = _Parameters[1];
        double c = _Parameters[2];
        double f = _Parameters[3];
+       double vaccineTime = _Parameters[4];
        
        Derivatives.push_back(c*R-a*S*I/N-f);
        Derivatives.push_back(a*S*I/N-b*I);
