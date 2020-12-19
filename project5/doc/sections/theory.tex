@@ -3,7 +3,7 @@
 \begin{document}
 \section{Theory}\label{sec:theory}
 \subsection{The SIRS model for transmission of an infectious disease}
-The SIRS model is a modification of the traditional SIR model for epidemics introduced by Kermack and McKendrick \cite{SIRmodel} almost 100 years ago, where immunity lasts only for a short period of time. We consider an isolated population of $N$ people which are divided into three classes: 
+The SIRS model is a modification of the traditional SIR model for epidemics introduced by Kermack and McKendrick \cite{SIRmodel} almost 100 years ago, where immunity lasts only for a short period of time. The model assumes that the course of an epidemic depends on the rate of contact between susceptible and infected individuals \cite{José}. We consider an isolated population of $N$ people which are divided into three classes: 
 
 \begin{itemize}
     \item Susceptible ($S$): represents the individuals not yet infected with disease at time, $t$, or those susceptible to the disease of the population. 
@@ -69,9 +69,9 @@ We add vital dynamics to our system so that the model can describe the spread of
 \end{align} Where we have assumed that all babies born into the population are initially susceptible. 
 
 \subsubsection{Seasonal variation}
-Some diseases are seasonal, or put differently: The rate of transmission depends largely on the time of year. Common cold viruses are more prevalent during winter and childhood diseases are strongly correlated with the school calendar.  As a consequence, for many diseases, one should consider a rate of transmission which oscillates. We can a periodically varying contact rate by letting the rate of transmission be given by
+Some diseases are seasonal, or put differently: The rate of transmission depends largely on the time of year. Common cold viruses are more prevalent during winter and childhood diseases are strongly correlated with the school calendar\cite{Greenhalgh2003}.  As a consequence, for many diseases, one should consider a rate of transmission which oscillates. We can a periodically varying contact rate by letting the rate of transmission be given by
 
-\begin{align}
+\begin{align}\label{eq:a}
     a(t)=A\cos(\omega t)+a_0.
 \end{align} Here $a_0$ is the average transmission rate, $A$ is the maximum deviation from $a_0$, and $\omega$ is the frequency of oscillation. 
 
@@ -85,4 +85,12 @@ For diseases with available vaccinations, people can move directly from $S$ to $
         R^{'}=bI-cR+f.
     \end{split}
 \end{align}
+
+where we define 
+\begin{equation}\label{eq:f}
+    f = f(t) = \textit{min} \{ f_0, f_0 \frac{t - f_t}{10}   \}, \quad t \geq f_t, 
+\end{equation}
+as our time dependent vaccination function, with $f_0$ as the initial rate of vaccination and $f_t$ as the time at which the vaccination begins.
+
+
 \end{document}

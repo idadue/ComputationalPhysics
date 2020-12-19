@@ -3,7 +3,7 @@
 \begin{document}
 \section{Method}\label{sec:method}
 \subsection{Populations}\label{sec:populations}
-We investigate the effect of increasing the rate of recovery $b$ and crossing the "threshold" in four different populations. Each population consists of 400 people, 100 of which were initially infected and 300 of which were initially susceptible. The rate of transmission and rate of immunity loss is fixed between populations. We let the rate of recovery be varied because it is the one parameter which can be reasonably controlled by the actions of human society. \Cref{tab:parameters} lists the set of parameters for the four different populations. We treat the population as a continuos variable. 
+We investigate the effect of increasing the rate of recovery $b$ and crossing the "threshold" in four different populations. Each population consists of 400 people, 100 of which were initially infected and 300 of which were initially susceptible. The rate of transmission and rate of immunity loss is fixed between populations. We let the rate of recovery be varied because it is the one parameter which can be reasonably controlled by the actions of human society. \Cref{tab:parameters} lists the set of parameters for the four different populations. We treat the population as a continuous variable. 
 \begin{table}[htb]
     \centering
     \caption{Parameters for the investigated populations.}
@@ -36,6 +36,28 @@ We use the well known fourth-order Runge-Kutta method to solve the differential 
 \end{align}
 
 We see that the algorithm consists in first calculating $k_1$ with $t_i$, $y_1$ and $f$ as inputs. Then, the step size is increased by \ensuremath{h/2} and $k_2$, $k_3$ and finally $k_4$ is calculated. The global error goes as \ensuremath{\mathcal{O}(h^4)}
-\subsection{Monte Carlo simulation}
 
+\subsection{Monte Carlo simulation}
+In our Monte Carlo simulation we use the idea of randomness and define a set of transition probabilities for the possible moves a person can take from one state to another. From \cref{eq:SIRS} we see that in a small time step, \ensuremath{\Delta t}, the number of people moving from \ensuremath{\mathcal{S}} to \ensuremath{\mathcal{I}} is approximately \ensuremath{\frac{aSI}{N}\Delta t}. Likewise, the number of people moving from \ensuremath{\mathcal{I}} to \ensuremath{\mathcal{R}} is approximately \ensuremath{bI\Delta t} and \ensuremath{cR\Delta t} move from \ensuremath{\mathcal{R}} to \ensuremath{\mathcal{S}}. We assume that \textit{at most} one person moves from a given group to another
+
+\begin{align}
+\begin{split}
+    \text{max}\left\{ \frac{aSI}{N}\Delta t\right\}=\frac{a}{N}\left(\frac{N}{2}\right)^2\Delta t=\frac{aN}{4}\Delta t, \\
+    \text{max}\left\{ \frac{aSI}{N}\Delta t\right\}, \\
+    \text{max}\left\{ \frac{aSI}{N}\Delta t\right\}, 
+\end{split}
+\end{align} where the time step is given by
+
+\begin{align}
+    \Delta t= \text{min} \left\{ \frac{4}{aN}, \frac{1}{bN}, \frac{1}{cN} \right\}.
+\end{align}
+
+We reinterpret the values \ensuremath{\frac{aSI}{N}\Delta t}, \ensuremath{bI\Delta t} and \ensuremath{cR\Delta t} as transition probabilities: 
+\begin{align}
+    \begin{split}
+        P(S\rightarrow I) = \frac{aSI}{N}\Delta t,\\
+        P(I\rightarrow R) = bI\Delta t, \\
+        P(R\rightarrow S) = cR\Delta t.  
+    \end{split}
+\end{align} A random number between 0 and 1 is generated, and if the number is less than the probability for the move, the move is taken. 
 \end{document}

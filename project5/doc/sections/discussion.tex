@@ -3,4 +3,25 @@
 \begin{document}
 \section{Discussion}\label{sec:discussion}
 
+
+
+\subsection{Spread of disease in a sample population}
+In figure (\ref{fig:mc:base}) we can see how the value of $b$ affects the equilibrium states of the systems. When $b < a$, the disease can infect more people, which will in turn lead to more recovered and less susceptible people, until enough time has elapsed and the system reaches a natural equilibrium. As we increase $b$ and $b \rightarrow a$, we can see how the number of infections drops until it reaches zero, effectively killing the disease. Of course, as the levels of infected drop, the amount of people who will eventually catch the disease and then later recover will naturally decrease, and after enough time has passed, you will be left only with people who are susceptible, as immunity is gradually lost in the population. This is an expected outcome, and all four sub plots support this. 
+
+We can also observe the inherent randomness of the Monte Carlo simulation, but although the Monte Carlo lines some random noise, it is still possible to see that the Monte Carlo simulation more often then not follows the lines made by the Runge Kutta method quite well. 
+
+Looking closer at the Monte Carlo method in comparison to the Runge Kutta 4 method in (\ref{fig:mc:comparison}), we can see how the Monto Carlo simulations may vary for each simulation, but will generally stay similar to ODE simulation, with only a few cases where there is no overlap between the two methods. This lack of overlap in some places might be because the number of simulations done was not enough, and it is possible that more runs would yield a bigger standard deviation. It is also possible to see what looks like the expectation values converging. 
+In general, one would expect the Monte Carlo method to be slightly more useful for real life simulations of diseases, as the stochastic nature of the method allows for calculations of a range of possible outcomes, instead of a single deterministic one.
+
+
+\subsection{Addition of vital dynamics}
+When we add the possibility of a fluctuating total population due to natural deaths, infected deaths and the birth of new members, we would expect to see either an increase or decrease in population, depending of course on the rates at which people die and new babies are born, and of course the rate at which an infection kills its host. In the case of figure (\ref{fig:mc:vital}), we can see how a disease with a $d_I = 10\%$ can devastate a population in a short amount of time. When $d_I = 1\%$ however, the infection is more manageable, even though some part of the population will die. In either case, the loss of population should continue until the system reaches equilibrium. As is suggested by the plot for $d_I = 0.1$, when the population reduces, so must the number of infected and the susceptibles, as there is naturally less people in the system.
+
+It is likely that the values chosen for $e$ and $d$ were in this case too low. Given the small amount of time that passes, one would most likely not see any effect from these rate when the population starts at just $N = 400$. To compensate for this it would probably be a better choice to either run the simulations for a longer time period or increase the total size of the population. Alternatively, increasing the values of $e$ and $d$ by a factor of $10$ or more would possibly help show the evolution of the population growth or decline.  
+
+\subsection{Seasonal variations}
+Many diseases will have transmission rates which vary with the seasons. This could be due to a plethora of factors, but it is usually because of what method a disease uses to spread itself, and whether or not said method is affected by outside temperature, air humidity or other such seasonal changes.  Our results, as seen in (\ref{fig:mc:seasonal}), show how a disease could periodically vary with time. In our case, since we are using a cyclic function to model our variations, we see that the disease in question has a cyclic nature, reaching a low in infected $I$ and a high in susceptibles $S$ around every 10 units of time. 
+
+\subsection{Vaccination}
+Introducing vaccinations to combat a disease should more often than not significantly reduce the number of infected. Our data supports these thoughts. Looking at the results obtained in figure (\ref{fig:mc:vaccine}), we can see how after a vaccine is introduced at time $f_t = 25$, the number of infected is reduced accordingly with the vaccination rate and correspondingly, the amount of recovered people increases. Considering the fact that the number of susceptibles and infected are about the same before the introduction of the vaccine, it is clear that those who should have been infected after the vaccine is introduced are instead skipping that, and going straight to recovered.
 \end{document}
