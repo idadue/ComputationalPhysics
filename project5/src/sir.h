@@ -5,6 +5,11 @@
 #include <iomanip>
 #include <algorithm>
 
+/*
+Classes for solving the classical SIR(SIRS) model. Included is an ODE solver using the Runge Kutta 4th order
+method and a Monte Carlo simulation solver (not implemented here yet).
+*/
+
 class SIR
 {
 
@@ -65,15 +70,6 @@ class MCSolver : public SIR
 public:
     MCSolver(double steps, double N, double S0, double I0, double R0, double a, double b, double c) : SIR(steps, S0, I0, R0, a, b, c)
     {
-        S.resize(steps, 0);
-        I.resize(steps, 0);
-        R.resize(steps, 0);
-
-        S[0] = S0;
-        I[0] = I0;
-        R[0] = R0;
-
-        total = S0 + I0 + R0;
     }
 
 private:
@@ -81,7 +77,4 @@ private:
     std::vector<double> S;
     std::vector<double> I;
     std::vector<double> R;
-    double tProb[36];
-
-    void transitionProbability(int i);
 };

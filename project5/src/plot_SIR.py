@@ -11,10 +11,17 @@ newparams = {'axes.titlesize': fontsize + 4, 'axes.labelsize': fontsize,
              'legend.fontsize': fontsize + 2}
 plt.rcParams.update(newparams)
 
+"""
+Program to plot results from SIR simulations.
+All files are found in results folder.
+"""
+
+
+os.chdir("../results")
 path = os.path.dirname(os.path.abspath(__file__))
 
 
-def MC_plot(files, T, files2=None, pop=False):
+def MC_plot(files, T, files2, pop=False):
 
     fig, axs = plt.subplots(2, 2)
     i = 0
@@ -36,7 +43,7 @@ def MC_plot(files, T, files2=None, pop=False):
         axs[i, j].set_ylabel("Number of people")
         axs[i, j].set_xlabel("Time")
 
-        S, I, R, N = np.loadtxt(files_[k], unpack=True)
+        S, I, R, N = np.loadtxt(files2[k], unpack=True)
         t = np.linspace(0, T, len(S))
         axs[i, j].plot(t, S, 'b', label=r"$S$")
         axs[i, j].plot(t, I, 'r', label=r"$I$")
@@ -59,7 +66,7 @@ def MC_plot(files, T, files2=None, pop=False):
 
 
 def MC_plot_std(files, files2, T):
-    S, I, R = np.loadtxt(path + "/testing_own/A.txt", unpack=True)
+    S, I, R, _ = np.loadtxt(path + "/Base/rk4_b1.txt", unpack=True)
     t = np.linspace(0, T, len(S))
     plt.plot(t, S, 'b', label=r"$S$")
     plt.plot(t, I, 'r', label=r"$I$")
@@ -135,7 +142,34 @@ def plot_vitals(path, files, files2):
         axs[i].set_xlabel("Time")
         if (i == 1):
             axs[i].legend(bbox_to_anchor=(1.0, 1), loc="upper left")
-        axs[i].set_title(r"$d = %.2f $" % d_vals[i])
+        axs[i].set_title(r"$d_I = %.2f $" % d_vals[i])
+
+    plt.show()
+
+
+def plot_seasonal(path, files, files2):
+    fig, axs = plt.subplots(1, 2)
+    path = path + "/Sv/"
+
+    w_vals = [0.05, 0.1]
+
+    for i in range(2):
+        S, I, R, _, _, _ = np.loadtxt(path + files[i], unpack=True)
+        t = np.linspace(0, 40, len(S))
+        axs[i].plot(t, S, 'b:', label=r"$S_{MC}$")
+        axs[i].plot(t, I, 'r:', label=r"$I_{MC}$")
+        axs[i].plot(t, R, 'g:', label=r"$R_{MC}$")
+
+        S, I, R, _ = np.loadtxt(path + files2[i], unpack=True)
+        t = np.linspace(0, 40, len(S))
+        axs[i].plot(t, S, 'b', label=r"$S$")
+        axs[i].plot(t, I, 'r', label=r"$I$")
+        axs[i].plot(t, R, 'g', label=r"$R$")
+        axs[i].set_ylabel("Number of people")
+        axs[i].set_xlabel("Time")
+        if (i == 1):
+            axs[i].legend(bbox_to_anchor=(1.0, 1), loc="upper left")
+        axs[i].set_title(r"$\omega = %.2f $" % w_vals[i])
 
     plt.show()
 
@@ -172,14 +206,7 @@ files = [path + "/Base/a_val.txt", path + "/Base/b_val.txt",
 files_ = [path + "/Base/rk4_b1.txt", path + "/Base/rk4_b2.txt",
           path + "/Base/rk4_b3.txt", path + "/Base/rk4_b4.txt"]
 
-files2 = [path + "/Vd/a_v_val.txt", path + "/Vd/b_v_val.txt",
-          path + "/Vd/c_v_val.txt", path + "/Vd/d_v_val.txt"]
-files3 = [path + "/Sv/a_s_val.txt", path + "/Sv/b_s_val.txt",
-          path + "/Sv/c_s_val.txt", path + "/Sv/d_s_val.txt"]
 
-#MC_plot(files, 10)
-#MC_plot(files2, 40, True)
-#MC_plot(files3, 100)
 MC_plot(files, 10, files_, False)
 
 path2 = path + "/rk_vs_mc/"
@@ -187,11 +214,15 @@ files = [path2 + "1_val.txt", path2 + "2_val.txt",
          path2 + "3_val.txt", path2 + "4_val.txt", path2 + "5_val.txt"]
 files2 = [path2 + "1_exp.txt", path2 + "2_exp.txt",
           path2 + "3_exp.txt", path2 + "4_exp.txt", path2 + "5_exp.txt"]
+
 MC_plot_std(files, files2, 10)
 
 
 plot_vaccine(path, ["a_f_val.txt", "b_f_val.txt"],
              ["rk4_f1.txt", "rk4_f2.txt"])
+
+plot_seasonal(path, ["s1_val.txt", "s2_val.txt"],
+              ["rk4_a1.txt", "rk4_a2.txt"])
 
 plot_vitals(path, ["vital1_val.txt", "vital2_val.txt"],
             ["rk4_v1.txt", "rk4_v2.txt"])

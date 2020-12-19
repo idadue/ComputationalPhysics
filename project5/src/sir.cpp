@@ -45,6 +45,7 @@ ODESolver Methods below:
 
 */
 
+/*Implementation of Runge Kutta 4th order method.*/
 void ODESolver::RungeKutta4(double T, const std::string &filename, bool seasonal = false)
 {
     steps = (int)(T / h);
@@ -83,7 +84,7 @@ void ODESolver::RungeKutta4(double T, const std::string &filename, bool seasonal
     for (int i = 0; i < steps; i++)
     {
         if (seasonal)
-            SIR::a = seasonalVariation(i * h, 1, 2 * M_PI, 4);
+            SIR::a = seasonalVariation(i * h, A, w, a_0);
 
         if (h * i >= f_t && f_t != 0.0)
         {
@@ -110,7 +111,6 @@ void ODESolver::RungeKutta4(double T, const std::string &filename, bool seasonal
         I[i + 1] = I[i] + (1.0 / 6.0) * (l1 + 2 * l2 + 2 * l3 + l4);
         R[i + 1] = R[i] + (1.0 / 6.0) * (p1 + 2 * p2 + 2 * p3 + p4);
 
-        //R[i + 1] = N[i] - S[i + 1] - I[i + 1];
         N[i + 1] = S[i + 1] + I[i + 1] + R[i + 1];
     }
     output(filename, S, I, R, N);
@@ -147,64 +147,3 @@ void ODESolver::setSeasonalParams(double A, double w)
 MCSolver Methods below:
 
 */
-
-void MCSolver::transitionProbability(int i)
-{
-    // Probabiltiies of advancing in SIRS
-    tProb[0 * 6 + 1] = (a * S[i] * I[i] / total) * h;
-    tProb[1 * 6 + 2] = (b * I[i]) * h;
-    tProb[2 * 6 + 0] = (c * R[i]) * h;
-
-    // Probabilities of death by unrelated causes
-    tProb[0 * 6 + 3] = d * S[i] * h;
-    tProb[1 * 6 + 3] = d * I[i] * h;
-    tProb[2 * 6 + 3] = d * R[i] * h;
-
-    // Probability of death by infection
-    tProb[1 * 6 + 4] = d_i * I[i] * h;
-
-    // Probability of birth
-    tProb[5 * 6 + 0] = (e * total) * h;
-
-    // Probability of vaccination
-    tProb[0 * 6 + 2] = f * S[i] * h;
-}
-
-int main(int argc, char *argv[])
-{
-    std::string solver = argv[1];
-    double T = std::atof(argv[2]);
-    double h = std::atof(argv[3]);
-    double a = std::atof(argv[4]);
-    double b = std::atof(argv[5]);
-    double c = std::atof(argv[6]);
-    double d = std::atof(argv[7]);
-    double d_I = std::atof(argv[8]);
-    double e = std::atof(argv[9]);
-    double A = std::atof(argv[10]);
-    double w = std::atof(argv[11]) * 2 * M_PI;
-    double f = std::atof(argv[12]);
-    double f_t = std::atof(argv[13]);
-    std::string filename = argv[14];
-
-    if (solver == "rk4")
-    {
-        ODESolver ode(h, 300.0, 100.0, 0.0, a, b, c);
-        ode.setParams(a, b, c, d, d_I, e, f, f_t);
-
-        bool seasonal = false;
-        if (A != 0)
-        {
-            seasonal = true;
-            ode.setSeasonalParams(A, w);
-        }
-        ode.RungeKutta4(T, filename, seasonal);
-    }
-    else
-    {
-        printf("MC solver not implemented yet \n");
-        exit(0);
-    }
-
-    return 0;
-}

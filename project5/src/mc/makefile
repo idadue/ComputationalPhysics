@@ -4,13 +4,13 @@ a = 4	# Rate of transmission
 b = 1.0	# Rate of recovery
 c = 0.5	# Rate of immunity loss
 d = 0.0003	# Rate of death
-d_I = 0.1 # Rate of death by infection
+d_I = 0.01 # Rate of death by infection
 e = 0.0005	# Rate of birth
-A = 0	# Seasonal variation amplitude of transmission rate
+A = 0.0	# Seasonal variation amplitude of transmission rate
 w = 0.0 # Seasonal variation rate, fraction of 2*pi
 f = 0.0	# Rate of vaccinations
 fT = 0.0 # Time at which vaccination begins
-filename = vital2
+filename = vital1
 
 all: compile execute
 
